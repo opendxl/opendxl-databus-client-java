@@ -1,0 +1,263 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'checkstyle'
+    id 'distribution'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id "com.github.johnrengelman.shadow" version "4.0.3"
+    id "kr.motd.sphinx" version "2.3.1"
+}
+
+
+group 'com.opendxl.databus'
+
+sourceCompatibility = 1.8
+
+apply plugin: 'base'
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: "com.github.johnrengelman.shadow"
+
+
+configurations {
+    kafkaInMemory
+}
+
+
+dependencies {
+    implementation 'org.apache.kafka:kafka-clients:2.3.0'
+    implementation 'org.apache.kafka:kafka-streams:2.3.0'
+    implementation 'org.apache.avro:avro:1.9.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'org.apache.commons:commons-configuration2:2.5'
+    implementation 'commons-lang:commons-lang:2.6'
+    implementation 'log4j:log4j:1.2.17'
+    implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
+    testImplementation 'org.apache.kafka:kafka_2.12:2.3.0'
+    testImplementation 'org.apache.zookeeper:zookeeper:3.4.14'
+    testImplementation 'commons-io:commons-io:2.6'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
+    kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.0'
+    kafkaInMemory 'commons-io:commons-io:2.6'
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Jar Manifest info
+jar {
+    manifest {
+        attributes('Main-Class': 'com.opendxl.databus.cli.CommandLineInterface',
+                'Implementation-Title': rootProject.name,
+                'Implementation-Version': rootProject.name
+        )
+    }
+}
+
+// Task for creating a jar with the source files
+task sourceJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// Task for creating a jar with JavaDoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    exclude "**/broker/**"
+    options.memberLevel = JavadocMemberLevel.PUBLIC
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+// Set up the distribution zip
+distributions {
+    main {
+        baseName = 'opendxldatabusclient-java-sdk'
+        contents {
+            from(jar) {
+                into('lib')
+            }
+            from(shadowJar) {
+                into("lib")
+            }
+            from(configurations.compileClasspath) {
+                into("lib/3rdparty")
+            }
+            from(sphinx) {
+                into('doc')
+            }
+            from('sample') {
+                into 'sample'
+            }
+            from('broker/src/broker') {
+                into 'sample/src/sample'
+            }
+            from(shadowJar) {
+                into("sample/lib")
+            }
+            from(configurations.kafkaInMemory) {
+                into("sample/lib/kafka")
+            }
+            from('distribution')
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'broker/src'
+        }
+        resources {
+            srcDir 'src/main/java'
+        }
+        compileClasspath +=   configurations.kafkaInMemory
+        runtimeClasspath +=  configurations.kafkaInMemory
+    }
+    sample {
+        java {
+            srcDir 'sample/src'
+        }
+        resources {
+            srcDir 'sample/src'
+        }
+        compileClasspath += main.output + configurations.compileClasspath + configurations.kafkaInMemory
+        runtimeClasspath += main.output + configurations.runtimeClasspath + configurations.kafkaInMemory
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDir 'src/test/resources'
+        }
+    }
+}
+
+// Make check style run before creating a jar
+jar.dependsOn(checkstyleMain)
+
+// Force distZip to be dependent on javadocJar and sourceJar
+distZip.dependsOn javadocJar
+distZip.dependsOn sourceJar
+
+sphinx {
+    // Change the source directory.
+    sourceDirectory = "${projectDir}/docs"
+    // Change the output directory.
+    outputDirectory = "${project.buildDir}/docs"
+}
+
+task versionFile()  {
+    doLast {
+        new File("${projectDir}/VERSION").text = """$version"""
+    }
+}
+
+checkstyle {
+    sourceSets = []
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            pom {
+                name = 'OpenDXL Databus Java Client'
+                description = 'An OpenDXL Databus client library for Java'
+                url = 'https://github.com/opendxl/opendxl-databus-client-java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        email = 'support@opendxl.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/opendxl/opendxl-databus-client-java.git'
+                    developerConnection = 'scm:git:ssh://github.com/opendxl/opendxl-databus-client-java.git'
+                    url = 'https://github.com/opendxl/opendxl-databus-client-java'
+                }
+            }
+
+            from components.java
+
+            artifact(sourceJar) {
+                classifier = 'sources'
+            }
+            artifact(javadocJar) {
+                classifier = 'javadoc'
+            }
+            artifact(shadowJar) {
+                classifier = 'all'
+            }
+
+
+        }
+    }
+    repositories {
+        maven {
+            url = "$buildDir/repo"
+//            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+//            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//            credentials {
+//                username sonatypeUsername
+//                password sonatypePassword
+//            }
+
+        }
+    }
+}
+
+task replaceVersionInREADME() {
+    if (!version.endsWith('SNAPSHOT')) {
+        // Maven
+        ant.replaceregexp(match: '<version>(.+)</version>', replace: "<version>${version}</version>", flags: 'g', byline: true) {
+            fileset(dir: '.', includes: 'README.md')
+        }
+        ant.replaceregexp(match: '<version>(.+)</version>', replace: "<version>${version}</version>", flags: 'g', byline: true) {
+            fileset(dir: 'docs', includes: 'prerequisites.rst')
+        }
+        // Gradle
+        ant.replaceregexp(match: "com\\.opendxl\\.databus\\:opendxldatabusclient-java-sdk\\:(.+)", replace: "com.opendxl.databus:opendxldatabusclient-java-sdk:${version}'", flags: 'g', byline: true) {
+            fileset(dir: '.', includes: 'README.md')
+        }
+        ant.replaceregexp(match: "com\\.opendxl\\.databus\\:opendxldatabusclient-java-sdk\\:(.+)", replace: "com.opendxl.databus:opendxldatabusclient-java-sdk:${version}'", flags: 'g', byline: true) {
+            fileset(dir: 'docs', includes: 'prerequisites.rst')
+        }
+    }
+}
+
+signing {sign publishing.publications.maven}
+
+distZip.dependsOn javadocJar
+distZip.dependsOn sourceJar
+sphinx.dependsOn(versionFile)
+assemble.dependsOn(replaceVersionInREADME)

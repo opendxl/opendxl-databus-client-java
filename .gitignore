@@ -1,0 +1,16 @@
+# Gradle
+.gradle
+build
+local.properties
+reports
+secring.gpg
+
+# IntelliJ
+.idea
+*.iml
+*.ipr
+*.iws
+out
+
+# Version
+/VERSION
