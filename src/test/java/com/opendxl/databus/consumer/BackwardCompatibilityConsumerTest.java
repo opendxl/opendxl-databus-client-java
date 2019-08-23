@@ -6,11 +6,11 @@ package com.opendxl.databus.consumer;
 
 import broker.ClusterHelper;
 
-import com.opendxl.databus.consumer.util.Constants;
-import com.opendxl.databus.consumer.util.ConsumerHelper;
-import com.opendxl.databus.consumer.util.Topic;
+import com.opendxl.databus.util.Constants;
+import com.opendxl.databus.util.ConsumerHelper;
+import com.opendxl.databus.util.Topic;
 import com.opendxl.databus.producer.ProducerRecord;
-import com.opendxl.databus.consumer.util.ProducerHelper;
+import com.opendxl.databus.util.ProducerHelper;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.serialization.StringSerializer;

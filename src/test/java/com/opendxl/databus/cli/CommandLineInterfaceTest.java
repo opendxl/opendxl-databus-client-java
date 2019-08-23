@@ -6,7 +6,7 @@ package com.opendxl.databus.cli;
 
 import broker.ClusterHelper;
 import com.opendxl.databus.cli.entity.ExecutionResult;
-import com.opendxl.databus.consumer.util.Constants;
+import com.opendxl.databus.util.Constants;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import java.io.IOException;
