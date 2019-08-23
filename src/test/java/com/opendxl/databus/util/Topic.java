@@ -2,7 +2,7 @@
  * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
-package com.opendxl.databus.consumer.util;
+package com.opendxl.databus.util;
 
 import kafka.admin.TopicCommand;
 import kafka.zk.KafkaZkClient;

@@ -2,7 +2,7 @@
  * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
-package com.opendxl.databus.consumer.util;
+package com.opendxl.databus.util;
 
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.entities.Headers;
@@ -11,6 +11,7 @@ import com.opendxl.databus.entities.RoutingData;
 import com.opendxl.databus.producer.Callback;
 import com.opendxl.databus.producer.DatabusProducer;
 import com.opendxl.databus.producer.Producer;
+import com.opendxl.databus.producer.ProducerConfig;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArraySerializer;
 
@@ -33,6 +34,8 @@ public class ProducerHelper {
     public ProducerHelper() {
         config.put("bootstrap.servers", Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT));
         config.put("client.id", "test-producer");
+        config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
+        config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
     }
 
     public ProducerHelper config(final Map<String, Object> config) {
@@ -65,7 +68,7 @@ public class ProducerHelper {
         return this;
     }
 
-    private ProducerRecord<byte[]>  getRecord(final String topicName, final String shardingKey) {
+    public ProducerRecord<byte[]>  getRecord(final String topicName, final String shardingKey) {
         final RoutingData routingData = new RoutingData(topicName, shardingKey,null);
         final String message = "Hello World at:" + LocalDateTime.now();
         final byte[] payload = message.getBytes(Charset.defaultCharset());
@@ -73,7 +76,7 @@ public class ProducerHelper {
         return new ProducerRecord<> (routingData, new Headers(), messagePayload);
     }
 
-    private  Producer<byte[]> getProducer() {
+    public Producer<byte[]> getProducer() {
         try {
             return new DatabusProducer<>(config, new ByteArraySerializer());
         } catch (Exception e) {

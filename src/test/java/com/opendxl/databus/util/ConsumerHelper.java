@@ -2,7 +2,7 @@
  * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
-package com.opendxl.databus.consumer.util;
+package com.opendxl.databus.util;
 
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
@@ -13,8 +13,13 @@ import com.opendxl.databus.consumer.ConsumerRecords;
 import com.opendxl.databus.consumer.DatabusConsumer;
 import com.opendxl.databus.consumer.OffsetAndMetadata;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class ConsumerHelper {
     private Consumer<byte[]> consumer;

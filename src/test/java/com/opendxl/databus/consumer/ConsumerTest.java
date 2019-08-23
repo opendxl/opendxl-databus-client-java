@@ -6,10 +6,10 @@ package com.opendxl.databus.consumer;
 
 import broker.ClusterHelper;
 import com.opendxl.databus.common.TopicPartition;
-import com.opendxl.databus.consumer.util.Constants;
-import com.opendxl.databus.consumer.util.ConsumerHelper;
-import com.opendxl.databus.consumer.util.ProducerHelper;
-import com.opendxl.databus.consumer.util.Topic;
+import com.opendxl.databus.util.Constants;
+import com.opendxl.databus.util.ConsumerHelper;
+import com.opendxl.databus.util.ProducerHelper;
+import com.opendxl.databus.util.Topic;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
