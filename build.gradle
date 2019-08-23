@@ -15,6 +15,7 @@ plugins {
     id 'signing'
     id "com.github.johnrengelman.shadow" version "4.0.3"
     id "kr.motd.sphinx" version "2.3.1"
+    id "jacoco"
 }
 
 
@@ -29,6 +30,18 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: "com.github.johnrengelman.shadow"
 
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("$buildDir/reports/coverage")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("$buildDir/reports/coverage")
+    }
+}
 
 configurations {
     kafkaInMemory
@@ -118,6 +131,9 @@ distributions {
             }
             from(configurations.kafkaInMemory) {
                 into("sample/lib/kafka")
+            }
+            from(jacocoTestReport) {
+                into("coverage")
             }
             from('distribution')
         }
