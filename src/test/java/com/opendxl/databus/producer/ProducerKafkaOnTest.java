@@ -8,6 +8,7 @@ import broker.ClusterHelper;
 import com.opendxl.databus.util.Constants;
 import com.opendxl.databus.util.ProducerHelper;
 import com.opendxl.databus.util.TestCallback;
+import junit.framework.AssertionFailedError;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -33,30 +34,25 @@ public class ProducerKafkaOnTest {
     }
 
     @Test
-    public void produceMessageSuccessTest(){
-        final ProducerHelper producerHelper = new ProducerHelper();
-        final Producer<byte[]> producer = producerHelper.getProducer();
-        final String producerTopic = "topic1test";
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-        final String message = "Hello World Test at:" + LocalDateTime.now();
-
-        // user should provide the encoding
-        final ProducerRecord<byte[]> producerRecord = producerHelper.getRecord(producerTopic,
-                String.valueOf(System.currentTimeMillis()));
-
-        TestCallback testCallback = new TestCallback(countDownLatch);
-
-        // Send the record
-        producer.send(producerRecord, testCallback);
-
+    public void produceMessageSuccessTest() {
         try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            final ProducerHelper producerHelper = new ProducerHelper();
+            final Producer<byte[]> producer = producerHelper.getProducer();
+            final String producerTopic = "topic1test";
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            final ProducerRecord<byte[]> producerRecord = producerHelper.getRecord(producerTopic,
+                    String.valueOf(System.currentTimeMillis()));
 
-        // Callbacks success
-        Assert.assertTrue(testCallback.isSuccess());
+            TestCallback testCallback = new TestCallback(countDownLatch);
+
+            // Send the record
+            producer.send(producerRecord, testCallback);
+
+            countDownLatch.await();
+            // Callbacks success
+            Assert.assertTrue(testCallback.isSuccess());
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 }

@@ -15,11 +15,11 @@ public class ProducerKafkaOffTest {
 
     @Test
     public void produceMessageFailTest(){
+        try {
         final ProducerHelper producerHelper = new ProducerHelper();
         final Producer<byte[]> producer = producerHelper.getProducer();
         final String producerTopic = "topic1test";
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-
         final ProducerRecord<byte[]> producerRecord = producerHelper.getRecord(producerTopic,
                 String.valueOf(System.currentTimeMillis()));
 
@@ -28,13 +28,11 @@ public class ProducerKafkaOffTest {
         // Send the record
         producer.send(producerRecord, testCallback);
 
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        countDownLatch.await();
         // Callbacks fails with exception
         Assert.assertFalse((testCallback.isSuccess()));
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 }
