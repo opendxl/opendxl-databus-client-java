@@ -35,6 +35,4 @@ public class ProducerKafkaOffTest {
             Assert.fail(e.getMessage());
         }
     }
-
-
 }
