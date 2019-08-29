@@ -119,7 +119,7 @@ public class CommandLineInterface {
                         .withOptionalArg()
                         .describedAs("partition")
                         .ofType(String.class)
-                        .defaultsTo("0");
+                        .defaultsTo("");
 
         if (args.length == 0) {
             CliUtils.printUsageAndFinish(parser, "There are not options");
@@ -157,7 +157,7 @@ public class CommandLineInterface {
             CliUtils.printUsageAndFinish(parser, "--operation is missing");
         }
 
-        if (options.hasArgument(Options.PARTITION.getOptionName())
+        if (options.has(optionSpecMap.get(Options.PARTITION))
                 && !CliUtils.isValidPartitionNumber(options.valueOf(Options.PARTITION.getOptionName()).toString())) {
             CliUtils.printUsageAndFinish(parser, "--partition must be a number value > 0");
         }

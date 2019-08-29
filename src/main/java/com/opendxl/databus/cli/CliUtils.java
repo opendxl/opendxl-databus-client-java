@@ -130,8 +130,12 @@ public class CliUtils {
     public static boolean isValidPartitionNumber(final String partition) {
         boolean isValidPartitionNumber = true;
         try {
-            Integer validPartitionNumber = Integer.parseInt(partition);
-            if (!(validPartitionNumber > INVALID_PARTITION)) {
+            if (!partition.isEmpty()) {
+                Integer validPartitionNumber = Integer.parseInt(partition);
+                if (!(validPartitionNumber > INVALID_PARTITION)) {
+                    isValidPartitionNumber = false;
+                }
+            } else {
                 isValidPartitionNumber = false;
             }
         } catch (NumberFormatException | NullPointerException e) {
