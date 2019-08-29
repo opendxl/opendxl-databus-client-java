@@ -130,10 +130,10 @@ public class ProduceOperation implements CommandLineOperation {
             // parse headers argument
             final Map<String, String> headersMap = new HashMap<>();
             if (options.hasArgument(Options.HEADERS.name().toLowerCase())) {
-                Properties configArg =
+                Properties headersArg =
                         CliUtils.stringToMap(options.valueOf(Options.HEADERS.name().toLowerCase()).toString());
-                for (String key : configArg.stringPropertyNames()) {
-                    headersMap.put(key, configArg.getProperty(key));
+                for (String key : headersArg.stringPropertyNames()) {
+                    headersMap.put(key, headersArg.getProperty(key));
                 }
             }
 
@@ -152,7 +152,6 @@ public class ProduceOperation implements CommandLineOperation {
             Producer<byte[]> producer = new DatabusProducer<>(config, new ByteArraySerializer());
 
             // Create a Databus Message
-            // TODO: Add option for shardingKey, tenantGroup and headers
             final byte[] payload = message.getBytes(Charset.defaultCharset());
             final RoutingData routingData = new RoutingData(topic, shardingKey, tenantGroup);
             final MessagePayload<byte[]> messagePayload = new MessagePayload<>(payload);

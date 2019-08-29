@@ -60,19 +60,19 @@ public class CommandLineInterface {
 
         // Broker list as --brokers command line
         final ArgumentAcceptingOptionSpec<String> brokerListOpt =
-                parser.accepts("brokers", "Comma-separated broker list: broker1:port1,broker2:port2,...,brokerN:portN")
+                parser.accepts("brokers", "Comma-separated broker list: "
+                        + " Example: broker1:port1,broker2:port2,...,brokerN:portN")
                         .withRequiredArg()
                         .describedAs("broker list")
                         .ofType(String.class)
                         .required();
 
         // topic option spec represented as --to-topic command line
-        final ArgumentAcceptingOptionSpec<String> topicIdOpt =
+        final ArgumentAcceptingOptionSpec<String> toTopicOpt =
                 parser.accepts("to-topic", "Topic name to produce")
                         .withRequiredArg()
                         .describedAs("to-topic")
-                        .ofType(String.class)
-                        .required();
+                        .ofType(String.class);
 
         // message option spec represented as --msg command line
         final ArgumentAcceptingOptionSpec<String> msgOpt =
@@ -91,7 +91,7 @@ public class CommandLineInterface {
 
         // Configuration option spec represented as --config command line
         final ArgumentAcceptingOptionSpec<String> configOpt =
-                parser.accepts("config", "The producer/consumer configuration list: "
+                parser.accepts("config", "The producer/consumer configuration list: Example:"
                         + "linger.ms=1000,batch.size=100000,compression.type=lz4")
                         .withRequiredArg()
                         .describedAs("config")
@@ -114,7 +114,23 @@ public class CommandLineInterface {
                         .ofType(String.class)
                         .defaultsTo("");
 
+        // topic option spec represented as --from-topic command line
+        final ArgumentAcceptingOptionSpec<String> fromTopicOpt =
+                parser.accepts("from-topic", "Coma-separated topic name list to consume. "
+                        + "Example: topic1,topic2,...,topicN")
+                        .withRequiredArg()
+                        .describedAs("from-topic")
+                        .ofType(String.class);
 
+        // Consumer config option spec represented as --timeout command line
+        final ArgumentAcceptingOptionSpec<String> consumeTimeoutOpt =
+                parser.accepts("consume-timeout", "Consume Poll Timeout. Time that the consumer "
+                        + " waits for new records during a consume operation. "
+                        + " Optional parameter, if absent, it defaults to zero.")
+                        .withRequiredArg()
+                        .describedAs("consume-timeout")
+                        .ofType(String.class)
+                        .defaultsTo("0");
 
         if (args.length == 0) {
             CliUtils.printUsageAndFinish(parser, "There are not options");
@@ -123,13 +139,15 @@ public class CommandLineInterface {
         parseOptions(args);
         final Map<Options, ArgumentAcceptingOptionSpec<String>> optionSpecMap = new HashMap();
         optionSpecMap.put(Options.OPERATION, operationsOpt);
-        optionSpecMap.put(Options.TO_TOPIC, topicIdOpt);
+        optionSpecMap.put(Options.TO_TOPIC, toTopicOpt);
         optionSpecMap.put(Options.BROKER_LIST, brokerListOpt);
         optionSpecMap.put(Options.MESSAGE, msgOpt);
         optionSpecMap.put(Options.CONFIG, configOpt);
         optionSpecMap.put(Options.TENANT_GROUP, tenantGroupOpt);
         optionSpecMap.put(Options.SHARDING_KEY, shardingKeyOpt);
         optionSpecMap.put(Options.HEADERS, shardingKeyOpt);
+        optionSpecMap.put(Options.FROM_TOPIC, fromTopicOpt);
+        optionSpecMap.put(Options.CONSUME_TIMEOUT, fromTopicOpt);
 
 
         this.operation = buildOperation(optionSpecMap);

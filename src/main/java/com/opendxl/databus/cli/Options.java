@@ -15,7 +15,9 @@ public enum Options {
     CONFIG("config"),
     TENANT_GROUP("tenant-group"),
     SHARDING_KEY("sharding-key"),
-    HEADERS("headers");
+    HEADERS("headers"),
+    FROM_TOPIC("from-topic"),
+    CONSUME_TIMEOUT("consume-timeout");
 
     private final String optionName;
 
