@@ -20,6 +20,7 @@ import com.opendxl.databus.producer.ProducerConfig;
 import com.opendxl.databus.producer.ProducerRecord;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionSet;
+import joptsimple.internal.Strings;
 import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
@@ -126,6 +127,10 @@ public class ProduceOperation implements CommandLineOperation {
             if (options.hasArgument(Options.SHARDING_KEY.getOptionName())) {
                 shardingKey = options.valueOf(Options.SHARDING_KEY.getOptionName()).toString();
             }
+            String partition = Strings.EMPTY;
+            if (options.hasArgument(Options.PARTITION.getOptionName())) {
+                partition = options.valueOf(Options.PARTITION.getOptionName()).toString();
+            }
 
             // parse headers argument
             final Map<String, String> headersMap = new HashMap<>();
@@ -154,7 +159,8 @@ public class ProduceOperation implements CommandLineOperation {
             // Create a Databus Message
             // TODO: Add option for shardingKey, tenantGroup and headers
             final byte[] payload = message.getBytes(Charset.defaultCharset());
-            final RoutingData routingData = new RoutingData(topic, shardingKey, tenantGroup);
+            RoutingData routingData = getRoutingData(topic, shardingKey, tenantGroup, partition);
+
             final MessagePayload<byte[]> messagePayload = new MessagePayload<>(payload);
             final Headers headers = new Headers(headersMap);
             final ProducerRecord<byte[]> producerRecord = new ProducerRecord<>(routingData, headers, messagePayload);
@@ -178,6 +184,26 @@ public class ProduceOperation implements CommandLineOperation {
     }
 
     /**
+     * Gets a Routing data object instance for the given parameters
+     * @param topic The topic name
+     * @param shardingKey The sharding key
+     * @param tenantGroup The tenant group
+     * @param partition The the given partition number
+     *
+     * @return An {@link RoutingData} instance
+     */
+    private RoutingData getRoutingData(final String topic, final String shardingKey, final String tenantGroup,
+                                         final String partition) {
+        RoutingData routingData;
+        if (!partition.isEmpty()) {
+            routingData = new RoutingData(topic, shardingKey, tenantGroup, Integer.parseInt(partition));
+        } else {
+            routingData = new RoutingData(topic, shardingKey, tenantGroup);
+        }
+        return  routingData;
+    }
+
+    /**
      *
      * @param executionResult The result of producing a record. This methos is invoked by the callback
      *
@@ -185,7 +211,6 @@ public class ProduceOperation implements CommandLineOperation {
     private synchronized void setProducerResult(final ExecutionResult executionResult) {
         this.executionResult = executionResult;
     }
-
 
     /**
      * Callback invoked by Kafka to set the result of producing a messages
@@ -226,7 +251,6 @@ public class ProduceOperation implements CommandLineOperation {
             LOG.info("[PRODUCER <- KAFKA][OK MSG SENT] " + resultMessage);
             setProducerResult(new ExecutionResult("OK", resultMessage, options.asMap()));
             countDownLatch.countDown();
-
 
         }
     }

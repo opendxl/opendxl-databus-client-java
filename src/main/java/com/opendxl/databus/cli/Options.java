@@ -15,7 +15,8 @@ public enum Options {
     CONFIG("config"),
     TENANT_GROUP("tenant-group"),
     SHARDING_KEY("sharding-key"),
-    HEADERS("headers");
+    HEADERS("headers"),
+    PARTITION("partition");
 
     private final String optionName;
 
