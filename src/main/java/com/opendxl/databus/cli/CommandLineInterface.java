@@ -113,7 +113,7 @@ public class CommandLineInterface {
                         .defaultsTo("");
 
 
-        // Configuration option spec represented as --headers command line
+        // Configuration option spec represented as --partition command line
         final ArgumentAcceptingOptionSpec<String> partitionOpt =
                 parser.accepts("partition", "The partition number: ")
                         .withOptionalArg()
