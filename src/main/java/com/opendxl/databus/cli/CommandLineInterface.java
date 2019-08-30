@@ -41,8 +41,6 @@ public class CommandLineInterface {
      */
     public static OptionParser parser = new OptionParser(false);
 
-
-
     /**
      * Constructor
      *
@@ -149,6 +147,13 @@ public class CommandLineInterface {
                         .ofType(String.class);
 
 
+        // Configuration option spec represented as --partition command line
+        final ArgumentAcceptingOptionSpec<String> partitionOpt =
+                parser.accepts("partition", "The partition number: ")
+                        .withOptionalArg()
+                        .describedAs("partition")
+                        .ofType(String.class)
+                        .defaultsTo("");
 
         if (args.length == 0) {
             CliUtils.printUsageAndFinish(parser, "There are not options");
@@ -168,7 +173,7 @@ public class CommandLineInterface {
         optionSpecMap.put(Options.CONSUME_TIMEOUT, consumeTimeoutOpt);
         optionSpecMap.put(Options.CONSUME_RECORDS, consumeRecordsOpt);
         optionSpecMap.put(Options.CG, fromTopicOpt);
-
+        optionSpecMap.put(Options.PARTITION, partitionOpt);
         this.operation = buildOperation(optionSpecMap);
         CliUtils.validateMandatoryOperationArgs(operation, parser, options);
 
@@ -187,6 +192,11 @@ public class CommandLineInterface {
 
         if (!options.has(optionSpecMap.get(Options.OPERATION))) {
             CliUtils.printUsageAndFinish(parser, "--operation is missing");
+        }
+
+        if (options.has(optionSpecMap.get(Options.PARTITION))
+                && !CliUtils.isValidPartitionNumber(options.valueOf(Options.PARTITION.getOptionName()).toString())) {
+            CliUtils.printUsageAndFinish(parser, "--partition must be a number value > 0");
         }
 
         OperationFactory factory = new OperationFactory(optionSpecMap, options);

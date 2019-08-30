@@ -23,6 +23,12 @@ public class CliUtils {
      */
     private static final Logger LOG = Logger.getLogger(CliUtils.class);
 
+    /**
+     * A static field which represents an invalid partition, used as a default value
+     * when a partition is not given as parameter in the command line.
+     */
+    private static final int INVALID_PARTITION = -1;
+
     private CliUtils() {
 
     }
@@ -36,7 +42,6 @@ public class CliUtils {
         System.out.println(executionResult);
         Runtime.getRuntime().exit(0);
     }
-
 
     /**
      * This method is invoked when the command line made up by options and argument
@@ -115,4 +120,27 @@ public class CliUtils {
         return map;
     }
 
+    /**
+     * This method returns if a partition provided by the command line is valid
+     *
+     * @param partition An argument for partition number.
+     * @return If the given partition String is a valid partition number
+     *
+     */
+    public static boolean isValidPartitionNumber(final String partition) {
+        boolean isValidPartitionNumber = true;
+        try {
+            if (!partition.isEmpty()) {
+                Integer validPartitionNumber = Integer.parseInt(partition);
+                if (!(validPartitionNumber > INVALID_PARTITION)) {
+                    isValidPartitionNumber = false;
+                }
+            } else {
+                isValidPartitionNumber = false;
+            }
+        } catch (NumberFormatException | NullPointerException e) {
+            isValidPartitionNumber = false;
+        }
+        return isValidPartitionNumber;
+    }
 }

@@ -47,7 +47,8 @@ public class CommandLineInterfaceTest {
                     + " --msg Hello_World!"
                     + " --config linger.ms=1000,batch.size=100000,compression.type=lz4" //optional
                     + " --headers correlationId=1234,clientId=56567" //optional
-                    + " --tenant-group group0"; //optional
+                    + " --tenant-group group0" //optional
+                    + " --partition 0"; //optional
 
 
             // Test
@@ -166,7 +167,6 @@ public class CommandLineInterfaceTest {
         CommandLineInterface.main(args.split(" "));
     }
 
-
     @Test
     public void shouldConsumeSuccessfullyWithAllArguments() {
         try {
@@ -249,7 +249,6 @@ public class CommandLineInterfaceTest {
     public void shouldFailWhenConsumeAndFromTopicIsMissing() {
         exit.expectSystemExit();
         // Setup CLI parameters
-        // Setup CLI parameters
         String args = "--operation consume"
                 + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
                 + " --config enable.auto.commit=false,auto.offset.reset=earliest" //optional
@@ -257,7 +256,39 @@ public class CommandLineInterfaceTest {
                 + " --consume-timeout 30000" //optional
                 + " --tenant-group group0" // optional
                 + " --cg cg1"; // optional
+        CommandLineInterface.main(args.split(" "));
+    }
 
+    @Test
+    public void shouldFailWithInvalidAlphanumericPartition() {
+        exit.expectSystemExit();
+        // Setup CLI parameters
+        String args = "--operation produce"
+                + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
+                + " --to-topic topic1"
+                + " --sharding-key a123" // optional
+                + " --msg Hello_World!"
+                + " --config linger.ms=1000,batch.size=100000,compression.type=lz4" //optional
+                + " --headers correlationId=1234,clientId=56567" //optional
+                + " --tenant-group group0" //optional
+                + " --partition erer4tet569"; //optional
+
+        CommandLineInterface.main(args.split(" "));
+    }
+
+    @Test
+    public void shouldFailWithInvalidNumericPartition() {
+        exit.expectSystemExit();
+        // Setup CLI parameters
+        String args = "--operation produce"
+                + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
+                + " --to-topic topic1"
+                + " --sharding-key a123" // optional
+                + " --msg Hello_World!"
+                + " --config linger.ms=1000,batch.size=100000,compression.type=lz4" //optional
+                + " --headers correlationId=1234,clientId=56567" //optional
+                + " --tenant-group group0" //optional
+                + " --partition -1"; //optional
         CommandLineInterface.main(args.split(" "));
     }
 
@@ -282,5 +313,22 @@ public class CommandLineInterfaceTest {
 
     public ProducerHelper produceTo(final String topicName) {
         return ProducerHelper.produceTo(topicName);
+    }
+
+    @Test
+    public void shouldFailWithEmptyPartition() {
+        exit.expectSystemExit();
+        // Setup CLI parameters
+        String args = "--operation produce"
+                + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
+                + " --to-topic topic1"
+                + " --sharding-key a123" // optional
+                + " --msg Hello_World!"
+                + " --config linger.ms=1000,batch.size=100000,compression.type=lz4" //optional
+                + " --headers correlationId=1234,clientId=56567" //optional
+                + " --tenant-group group0" //optional
+                + " --partition "; //optional
+
+        CommandLineInterface.main(args.split(" "));
     }
 }

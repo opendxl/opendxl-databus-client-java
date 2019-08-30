@@ -19,8 +19,8 @@ public enum Options {
     FROM_TOPIC("from-topic"),
     CONSUME_TIMEOUT("consume-timeout"),
     CG("cg"),
-    CONSUME_RECORDS("consume-records");
-
+    CONSUME_RECORDS("consume-records"),
+    PARTITION("partition");
     private final String optionName;
 
     /**
