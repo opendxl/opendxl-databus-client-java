@@ -17,7 +17,9 @@ public enum Options {
     SHARDING_KEY("sharding-key"),
     HEADERS("headers"),
     FROM_TOPIC("from-topic"),
-    CONSUME_TIMEOUT("consume-timeout");
+    CONSUME_TIMEOUT("consume-timeout"),
+    CG("cg"),
+    CONSUME_RECORDS("consume-records");
 
     private final String optionName;
 

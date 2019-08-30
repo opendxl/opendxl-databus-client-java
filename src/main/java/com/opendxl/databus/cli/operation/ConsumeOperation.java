@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +46,7 @@ public class ConsumeOperation implements CommandLineOperation {
     /**
      * A list of mandatory options for this operation command line
      */
-    private Map<Options, ArgumentAcceptingOptionSpec<String>> mandatoryOptions = new HashMap<>();
+    private Map<Options, ArgumentAcceptingOptionSpec> mandatoryOptions = new HashMap<>();
 
     /**
      * Command line parsed options
@@ -58,7 +59,7 @@ public class ConsumeOperation implements CommandLineOperation {
      * @param optionSpecMap Map of options spec
      * @param options       parsed options
      */
-    public ConsumeOperation(final Map<Options, ArgumentAcceptingOptionSpec<String>> optionSpecMap,
+    public ConsumeOperation(final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap,
                             final OptionSet options) {
         this.options = options;
         mandatoryOptions.put(Options.BROKER_LIST, optionSpecMap.get(Options.BROKER_LIST));
@@ -70,7 +71,7 @@ public class ConsumeOperation implements CommandLineOperation {
      *
      */
     @Override
-    public Map<Options, ArgumentAcceptingOptionSpec<String>> getMandatoryOptions() {
+    public Map<Options, ArgumentAcceptingOptionSpec> getMandatoryOptions() {
         return mandatoryOptions;
     }
 
@@ -90,19 +91,18 @@ public class ConsumeOperation implements CommandLineOperation {
      */
     @Override
     public ExecutionResult execute() {
+        Consumer<byte[]> consumer = null;
         try {
             // Get option values
-            final String brokerList = options.valueOf(mandatoryOptions.get(Options.BROKER_LIST));
-            final String commaSeparatedTopics = options.valueOf(mandatoryOptions.get(Options.FROM_TOPIC));
+            final String brokerList = options.valueOf(mandatoryOptions.get(Options.BROKER_LIST)).toString();
+            final String commaSeparatedTopics = options.valueOf(mandatoryOptions.get(Options.FROM_TOPIC)).toString();
             final List<String> topics = Arrays.stream(commaSeparatedTopics.split(",")).collect(Collectors.toList());
             String tenantGroup = "";
             if (options.hasArgument(Options.TENANT_GROUP.getOptionName())) {
                 tenantGroup = options.valueOf(Options.TENANT_GROUP.getOptionName()).toString();
             }
-            String consumeTimeout = "0";
-            if (options.hasArgument(Options.CONSUME_TIMEOUT.getOptionName())) {
-                consumeTimeout = options.valueOf(Options.CONSUME_TIMEOUT.getOptionName()).toString();
-            }
+            final int consumeTimeoutMs = (int) options.valueOf(Options.CONSUME_TIMEOUT.getOptionName());
+            final int consumeRecords = (int) options.valueOf(Options.CONSUME_RECORDS.getOptionName());
 
             // parse config arguments
             final Map config = new HashMap<String, Object>();
@@ -115,14 +115,16 @@ public class ConsumeOperation implements CommandLineOperation {
             }
 
             // Consumer Group
-            String consumerGroupName = (String) config.get(ConsumerConfiguration.GROUP_ID_CONFIG);
-            if (consumerGroupName == null || consumerGroupName.isEmpty())  {
+            final String consumerGroupName;
+            if (options.hasArgument(Options.CG.name().toLowerCase())) {
+                consumerGroupName = options.valueOf(Options.CG.getOptionName()).toString().toLowerCase();
+            } else {
                 consumerGroupName = UUID.randomUUID().toString();
             }
 
             // Auto commit
             String enableAutoCommit = (String) config.get(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG);
-            if (consumerGroupName == null || consumerGroupName.isEmpty()) {
+            if (enableAutoCommit == null || enableAutoCommit.isEmpty()) {
                 enableAutoCommit = "true";
             }
 
@@ -130,7 +132,7 @@ public class ConsumeOperation implements CommandLineOperation {
             config.put(ConsumerConfiguration.BOOTSTRAP_SERVERS_CONFIG, brokerList);
             config.put(ConsumerConfiguration.GROUP_ID_CONFIG, consumerGroupName);
             config.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, enableAutoCommit);
-            final Consumer<byte[]> consumer = new DatabusConsumer<>(config, new ByteArrayDeserializer());
+            consumer = new DatabusConsumer<>(config, new ByteArrayDeserializer());
 
             // Subscribe to topics
             if (tenantGroup == null || tenantGroup.isEmpty()) {
@@ -141,29 +143,41 @@ public class ConsumeOperation implements CommandLineOperation {
                 consumer.subscribe(groupTopics);
             }
 
-            // Consume records, commit and close consumer
-            ConsumerRecords<byte[]> records = consumer.poll(Integer.parseInt(consumeTimeout));
-            LOG.warn(records.count());
-            if (records.count() > 0 && Boolean.parseBoolean(enableAutoCommit) == Boolean.FALSE) {
-                consumer.commitSync();
-            }
-
-            // Create a result
+            // Collect records
             List<ConsumerRecordResult> recordResults = new ArrayList<>();
-            for (ConsumerRecord<byte[]> record : records) {
-                recordResults.add(new ConsumerRecordResult(record.getKey(),
-                        new String(record.getMessagePayload().getPayload()),
-                        record.getComposedTopic(),
-                        record.getTopic(),
-                        record.getTenantGroup(),
-                        record.getHeaders().getAll(),
-                        record.getOffset(),
-                        record.getPartition(),
-                        record.getTimestamp())
-                );
-            }
+            final long startTime = System.nanoTime();
+            ConsumerRecords<byte[]> records;
+            boolean cont = true;
+            do {
+                // Consume records and commit
+                records = consumer.poll(100);
+                LOG.warn(records.count());
+                if (records.count() > 0 && Boolean.parseBoolean(enableAutoCommit) == Boolean.FALSE) {
+                    consumer.commitSync();
+                }
 
-            consumer.close();
+                // Create a result
+                for (ConsumerRecord<byte[]> record : records) {
+                    recordResults.add(new ConsumerRecordResult(record.getKey(),
+                            new String(record.getMessagePayload().getPayload()),
+                            record.getComposedTopic(),
+                            record.getTopic(),
+                            record.getTenantGroup(),
+                            record.getHeaders().getAll(),
+                            record.getOffset(),
+                            record.getPartition(),
+                            record.getTimestamp())
+                    );
+                }
+
+                // Loops ends when reads enough records or timeout
+                if (recordResults.size() >= consumeRecords
+                        || (TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTime,
+                                TimeUnit.NANOSECONDS) >= consumeTimeoutMs)) {
+                    cont = false;
+                }
+
+            } while (cont);
 
             final ExecutionResult result = new ExecutionResult("OK", recordResults, options.asMap());
             return result;
@@ -172,6 +186,10 @@ public class ConsumeOperation implements CommandLineOperation {
             LOG.error("Error consuming records " + exception.getMessage());
             final ExecutionResult result = new ExecutionResult("ERROR", exception.getMessage(), options.asMap());
             return result;
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
         }
 
     }

@@ -19,7 +19,7 @@ public interface CommandLineOperation {
      *
      * @return mandatory options for the specific operation
      */
-    Map<Options, ArgumentAcceptingOptionSpec<String>> getMandatoryOptions();
+    Map<Options, ArgumentAcceptingOptionSpec> getMandatoryOptions();
 
     /**
      *

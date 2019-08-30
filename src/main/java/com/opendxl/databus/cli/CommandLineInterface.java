@@ -123,21 +123,39 @@ public class CommandLineInterface {
                         .ofType(String.class);
 
         // Consumer config option spec represented as --timeout command line
-        final ArgumentAcceptingOptionSpec<String> consumeTimeoutOpt =
-                parser.accepts("consume-timeout", "Consume Poll Timeout. Time that the consumer "
+        final ArgumentAcceptingOptionSpec<Integer> consumeTimeoutOpt =
+                parser.accepts("consume-timeout", "Consume Poll Timeout. Time in ms that the consumer"
                         + " waits for new records during a consume operation. "
-                        + " Optional parameter, if absent, it defaults to zero.")
+                        + " Optional parameter, if absent, it defaults to 5000 ms.")
                         .withRequiredArg()
+                        .ofType(Integer.class)
                         .describedAs("consume-timeout")
-                        .ofType(String.class)
-                        .defaultsTo("0");
+                        .defaultsTo(15000);
+
+        // Consumer config option spec represented as --timeout command line
+        final ArgumentAcceptingOptionSpec<Integer> consumeRecordsOpt =
+                parser.accepts("consume-records", "Consume Poll expected records. "
+                        + "Number of expected records. ")
+                        .withRequiredArg()
+                        .ofType(Integer.class)
+                        .describedAs("consume-records")
+                        .defaultsTo(1);
+
+        // Consumer Group option spec represented as --cg command line
+        final ArgumentAcceptingOptionSpec<String> consumerGroupOpt =
+                parser.accepts("cg", "The consumer group name.")
+                        .withRequiredArg()
+                        .describedAs("cg")
+                        .ofType(String.class);
+
+
 
         if (args.length == 0) {
             CliUtils.printUsageAndFinish(parser, "There are not options");
         }
 
         parseOptions(args);
-        final Map<Options, ArgumentAcceptingOptionSpec<String>> optionSpecMap = new HashMap();
+        final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap = new HashMap();
         optionSpecMap.put(Options.OPERATION, operationsOpt);
         optionSpecMap.put(Options.TO_TOPIC, toTopicOpt);
         optionSpecMap.put(Options.BROKER_LIST, brokerListOpt);
@@ -147,8 +165,9 @@ public class CommandLineInterface {
         optionSpecMap.put(Options.SHARDING_KEY, shardingKeyOpt);
         optionSpecMap.put(Options.HEADERS, shardingKeyOpt);
         optionSpecMap.put(Options.FROM_TOPIC, fromTopicOpt);
-        optionSpecMap.put(Options.CONSUME_TIMEOUT, fromTopicOpt);
-
+        optionSpecMap.put(Options.CONSUME_TIMEOUT, consumeTimeoutOpt);
+        optionSpecMap.put(Options.CONSUME_RECORDS, consumeRecordsOpt);
+        optionSpecMap.put(Options.CG, fromTopicOpt);
 
         this.operation = buildOperation(optionSpecMap);
         CliUtils.validateMandatoryOperationArgs(operation, parser, options);
@@ -164,7 +183,7 @@ public class CommandLineInterface {
      * @param optionSpecMap keeps a relationship between a {@link Options} and a Option Spec
      */
     private CommandLineOperation buildOperation(
-            final Map<Options, ArgumentAcceptingOptionSpec<String>> optionSpecMap) {
+            final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap) {
 
         if (!options.has(optionSpecMap.get(Options.OPERATION))) {
             CliUtils.printUsageAndFinish(parser, "--operation is missing");
