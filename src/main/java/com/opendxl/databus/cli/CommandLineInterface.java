@@ -90,7 +90,7 @@ public class CommandLineInterface {
         // Configuration option spec represented as --config command line
         final ArgumentAcceptingOptionSpec<String> configOpt =
                 parser.accepts("config", "The producer/consumer configuration list: Example:"
-                        + "linger.ms=1000,batch.size=100000,compression.type=lz4")
+                        + " linger.ms=1000,batch.size=100000,compression.type=lz4")
                         .withRequiredArg()
                         .describedAs("config")
                         .ofType(String.class);
@@ -120,7 +120,7 @@ public class CommandLineInterface {
                         .describedAs("from-topic")
                         .ofType(String.class);
 
-        // Consumer config option spec represented as --timeout command line
+        // Consumer config option spec represented as --consume-timeout command line
         final ArgumentAcceptingOptionSpec<Integer> consumeTimeoutOpt =
                 parser.accepts("consume-timeout", "Consume Poll Timeout. Time in ms that the consumer"
                         + " waits for new records during a consume operation. "
@@ -130,7 +130,7 @@ public class CommandLineInterface {
                         .describedAs("consume-timeout")
                         .defaultsTo(15000);
 
-        // Consumer config option spec represented as --timeout command line
+        // Consumer config option spec represented as --consume-records command line
         final ArgumentAcceptingOptionSpec<Integer> consumeRecordsOpt =
                 parser.accepts("consume-records", "Consume Poll expected records. "
                         + "Number of expected records. ")
