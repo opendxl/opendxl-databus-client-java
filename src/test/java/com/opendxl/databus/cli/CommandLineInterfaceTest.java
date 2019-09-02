@@ -5,11 +5,17 @@
 package com.opendxl.databus.cli;
 
 import broker.ClusterHelper;
+import com.opendxl.databus.cli.entity.ConsumerRecordResult;
 import com.opendxl.databus.cli.entity.ExecutionResult;
+import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.util.Constants;
+import com.opendxl.databus.util.ProducerHelper;
+import com.opendxl.databus.util.Topic;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class CommandLineInterfaceTest {
 
@@ -162,6 +168,98 @@ public class CommandLineInterfaceTest {
     }
 
     @Test
+    public void shouldConsumeSuccessfullyWithAllArguments() {
+        try {
+
+            final int numOfRecordsForTest = 10;
+
+            // Create a topic with 3 partitions
+            final String topicName = createTopic()
+                    .partitions(1)
+                    .go();
+
+            // produceWithStreamingSDK records
+            Map<String, ProducerRecord<byte[]>> recordsProduced = produceTo(topicName)
+                    .tenantGroup("group0")
+                    .numberOfRecords(numOfRecordsForTest)
+                    .produce()
+                    .asMap();
+
+            // Check that all records were produced successfully
+            Assert.assertEquals(numOfRecordsForTest, recordsProduced.size());
+
+            // Setup CLI parameters
+            String args = "--operation consume"
+                    + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
+                    + " --from-topic " + topicName
+                    + " --config enable.auto.commit=false,auto.offset.reset=earliest" //optional
+                    + " --consume-records 10 " //optional
+                    + " --consume-timeout 30000" //optional
+                    + " --tenant-group group0" // optional
+                    + " --cg cg1"; // optional
+
+            CommandLineInterface cli = new CommandLineInterface(args.split(" "));
+            ExecutionResult executionResult = cli.execute();
+            List<ConsumerRecordResult> result = (List<ConsumerRecordResult>) executionResult.getResult();
+
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+
+
+    @Test
+    public void shouldConsumeSuccessfullyOnlyWithMandatoryArguments() {
+        try {
+
+            final int numOfRecordsForTest = 10;
+
+            // Create a topic with 3 partitions
+            final String topicName = createTopic()
+                    .partitions(1)
+                    .go();
+
+            // produceWithStreamingSDK records
+            Map<String, ProducerRecord<byte[]>> recordsProduced = produceTo(topicName)
+                    .numberOfRecords(numOfRecordsForTest)
+                    .produce()
+                    .asMap();
+
+            // Check that all records were produced successfully
+            Assert.assertEquals(numOfRecordsForTest, recordsProduced.size());
+
+            // Setup CLI parameters
+            String args = "--operation consume"
+                    + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
+                    + " --config auto.offset.reset=earliest"
+                    + " --from-topic " + topicName;
+
+            CommandLineInterface cli = new CommandLineInterface(args.split(" "));
+            ExecutionResult executionResult = cli.execute();
+            List<ConsumerRecordResult> result = (List<ConsumerRecordResult>) executionResult.getResult();
+
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldFailWhenConsumeAndFromTopicIsMissing() {
+        exit.expectSystemExit();
+        // Setup CLI parameters
+        String args = "--operation consume"
+                + " --brokers " + Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT)
+                + " --config enable.auto.commit=false,auto.offset.reset=earliest" //optional
+                + " --consume-records 10 " //optional
+                + " --consume-timeout 30000" //optional
+                + " --tenant-group group0" // optional
+                + " --cg cg1"; // optional
+        CommandLineInterface.main(args.split(" "));
+    }
+
+    @Test
     public void shouldFailWithInvalidAlphanumericPartition() {
         exit.expectSystemExit();
         // Setup CLI parameters
@@ -191,8 +289,30 @@ public class CommandLineInterfaceTest {
                 + " --headers correlationId=1234,clientId=56567" //optional
                 + " --tenant-group group0" //optional
                 + " --partition -1"; //optional
+        CommandLineInterface.main(args.split(" "));
+    }
+
+    @Test
+    public void shouldFailWhenConsumeAndBrokersIsMissing() {
+        exit.expectSystemExit();
+        // Setup CLI parameters
+        String args = "--operation consume"
+                + " --from-topic " + "topicName"
+                + " --config enable.auto.commit=false,auto.offset.reset=earliest" //optional
+                + " --consume-records 10 " //optional
+                + " --consume-timeout 30000" //optional
+                + " --tenant-group group0" // optional
+                + " --cg cg1"; // optional
 
         CommandLineInterface.main(args.split(" "));
+    }
+
+    private Topic.Builder createTopic() {
+        return new Topic.Builder();
+    }
+
+    public ProducerHelper produceTo(final String topicName) {
+        return ProducerHelper.produceTo(topicName);
     }
 
     @Test

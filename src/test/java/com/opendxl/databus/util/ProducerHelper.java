@@ -30,6 +30,7 @@ public class ProducerHelper {
     private CountDownLatch countDownLatch;
     List<ProducerRecord<byte[]>> recordsProduced = new ArrayList<>();
     private Map config = new HashMap<String, Object>();
+    private String tenantGroup = null;
 
     public ProducerHelper() {
         config.put("bootstrap.servers", Constants.KAFKA_HOST.concat(":").concat(Constants.KAFKA_PORT));
@@ -55,11 +56,17 @@ public class ProducerHelper {
         return this;
     }
 
+    public ProducerHelper tenantGroup(final String tenantGroup) {
+        this.tenantGroup = tenantGroup;
+        return this;
+    }
+
+
     public ProducerHelper produce() throws InterruptedException {
         producer = getProducer();
         countDownLatch = new CountDownLatch(numOfRecords);
         for(int i = 0 ; i < numOfRecords ; i++) {
-            final ProducerRecord<byte[]> record = getRecord(topicName, String.valueOf(i));
+            final ProducerRecord<byte[]> record = getRecord(topicName, String.valueOf(i), tenantGroup);
             producer.send(record, new ProducerCallback(record));
         }
         countDownLatch.await();
@@ -69,13 +76,17 @@ public class ProducerHelper {
     }
 
     public ProducerRecord<byte[]>  getRecord(final String topicName, final String shardingKey) {
-        final RoutingData routingData = new RoutingData(topicName, shardingKey,null);
+        return getRecord(topicName, shardingKey, null);
+
+    }
+
+    public ProducerRecord<byte[]>  getRecord(final String topicName, final String shardingKey, final String tenantGroup) {
+        final RoutingData routingData = new RoutingData(topicName, shardingKey, tenantGroup);
         final String message = "Hello World at:" + LocalDateTime.now();
         final byte[] payload = message.getBytes(Charset.defaultCharset());
         MessagePayload<byte[]> messagePayload = new MessagePayload<>(payload);
         return new ProducerRecord<> (routingData, new Headers(), messagePayload);
     }
-
     public Producer<byte[]> getProducer() {
         try {
             return new DatabusProducer<>(config, new ByteArraySerializer());

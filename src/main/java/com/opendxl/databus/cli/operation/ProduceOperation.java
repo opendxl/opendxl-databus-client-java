@@ -59,7 +59,7 @@ public class ProduceOperation implements CommandLineOperation {
     /**
      * A list of mandatory options for this operation command line
      */
-    private Map<Options, ArgumentAcceptingOptionSpec<String>> mandatoryOptions = new HashMap<>();
+    private Map<Options, ArgumentAcceptingOptionSpec> mandatoryOptions = new HashMap<>();
 
     /**
      * Command line parsed options
@@ -77,7 +77,7 @@ public class ProduceOperation implements CommandLineOperation {
      * @param optionSpecMap Map of options spec
      * @param options       parsed options
      */
-    public ProduceOperation(final Map<Options, ArgumentAcceptingOptionSpec<String>> optionSpecMap,
+    public ProduceOperation(final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap,
                             final OptionSet options) {
         this.options = options;
         mandatoryOptions.put(Options.BROKER_LIST, optionSpecMap.get(Options.BROKER_LIST));
@@ -92,7 +92,7 @@ public class ProduceOperation implements CommandLineOperation {
      *
      */
     @Override
-    public Map<Options, ArgumentAcceptingOptionSpec<String>> getMandatoryOptions() {
+    public Map<Options, ArgumentAcceptingOptionSpec> getMandatoryOptions() {
         return mandatoryOptions;
     }
 
@@ -116,9 +116,9 @@ public class ProduceOperation implements CommandLineOperation {
         try {
 
             // Get option values
-            String brokerList = options.valueOf(mandatoryOptions.get(Options.BROKER_LIST));
-            String topic = options.valueOf(mandatoryOptions.get(Options.TO_TOPIC));
-            String message = options.valueOf(mandatoryOptions.get(Options.MESSAGE));
+            String brokerList = options.valueOf(mandatoryOptions.get(Options.BROKER_LIST)).toString();
+            String topic = options.valueOf(mandatoryOptions.get(Options.TO_TOPIC)).toString();
+            String message = options.valueOf(mandatoryOptions.get(Options.MESSAGE)).toString();
             String tenantGroup = "";
             if (options.hasArgument(Options.TENANT_GROUP.getOptionName())) {
                 tenantGroup = options.valueOf(Options.TENANT_GROUP.getOptionName()).toString();
@@ -135,10 +135,10 @@ public class ProduceOperation implements CommandLineOperation {
             // parse headers argument
             final Map<String, String> headersMap = new HashMap<>();
             if (options.hasArgument(Options.HEADERS.name().toLowerCase())) {
-                Properties configArg =
+                Properties headersArg =
                         CliUtils.stringToMap(options.valueOf(Options.HEADERS.name().toLowerCase()).toString());
-                for (String key : configArg.stringPropertyNames()) {
-                    headersMap.put(key, configArg.getProperty(key));
+                for (String key : headersArg.stringPropertyNames()) {
+                    headersMap.put(key, headersArg.getProperty(key));
                 }
             }
 
@@ -157,7 +157,6 @@ public class ProduceOperation implements CommandLineOperation {
             Producer<byte[]> producer = new DatabusProducer<>(config, new ByteArraySerializer());
 
             // Create a Databus Message
-            // TODO: Add option for shardingKey, tenantGroup and headers
             final byte[] payload = message.getBytes(Charset.defaultCharset());
             RoutingData routingData = getRoutingData(topic, shardingKey, tenantGroup, partition);
 

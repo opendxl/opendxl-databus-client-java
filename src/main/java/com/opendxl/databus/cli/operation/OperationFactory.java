@@ -21,7 +21,7 @@ public class OperationFactory {
 
     private final OptionSet options;
 
-    public OperationFactory(final Map<Options, ArgumentAcceptingOptionSpec<String>> optionSpecMap,
+    public OperationFactory(final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap,
                             final OptionSet options) {
         this.options = options;
         operationArgumentsFactoryMap.put(OperationArguments.PRODUCE,
