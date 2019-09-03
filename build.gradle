@@ -5,9 +5,9 @@ buildscript {
         }
         mavenCentral()
     }
-    dependencies {
-        classpath 'org.owasp:dependency-check-gradle:5.2.1'
-    }
+//    dependencies {
+//        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+//    }
 }
 
 plugins {
@@ -32,14 +32,14 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: "com.github.johnrengelman.shadow"
-apply plugin: 'org.owasp.dependencycheck'
-apply plugin: 'project-report'
+//apply plugin: 'org.owasp.dependencycheck'
+//apply plugin: 'project-report'
 
-dependencyCheck {
-    suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
-//    format = "HTML"
+//dependencyCheck {
+//    suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
+//    format='HTML'
 //    outputDirectory = file("$buildDir/reports/dependencycheck")
-}
+//}
 
 jacoco {
     toolVersion = "0.8.4"
@@ -159,6 +159,9 @@ distributions {
             from(jacocoTestReport) {
                 into("coverage")
             }
+//            from(dependencyCheckAnalyze) {
+//                into('dependencycheck')
+//            }
             from('distribution')
         }
     }
@@ -298,7 +301,7 @@ task replaceVersionInREADME() {
 }
 
 signing {sign publishing.publications.maven}
-
+//check.dependsOn dependencyCheckAnalyze
 distZip.dependsOn javadocJar
 distZip.dependsOn sourceJar
 sphinx.dependsOn(versionFile)
