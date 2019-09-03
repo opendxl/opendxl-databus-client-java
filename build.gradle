@@ -5,6 +5,9 @@ buildscript {
         }
         mavenCentral()
     }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+    }
 }
 
 plugins {
@@ -29,6 +32,14 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'project-report'
+
+dependencyCheck {
+    suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
+//    format = "HTML"
+//    outputDirectory = file("$buildDir/reports/dependencycheck")
+}
 
 jacoco {
     toolVersion = "0.8.4"
@@ -47,7 +58,6 @@ configurations {
     kafkaInMemory
 }
 
-
 dependencies {
     implementation 'org.apache.kafka:kafka-clients:2.3.0'
     implementation 'org.apache.kafka:kafka-streams:2.3.0'
@@ -64,6 +74,20 @@ dependencies {
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.0'
     kafkaInMemory 'commons-io:commons-io:2.6'
+
+    // Inforce some transitive dependency versions becaues older ones have vulnerabilities reported by OWAS
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
+        force = true
+    }
+    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
+        force = true
+    }
+    compile ('commons-beanutils:commons-beanutils:1.9.4') {
+        force = true
+    }
+    kafkaInMemory ('commons-beanutils:commons-beanutils:1.9.4') {
+        force = true
+    }
 }
 
 repositories {
@@ -194,6 +218,8 @@ task versionFile()  {
 
 checkstyle {
     sourceSets = []
+    toolVersion '8.23'
+
 }
 
 publishing {
