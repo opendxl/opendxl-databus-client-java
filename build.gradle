@@ -5,9 +5,9 @@ buildscript {
         }
         mavenCentral()
     }
-//    dependencies {
-//        classpath 'org.owasp:dependency-check-gradle:5.2.1'
-//    }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+    }
 }
 
 plugins {
@@ -32,14 +32,11 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: "com.github.johnrengelman.shadow"
-//apply plugin: 'org.owasp.dependencycheck'
-//apply plugin: 'project-report'
+apply plugin: 'org.owasp.dependencycheck'
 
-//dependencyCheck {
-//    suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
-//    format='HTML'
-//    outputDirectory = file("$buildDir/reports/dependencycheck")
-//}
+dependencyCheck {
+    suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
+}
 
 jacoco {
     toolVersion = "0.8.4"
@@ -75,17 +72,28 @@ dependencies {
     kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.0'
     kafkaInMemory 'commons-io:commons-io:2.6'
 
-    // Inforce some transitive dependency versions becaues older ones have vulnerabilities reported by OWAS
+    // This following section mitigates OWASP vulnerabilities report.
+    // It enforces to use specific transitive dependency versions
+    // when their previous versions were mentioned by OWASP vulnerability reports.
+    // If a vulnerability is false-positive,
+    // libraries should be declarad in /config/dependency-check/owasp-supression.xml
+
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-12384
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-12814
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-14379
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-14439
     compile ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
         force = true
     }
     kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
         force = true
     }
-    compile ('commons-beanutils:commons-beanutils:1.9.4') {
+
+    // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-12402
+    kafkaInMemory ('org.apache.commons:commons-compress:1.19') {
         force = true
     }
-    kafkaInMemory ('commons-beanutils:commons-beanutils:1.9.4') {
+    compile ('org.apache.commons:commons-compress:1.19') {
         force = true
     }
 }
@@ -159,9 +167,6 @@ distributions {
             from(jacocoTestReport) {
                 into("coverage")
             }
-//            from(dependencyCheckAnalyze) {
-//                into('dependencycheck')
-//            }
             from('distribution')
         }
     }
@@ -301,7 +306,7 @@ task replaceVersionInREADME() {
 }
 
 signing {sign publishing.publications.maven}
-//check.dependsOn dependencyCheckAnalyze
+check.dependsOn dependencyCheckAnalyze
 distZip.dependsOn javadocJar
 distZip.dependsOn sourceJar
 sphinx.dependsOn(versionFile)
