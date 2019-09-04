@@ -61,8 +61,6 @@ public class DatabusMessageTest {
             Assert.assertTrue(databusMessage.getHeaders().getAll().get(HeadersField.SOURCE_ID).equals(SOURCE_ID_VALUE));
             Assert.assertTrue(databusMessage.getHeaders().getAll().get(HeadersField.TENANT_ID).equals(TENANT_ID_VALUE));
 
-
-
         } catch (Exception e) {
             Assert.fail("An exception is not expected");
         }
@@ -94,7 +92,7 @@ public class DatabusMessageTest {
             Assert.assertTrue(dm1.hashCode() != dm4.hashCode());
 
         } catch (Exception e) {
-            Assert.fail("An exception is not expected");
+            Assert.fail("An exception is not expected "+ e.getMessage() );
         }
     }
 
@@ -165,7 +163,8 @@ public class DatabusMessageTest {
             inputStream.close();
             assertThat("The same databusMessage must be equals to itself after serialization", actual.equals(databusMessage), is(true));
             assertThat("The same databusMessage must implements Serializable", actual instanceof Serializable, is(true));
+        } catch (Exception e) {
+            Assert.fail("An exception is not expected: " + e.getMessage() );
         }
     }
-
 }
