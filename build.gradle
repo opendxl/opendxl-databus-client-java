@@ -5,6 +5,9 @@ buildscript {
         }
         mavenCentral()
     }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+    }
 }
 
 plugins {
@@ -29,6 +32,11 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencyCheck {
+    suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
+}
 
 jacoco {
     toolVersion = "0.8.4"
@@ -47,7 +55,6 @@ configurations {
     kafkaInMemory
 }
 
-
 dependencies {
     implementation 'org.apache.kafka:kafka-clients:2.3.0'
     implementation 'org.apache.kafka:kafka-streams:2.3.0'
@@ -64,6 +71,31 @@ dependencies {
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.0'
     kafkaInMemory 'commons-io:commons-io:2.6'
+
+    // This following section mitigates OWASP vulnerabilities report.
+    // It enforces to use specific transitive dependency versions
+    // when their previous versions were mentioned by OWASP vulnerability reports.
+    // If a vulnerability is false-positive,
+    // libraries should be declarad in /config/dependency-check/owasp-supression.xml
+
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-12384
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-12814
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-14379
+    // https://nvd.nist.gov/vuln/detail/CVE-2019-14439
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
+        force = true
+    }
+    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
+        force = true
+    }
+
+    // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-12402
+    kafkaInMemory ('org.apache.commons:commons-compress:1.19') {
+        force = true
+    }
+    compile ('org.apache.commons:commons-compress:1.19') {
+        force = true
+    }
 }
 
 repositories {
@@ -194,6 +226,8 @@ task versionFile()  {
 
 checkstyle {
     sourceSets = []
+    toolVersion '8.23'
+
 }
 
 publishing {
@@ -272,7 +306,7 @@ task replaceVersionInREADME() {
 }
 
 signing {sign publishing.publications.maven}
-
+check.dependsOn dependencyCheckAnalyze
 distZip.dependsOn javadocJar
 distZip.dependsOn sourceJar
 sphinx.dependsOn(versionFile)
