@@ -9,6 +9,7 @@ import com.opendxl.databus.consumer.ConsumerRecord;
 import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.producer.DatabusProducer;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +23,7 @@ import java.util.Optional;
  * Databus-SDK's user invoke {@link DatabusProducer}.send() method
  * </p>
  */
-public class DatabusMessage {
+public class DatabusMessage implements Serializable {
 
     private  Map<String, String> headers;
     private  byte[] payload;
