@@ -172,7 +172,7 @@ public class CommandLineInterface {
         optionSpecMap.put(Options.FROM_TOPIC, fromTopicOpt);
         optionSpecMap.put(Options.CONSUME_TIMEOUT, consumeTimeoutOpt);
         optionSpecMap.put(Options.CONSUME_RECORDS, consumeRecordsOpt);
-        optionSpecMap.put(Options.CG, fromTopicOpt);
+        optionSpecMap.put(Options.CG, consumerGroupOpt);
         optionSpecMap.put(Options.PARTITION, partitionOpt);
         this.operation = buildOperation(optionSpecMap);
         CliUtils.validateMandatoryOperationArgs(operation, parser, options);
