@@ -9,13 +9,28 @@ package com.opendxl.databus.cli.operation;
  */
 public enum OperationArguments {
 
+    /**
+     * Operation Argument related to the produce operation
+     */
     PRODUCE("produce"),
+
+    /**
+     * Operation Argument related to the consume operation
+     */
     CONSUME("consume");
 
-
+    /**
+     * OperationArguments constructor
+     * @param argumentName The argument name associated to the OperationArgument
+     */
     OperationArguments(final String argumentName) {
         this.argumentName = argumentName;
     }
+
+
+    /**
+     * The argument name for the OperationArgument
+     */
     String argumentName;
 
     /**
