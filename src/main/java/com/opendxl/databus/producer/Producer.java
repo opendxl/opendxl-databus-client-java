@@ -295,31 +295,66 @@ public abstract class Producer<P> {
 
     }
 
+    /**
+     * Set the DatabusKeySerializer in producer
+     *
+     * @param keySerializer A DatabusKeySerializer Instance
+     */
     protected void setKeySerializer(final DatabusKeySerializer keySerializer) {
         this.keySerializer = keySerializer;
     }
 
+    /**
+     * Set the value serializer in producer
+     *
+     * @param valueSerializer A Serializer object instance for the value serializer
+     */
     protected void
     setValueSerializer(final org.apache.kafka.common.serialization.Serializer<DatabusMessage> valueSerializer) {
         this.valueSerializer = valueSerializer;
     }
 
+    /**
+     * Get the key serializer from producer
+     *
+     * @return  A {@link DatabusKeySerializer} object instance
+     */
     protected DatabusKeySerializer getKeySerializer() {
         return keySerializer;
     }
 
+    /**
+     * Get the value serializer from producer
+     *
+     * @return  A {@link org.apache.kafka.common.serialization.Serializer} object instance
+     */
     protected org.apache.kafka.common.serialization.Serializer<DatabusMessage> getValueSerializer() {
         return valueSerializer;
     }
 
+    /**
+     * Set a Kafka producer instance to the producer.
+     *
+     * @return  A {@link org.apache.kafka.clients.producer.Producer} object instance to set in the producer
+     */
     protected void setProducer(final org.apache.kafka.clients.producer.Producer<String, DatabusMessage> producer) {
         this.producer = producer;
     }
 
+    /**
+     * Set a {@link DatabusProducerRecordAdapter} associated to the producer.
+     *
+     * @param databusProducerRecordAdapter The {@link DatabusProducerRecordAdapter} to set to the producer
+     */
     protected void setDatabusProducerRecordAdapter(final DatabusProducerRecordAdapter<P> databusProducerRecordAdapter) {
         this.databusProducerRecordAdapter = databusProducerRecordAdapter;
     }
 
+    /**
+     * Set the clientId to the producer
+     *
+     * @param clientId the clientId associated to the producer
+     */
     protected void setClientId(final String clientId) {
         this.clientId = clientId;
     }

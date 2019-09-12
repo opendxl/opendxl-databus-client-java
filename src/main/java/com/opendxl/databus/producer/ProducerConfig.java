@@ -437,7 +437,6 @@ public class ProducerConfig extends AbstractConfig {
      * ProducerConfig constructor
      *
      * @param props An instance of Properties object
-     * @return An instance of ProducerConfig
      */
     public ProducerConfig(Properties props) {
         super(CONFIG, props);
@@ -447,7 +446,6 @@ public class ProducerConfig extends AbstractConfig {
      * ProducerConfig constructor
      *
      * @param props A map of properties object
-     * @return An instance of ProducerConfig
      */
     public ProducerConfig(Map<String, Object> props) {
         super(CONFIG, props);
@@ -458,7 +456,6 @@ public class ProducerConfig extends AbstractConfig {
      *
      * @param props A map of properties object
      * @param doLog Whether the configurations should be logged
-     * @return An instance of ProducerConfig
      */
     ProducerConfig(Map<?, ?> props, boolean doLog) {
         super(CONFIG, props, doLog);
