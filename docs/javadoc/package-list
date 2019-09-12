@@ -6,7 +6,6 @@ com.opendxl.databus.common.internal.adapter
 com.opendxl.databus.common.internal.builder
 com.opendxl.databus.common.internal.util
 com.opendxl.databus.consumer
-com.opendxl.databus.consumer.internals
 com.opendxl.databus.consumer.metric
 com.opendxl.databus.credential
 com.opendxl.databus.entities

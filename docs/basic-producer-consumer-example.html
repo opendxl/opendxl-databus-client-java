@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Producer Consumer Example &mdash; OpenDXL Databus Java Client Library 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Producer Metrics Example" href="producer-metrics-sample.html" />
+    <link rel="prev" title="Prerequisites" href="prerequisites.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenDXL Databus Java Client Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Producer Consumer Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-code">Sample Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getconsumertask"><code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getproducertask"><code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-sample">Run the sample</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running">Running</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenDXL Databus Java Client Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Producer Consumer Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="producer-consumer-example">
+<h1>Producer Consumer Example<a class="headerlink" href="#producer-consumer-example" title="Permalink to this headline">¶</a></h1>
+<p>This sample demonstrates how to produce and consume messages from the
+DXL Databus client by using a DatabusProducer and DatabusConsumer in a
+running Kafka cluster.</p>
+<p>Code highlights are shown below:</p>
+<div class="section" id="sample-code">
+<h2>Sample Code<a class="headerlink" href="#sample-code" title="Permalink to this headline">¶</a></h2>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span>public static void main(String[] args) throws InterruptedException {
+    LOG.info(&quot;Ctrl-C to finish&quot;);
+    new BasicConsumerProducerExample().startExample();
+}
+
+public BasicConsumerProducerExample() {
+    // Start Kafka cluster
+    ClusterHelper
+            .getInstance()
+            .addBroker(9092)
+            .zookeeperPort(2181)
+            .start();
+
+    // Prepare a Producer
+    this.producer = getProducer();
+
+    // Prepare a Consumer
+    this.consumer = getConsumer();
+
+    // Subscribe to topic
+    this.consumer.subscribe(Collections.singletonList(consumerTopic));
+    //this.consumer.subscribe(Arrays.asList(&quot;topic1&quot;,&quot;topic2&quot;));
+
+    this.executor = Executors.newFixedThreadPool(2);
+}
+
+public void startExample() throws InterruptedException {
+    Runnable consumerTask = getConsumerTask();
+    Runnable producerTask = getProducerTask();
+
+    executor.submit(consumerTask);
+    executor.submit(producerTask);
+
+    Runtime.getRuntime().addShutdownHook(
+            new Thread(
+                    new Runnable() {
+                        public void run() {
+                            stopExample(executor);
+                            LOG.info(&quot;Example finished&quot;);
+                        }
+                    }));
+}
+
+private Runnable getConsumerTask() {
+    return () -&gt; {
+        try {
+            LOG.info(&quot;Consumer started&quot;);
+            while (!closed.get()) {
+
+                // Polling the databus
+                final ConsumerRecords&lt;byte[]&gt; records = consumer.poll(CONSUMER_TIME_CADENCE_MS);
+
+                // Iterate records
+                for (ConsumerRecord&lt;byte[]&gt; record : records) {
+
+                    // Get headers as String
+                    final StringBuilder headers = new StringBuilder().append(&quot;[&quot;);
+                    record.getHeaders().getAll().forEach((k, v) -&gt; headers.append(&quot;[&quot; + k + &quot;:&quot; + v + &quot;]&quot;));
+                    headers.append(&quot;]&quot;);
+
+                    LOG.info(&quot;[CONSUMER &lt;- KAFKA][MSG RCEIVED] ID &quot; + record.getKey() +
+                            &quot; TOPIC:&quot; + record.getComposedTopic() +
+                            &quot; KEY:&quot; + record.getKey() +
+                            &quot; PARTITION:&quot; + record.getPartition() +
+                            &quot; OFFSET:&quot; + record.getOffset() +
+                            &quot; TIMESTAMP:&quot; + record.getTimestamp() +
+                            &quot; HEADERS:&quot; + headers +
+                            &quot; PAYLOAD:&quot; + new String(record.getMessagePayload().getPayload()));
+                }
+                //consumer.commitSync();
+                consumer.commitAsync();
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        } finally {
+            consumer.unsubscribe();
+            consumer.close();
+            LOG.info(&quot;Consumer closed&quot;);
+        }
+    };
+}
+
+private Runnable getProducerTask() {
+    return () -&gt; {
+        LOG.info(&quot;Producer started&quot;);
+        while (!closed.get()) {
+
+            // Prepare a record
+            final String message = &quot;Hello World at:&quot; + LocalDateTime.now();
+
+            // user should provide the encoding
+            final byte[] payload = message.getBytes(Charset.defaultCharset());
+            final ProducerRecord&lt;byte[]&gt; producerRecord = getProducerRecord(producerTopic, payload);
+
+            // Send the record
+            producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
+            LOG.info(&quot;[PPODUCER -&gt; KAFKA][SENDING MSG] ID &quot; + producerRecord.getRoutingData().getShardingKey() +
+                    &quot; TOPIC:&quot; + TopicNameBuilder.getTopicName(producerTopic, null) +
+                    &quot; PAYLOAD:&quot; + message);
+
+            justWait(PRODUCER_TIME_CADENCE_MS);
+        }
+        producer.flush();
+        producer.close();
+        LOG.info(&quot;Producer closed&quot;);
+
+    };
+}
+
+synchronized private void stopExample(final ExecutorService executor) {
+    try {
+        closed.set(true);
+        consumer.wakeup();
+        ClusterHelper.getInstance().stop();
+        executor.shutdown();
+        executor.awaitTermination(5, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+    } finally {
+        executor.shutdownNow();
+    }
+}
+</pre></div>
+</div>
+<p>The first step is to create the instance of the Kafka cluster to run the
+example. The constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in
+charge of doing that. This method also creates a DatabusConsumer
+instance calling to <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same
+approach, calling to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of
+DatabusProducer.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">Consumer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getConsumer</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">final</span> <span class="n">Properties</span> <span class="n">consumerProps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Properties</span><span class="p">();</span>
+    <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">BOOTSTRAP_SERVERS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="p">);</span>
+    <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">GROUP_ID_CONFIG</span><span class="p">,</span> <span class="s2">&quot;consumer-group-1&quot;</span><span class="p">);</span>
+    <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">ENABLE_AUTO_COMMIT_CONFIG</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">);</span>
+    <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">SESSION_TIMEOUT_MS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;30000&quot;</span><span class="p">);</span>
+    <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">CLIENT_ID_CONFIG</span><span class="p">,</span> <span class="s2">&quot;consumer-id-sample&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">new</span> <span class="n">DatabusConsumer</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">consumerProps</span><span class="p">,</span> <span class="n">new</span> <span class="n">ByteArrayDeserializer</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="n">public</span> <span class="n">Producer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getProducer</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">final</span> <span class="n">Map</span> <span class="n">config</span> <span class="o">=</span> <span class="n">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">Object</span><span class="o">&gt;</span><span class="p">();</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ProducerConfig</span><span class="o">.</span><span class="n">BOOTSTRAP_SERVERS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="p">);</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ProducerConfig</span><span class="o">.</span><span class="n">CLIENT_ID_CONFIG</span><span class="p">,</span> <span class="s2">&quot;producer-id-sample&quot;</span><span class="p">);</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ProducerConfig</span><span class="o">.</span><span class="n">LINGER_MS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;100&quot;</span><span class="p">);</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ProducerConfig</span><span class="o">.</span><span class="n">BATCH_SIZE_CONFIG</span><span class="p">,</span> <span class="s2">&quot;150000&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">new</span> <span class="n">DatabusProducer</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">new</span> <span class="n">ByteArraySerializer</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>DatabusConsumer and DatabusProducer are created with configurarion maps
+setted as parameters.</p>
+<p>DatabusConsumer recieves the following configuration:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Config Parameter Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_C</span>
+<span class="pre">ONFIG</span></code></td>
+<td>The Kafka broker and port to listen.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">GROUP_ID_CONFIG</span></code></td>
+<td>The consumer group associated.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ENABLE_AUTO_COMMIT_</span>
+<span class="pre">CONFIG</span></code></td>
+<td>If autocommit be enabled or not.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">SESSION_TIMEOUT_MS_</span>
+<span class="pre">CONFIG</span></code></td>
+<td>The hearbeat interval in ms to check if the
+Kakfa broker is alive.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">CLIENT_ID_CONFIG</span></code></td>
+<td>The related clientId.</td>
+</tr>
+</tbody>
+</table>
+<p>DatabusProducer recieves the following configuration:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Config Parameter Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_C</span>
+<span class="pre">ONFIG</span></code></td>
+<td>The Kafka broker and port to listen.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">CLIENT_ID_CONFIG</span></code></td>
+<td>The related clientId.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">LINGER_MS_CONFIG</span></code></td>
+<td>The amount of time in ms to wait for
+additional messages before sending the
+current batch.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">BATCH_SIZE_CONFIG</span></code></td>
+<td>the amount of memory in bytes (not messages!)</td>
+</tr>
+<tr class="row-even"><td>that will be used for
+each batch.</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<p>After this, the consumer suscribes to a topic in the following line:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Collections</span><span class="o">.</span><span class="n">singletonList</span><span class="p">(</span><span class="n">consumerTopic</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Then the <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> constructor is executed, the
+<code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two internal
+methods for the producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to produce
+and consume messages respectively.</p>
+<p>Here in detail both methods will be explained:</p>
+</div>
+<div class="section" id="getconsumertask">
+<h2><code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code><a class="headerlink" href="#getconsumertask" title="Permalink to this headline">¶</a></h2>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span>private Runnable getConsumerTask() {
+        return () -&gt; {
+            try {
+                LOG.info(&quot;Consumer started&quot;);
+                while (!closed.get()) {
+
+                    // Polling the databus
+                    final ConsumerRecords&lt;byte[]&gt; records = consumer.poll(CONSUMER_TIME_CADENCE_MS);
+
+                    // Iterate records
+                    for (ConsumerRecord&lt;byte[]&gt; record : records) {
+
+                        // Get headers as String
+                        final StringBuilder headers = new StringBuilder().append(&quot;[&quot;);
+                        record.getHeaders().getAll().forEach((k, v) -&gt; headers.append(&quot;[&quot; + k + &quot;:&quot; + v + &quot;]&quot;));
+                        headers.append(&quot;]&quot;);
+
+                        LOG.info(&quot;[CONSUMER &lt;- KAFKA][MSG RCEIVED] ID &quot; + record.getKey() +
+                                &quot; TOPIC:&quot; + record.getComposedTopic() +
+                                &quot; KEY:&quot; + record.getKey() +
+                                &quot; PARTITION:&quot; + record.getPartition() +
+                                &quot; OFFSET:&quot; + record.getOffset() +
+                                &quot; TIMESTAMP:&quot; + record.getTimestamp() +
+                                &quot; HEADERS:&quot; + headers +
+                                &quot; PAYLOAD:&quot; + new String(record.getMessagePayload().getPayload()));
+                    }
+                    //consumer.commitSync();
+                    consumer.commitAsync();
+                }
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+            } finally {
+                consumer.unsubscribe();
+                consumer.close();
+                LOG.info(&quot;Consumer closed&quot;);
+            }
+        };
+    }
+</pre></div>
+</div>
+<p>Consumer thread runs until sample stops or an exception is triggered.
+When this happens the while loop breaks. Until that, the consumer polls
+the produced records.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">final</span> <span class="n">ConsumerRecords</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">consumer</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">CONSUMER_TIME_CADENCE_MS</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">CONSUMER_TIME_CADENCE_MS</span></code> is the time, in ms, spent waiting in
+poll if data is not available.</p>
+<p>When the poll finished the consumer logs the data of the recieved
+messages and calls the commit method.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">commitAsync</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">commitAsync()</span></code>, commits the last offset and carry on.</p>
+<p>When the sample stops, unsuscribe and close method of the consumer are
+called. These methods do the following: - Unsubscribe from topics
+currently subscribed. - Close the consumer. This will close the network
+connections and sockets.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">();</span>
+<span class="n">consumer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getproducertask">
+<h2><code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code><a class="headerlink" href="#getproducertask" title="Permalink to this headline">¶</a></h2>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span>private Runnable getProducerTask() {
+        return () -&gt; {
+            LOG.info(&quot;Producer started&quot;);
+            while (!closed.get()) {
+
+                // Prepare a record
+                final String message = &quot;Hello World at:&quot; + LocalDateTime.now();
+
+                // user should provide the encoding
+                final byte[] payload = message.getBytes(Charset.defaultCharset());
+                final ProducerRecord&lt;byte[]&gt; producerRecord = getProducerRecord(producerTopic, payload);
+
+                // Send the record
+                producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
+                LOG.info(&quot;[PPODUCER -&gt; KAFKA][SENDING MSG] ID &quot; + producerRecord.getRoutingData().getShardingKey() +
+                        &quot; TOPIC:&quot; + TopicNameBuilder.getTopicName(producerTopic, null) +
+                        &quot; PAYLOAD:&quot; + message);
+
+                justWait(PRODUCER_TIME_CADENCE_MS);
+            }
+            producer.flush();
+            producer.close();
+            LOG.info(&quot;Producer closed&quot;);
+
+        };
+    }
+</pre></div>
+</div>
+<p>Producer thread runs until sample stops or an exception is triggered.
+When this happens the while loop breaks. Until that, the producer sends
+the produced records.</p>
+<p>First the producer creates a message and make it into an array of bytes.
+After this, a producer record is created calling to the
+<code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code> method.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">ProducerRecord</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getProducerRecord</span><span class="p">(</span><span class="n">final</span> <span class="n">String</span> <span class="n">topic</span><span class="p">,</span> <span class="n">final</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">payload</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">currentTimeMillis</span><span class="p">());</span>
+    <span class="n">RoutingData</span> <span class="n">routingData</span> <span class="o">=</span> <span class="n">new</span> <span class="n">RoutingData</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">null</span><span class="p">);</span>
+    <span class="n">Headers</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+    <span class="n">MessagePayload</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">messagePayload</span> <span class="o">=</span> <span class="n">new</span> <span class="n">MessagePayload</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">payload</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">new</span> <span class="n">ProducerRecord</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">routingData</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">messagePayload</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this method the a <code class="docutils literal notranslate"><span class="pre">ProducerRecord</span></code> instance is created, adding to
+his constructor a <code class="docutils literal notranslate"><span class="pre">RoutingData</span></code> object with topic and key, <code class="docutils literal notranslate"><span class="pre">Headers</span></code>
+object and a <code class="docutils literal notranslate"><span class="pre">MessagePayload</span></code> object with the message content.</p>
+<p>Now, at this point the next step is send the message. To do that the
+producer calls the send method.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">producerRecord</span><span class="p">,</span> <span class="n">new</span> <span class="n">MyCallback</span><span class="p">(</span><span class="n">producerRecord</span><span class="o">.</span><span class="n">getRoutingData</span><span class="p">()</span><span class="o">.</span><span class="n">getShardingKey</span><span class="p">()));</span>
+</pre></div>
+</div>
+<p>This method sends a producer record and associates a callback for each
+sended execution. The callback is used because send is asynchronous and
+this method will return immediately once the record has been stored in
+the buffer of records waiting to be sent. This allows sending many
+records in parallel without blocking to wait for the response after each
+one. Fully non-blocking usage can make use of the callback parameter to
+provide a callback that will be invoked when the request is complete.</p>
+<p>After send method executes the <code class="docutils literal notranslate"><span class="pre">justWait()</span></code> method is called to wait
+and produce a new record. <code class="docutils literal notranslate"><span class="pre">PRODUCER_TIME_CADENCE_MS</span></code> is the time in ms
+that the producer waits to send a new message.</p>
+<p>Finally when sample stops flush and close method are called.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">flush</span><span class="p">();</span>
+<span class="n">producer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Flush method method makes all buffered records immediately available to
+send and blocks on the completion of the requests associated with these
+records. Flush gives a convenient way to ensure all previously sent
+messages have actually completed.</p>
+<p>Close method closes producer and frees resources such as connections,
+threads, and buffers associated with the producer.</p>
+</div>
+<div class="section" id="run-the-sample">
+<h2>Run the sample<a class="headerlink" href="#run-the-sample" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Java Development Kit 8 (JDK 8) or later.</li>
+</ul>
+</div>
+<div class="section" id="running">
+<h3>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h3>
+<p>To run this sample execute the runsample script as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./runsample sample.BasicConsumerProducerExample
+</pre></div>
+</div>
+<p>The output shows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Zookeeper</span> <span class="n">node</span> <span class="n">started</span><span class="p">:</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">2181</span>
+<span class="n">Kafka</span> <span class="n">broker</span> <span class="n">started</span><span class="p">:</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">9092</span>
+<span class="n">Consumer</span> <span class="n">started</span>
+<span class="n">Producer</span> <span class="n">started</span>
+<span class="p">[</span><span class="n">PPODUCER</span> <span class="o">-&gt;</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">SENDING</span> <span class="n">MSG</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720470608</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">30.608</span>
+<span class="p">[</span><span class="n">PRODUCER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">OK</span> <span class="n">MSG</span> <span class="n">SENT</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720470608</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">4</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">0</span>
+<span class="p">[</span><span class="n">PPODUCER</span> <span class="o">-&gt;</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">SENDING</span> <span class="n">MSG</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720471866</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">31.866</span>
+<span class="p">[</span><span class="n">PRODUCER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">OK</span> <span class="n">MSG</span> <span class="n">SENT</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720471866</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">5</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">0</span>
+<span class="p">[</span><span class="n">PPODUCER</span> <span class="o">-&gt;</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">SENDING</span> <span class="n">MSG</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720472871</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">32.870</span>
+<span class="p">[</span><span class="n">PRODUCER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">OK</span> <span class="n">MSG</span> <span class="n">SENT</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720472871</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">3</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">0</span>
+<span class="p">[</span><span class="n">PPODUCER</span> <span class="o">-&gt;</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">SENDING</span> <span class="n">MSG</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720473871</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">33.871</span>
+<span class="p">[</span><span class="n">PRODUCER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">OK</span> <span class="n">MSG</span> <span class="n">SENT</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720473871</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">0</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">0</span>
+<span class="p">[</span><span class="n">PPODUCER</span> <span class="o">-&gt;</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">SENDING</span> <span class="n">MSG</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720474876</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">34.876</span>
+<span class="p">[</span><span class="n">PRODUCER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">OK</span> <span class="n">MSG</span> <span class="n">SENT</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720474876</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">1</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">0</span>
+<span class="p">[</span><span class="n">CONSUMER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">MSG</span> <span class="n">RCEIVED</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720474876</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">KEY</span><span class="p">:</span><span class="mi">1567720474876</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">1</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">0</span> <span class="n">TIMESTAMP</span><span class="p">:</span><span class="mi">1567720474876</span> <span class="n">HEADERS</span><span class="p">:[]</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">34.876</span>
+<span class="p">[</span><span class="n">PPODUCER</span> <span class="o">-&gt;</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">SENDING</span> <span class="n">MSG</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720475880</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">35.880</span>
+<span class="p">[</span><span class="n">PRODUCER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">OK</span> <span class="n">MSG</span> <span class="n">SENT</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720475880</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">1</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">1</span>
+<span class="p">[</span><span class="n">CONSUMER</span> <span class="o">&lt;-</span> <span class="n">KAFKA</span><span class="p">][</span><span class="n">MSG</span> <span class="n">RCEIVED</span><span class="p">]</span> <span class="n">ID</span> <span class="mi">1567720475880</span> <span class="n">TOPIC</span><span class="p">:</span><span class="n">topic1</span> <span class="n">KEY</span><span class="p">:</span><span class="mi">1567720475880</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">1</span> <span class="n">OFFSET</span><span class="p">:</span><span class="mi">1</span> <span class="n">TIMESTAMP</span><span class="p">:</span><span class="mi">1567720475880</span> <span class="n">HEADERS</span><span class="p">:[]</span> <span class="n">PAYLOAD</span><span class="p">:</span><span class="n">Hello</span> <span class="n">World</span> <span class="n">at</span><span class="p">:</span><span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">05</span><span class="n">T18</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">35.880</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="producer-metrics-sample.html" class="btn btn-neutral float-right" title="Producer Metrics Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="prerequisites.html" class="btn btn-neutral" title="Prerequisites" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McAfee LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,489 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Producer Metrics Example &mdash; OpenDXL Databus Java Client Library 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Producer Consumer Example" href="basic-producer-consumer-example.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenDXL Databus Java Client Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="basic-producer-consumer-example.html">Producer Consumer Example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Producer Metrics Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-code">Sample Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-sample">Run the sample</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running">Running</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenDXL Databus Java Client Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Producer Metrics Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="producer-metrics-example">
+<h1>Producer Metrics Example<a class="headerlink" href="#producer-metrics-example" title="Permalink to this headline">¶</a></h1>
+<p>This sample demonstrates how to get producer metrics from the DXL
+Databus client by using a producer in a running Kafka cluster. The type
+of metrics that can be obtained are the following:</p>
+<ul class="simple">
+<li>Producer metrics associated to a clientId.</li>
+<li>Producer metrics associated to a clientId and a topic.</li>
+</ul>
+<p>Code highlights are shown below:</p>
+<div class="section" id="sample-code">
+<h2>Sample Code<a class="headerlink" href="#sample-code" title="Permalink to this headline">¶</a></h2>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="n">throws</span> <span class="n">InterruptedException</span> <span class="p">{</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ctrl-C to finish&quot;</span><span class="p">);</span>
+    <span class="n">new</span> <span class="n">ProducerMetricsExample</span><span class="p">()</span><span class="o">.</span><span class="n">startExample</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="n">public</span> <span class="n">ProducerMetricsExample</span><span class="p">()</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="n">Start</span> <span class="n">Kafka</span> <span class="n">cluster</span>
+    <span class="n">ClusterHelper</span>
+            <span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">addBroker</span><span class="p">(</span><span class="n">BROKER_PORT</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">zookeeperPort</span><span class="p">(</span><span class="n">ZOOKEEPER_PORT</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">start</span><span class="p">();</span>
+
+    <span class="o">//</span> <span class="n">Prepare</span> <span class="n">a</span> <span class="n">Producer</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">producer</span> <span class="o">=</span> <span class="n">getProducer</span><span class="p">();</span>
+
+    <span class="n">this</span><span class="o">.</span><span class="n">executor</span> <span class="o">=</span> <span class="n">Executors</span><span class="o">.</span><span class="n">newFixedThreadPool</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+
+    <span class="n">this</span><span class="o">.</span><span class="n">reportMetricsScheduler</span> <span class="o">=</span> <span class="n">Executors</span><span class="o">.</span><span class="n">newScheduledThreadPool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">decimalFormat</span> <span class="o">=</span> <span class="n">new</span> <span class="n">DecimalFormat</span><span class="p">(</span><span class="n">INTEGER_FORMAT_PATTERN</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Start</span> <span class="n">the</span> <span class="n">producer</span> <span class="n">metrics</span> <span class="n">example</span>
+<span class="n">public</span> <span class="n">void</span> <span class="n">startExample</span><span class="p">()</span> <span class="n">throws</span> <span class="n">InterruptedException</span> <span class="p">{</span>
+
+    <span class="n">Runnable</span> <span class="n">producerTask</span> <span class="o">=</span> <span class="n">getProducerTask</span><span class="p">();</span>
+
+    <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">producerTask</span><span class="p">);</span>
+    <span class="n">reportMetricsScheduler</span><span class="o">.</span><span class="n">scheduleAtFixedRate</span><span class="p">(</span><span class="n">reportMetrics</span><span class="p">(),</span>
+            <span class="n">REPORT_METRICS_INITIAL_DELAY</span><span class="p">,</span>
+            <span class="n">REPORT_METRICS_PERIOD</span><span class="p">,</span>
+            <span class="n">TimeUnit</span><span class="o">.</span><span class="n">MILLISECONDS</span><span class="p">);</span>
+
+    <span class="n">Runtime</span><span class="o">.</span><span class="n">getRuntime</span><span class="p">()</span><span class="o">.</span><span class="n">addShutdownHook</span><span class="p">(</span>
+            <span class="n">new</span> <span class="n">Thread</span><span class="p">(</span>
+                    <span class="p">()</span> <span class="o">-&gt;</span> <span class="p">{</span>
+                        <span class="n">stopExample</span><span class="p">(</span><span class="n">executor</span><span class="p">);</span>
+                        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Example finished&quot;</span><span class="p">);</span>
+                    <span class="p">}));</span>
+
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Instance</span> <span class="n">a</span> <span class="n">thread</span> <span class="n">to</span> <span class="n">get</span> <span class="n">Kafka</span> <span class="n">metrics</span>
+<span class="n">private</span> <span class="n">Runnable</span> <span class="n">reportMetrics</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;**************************************************************************************&quot;</span><span class="p">);</span>
+            <span class="n">getProducerByClientIdMetrics</span><span class="p">();</span>
+            <span class="n">getProducerByClientIdAndTopicMetrics</span><span class="p">();</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="ne">Exception</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Gets</span> <span class="n">the</span> <span class="n">metrics</span> <span class="n">related</span> <span class="n">to</span> <span class="n">the</span> <span class="n">clientId</span>
+<span class="n">private</span> <span class="n">void</span> <span class="n">getProducerByClientIdMetrics</span><span class="p">(){</span>
+    <span class="o">//</span> <span class="n">Producer</span> <span class="n">per</span> <span class="n">clientId</span> <span class="n">Metrics</span>
+    <span class="n">String</span> <span class="n">clientId</span> <span class="o">=</span> <span class="p">(</span><span class="n">String</span><span class="p">)</span> <span class="n">producer</span><span class="o">.</span><span class="n">getConfiguration</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ProducerConfig</span><span class="o">.</span><span class="n">CLIENT_ID_CONFIG</span><span class="p">);</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordBatchSizeAvgMetric</span> <span class="o">=</span> <span class="n">producer</span><span class="o">.</span><span class="n">recordBatchSizeAvgMetric</span><span class="p">();</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordBatchSizeMaxMetric</span> <span class="o">=</span> <span class="n">producer</span><span class="o">.</span><span class="n">recordBatchSizeMaxMetric</span><span class="p">();</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordSizeMaxMetric</span> <span class="o">=</span> <span class="n">producer</span><span class="o">.</span><span class="n">recordSizeMaxMetric</span><span class="p">();</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordSizeAvgMetric</span> <span class="o">=</span> <span class="n">producer</span><span class="o">.</span><span class="n">recordSizeAvgMetric</span><span class="p">();</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordSendRateMetric</span> <span class="o">=</span> <span class="n">producer</span><span class="o">.</span><span class="n">recordSendRateMetric</span><span class="p">();</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordSendTotalMetric</span> <span class="o">=</span> <span class="n">producer</span><span class="o">.</span><span class="n">recordSendTotalMetric</span><span class="p">();</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID &quot;</span> <span class="o">+</span> <span class="n">clientId</span> <span class="o">+</span> <span class="s2">&quot; TOTAL RECORDS: &quot;</span>
+            <span class="o">+</span> <span class="n">recordSendTotalMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; rec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID &quot;</span> <span class="o">+</span> <span class="n">clientId</span> <span class="o">+</span> <span class="s2">&quot; MAX BYTES BATCH SIZE: &quot;</span>
+            <span class="o">+</span> <span class="n">recordBatchSizeMaxMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; bytes&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID &quot;</span> <span class="o">+</span> <span class="n">clientId</span> <span class="o">+</span> <span class="s2">&quot; MAX RECORDS SIZE: &quot;</span>
+            <span class="o">+</span> <span class="n">decimalFormat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recordSizeMaxMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot; rec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID &quot;</span> <span class="o">+</span> <span class="n">clientId</span> <span class="o">+</span> <span class="s2">&quot; AVG RECORDS PER SEC: &quot;</span>
+            <span class="o">+</span> <span class="n">decimalFormat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recordSendRateMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot; rec/sec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID &quot;</span> <span class="o">+</span> <span class="n">clientId</span> <span class="o">+</span> <span class="s2">&quot; AVG BYTES BATCH SIZE PER SEC: &quot;</span>
+            <span class="o">+</span> <span class="n">decimalFormat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recordBatchSizeAvgMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot; bytes/sec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER CLIENT ID &quot;</span> <span class="o">+</span> <span class="n">clientId</span> <span class="o">+</span> <span class="s2">&quot; AVG RECORDS SIZE PER SEC: &quot;</span>
+            <span class="o">+</span> <span class="n">decimalFormat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recordSizeAvgMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot; bytes/rec&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Gets</span> <span class="n">the</span> <span class="n">metrics</span> <span class="n">related</span> <span class="n">to</span> <span class="n">the</span> <span class="n">clientId</span> <span class="k">for</span> <span class="n">a</span> <span class="n">given</span> <span class="n">topic</span>
+<span class="n">private</span> <span class="n">void</span> <span class="n">getProducerByClientIdAndTopicMetrics</span><span class="p">(){</span>
+    <span class="o">//</span> <span class="n">Producer</span> <span class="n">per</span> <span class="n">topics</span> <span class="ow">and</span> <span class="n">clientId</span> <span class="n">Metrics</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordsTotalMetric</span> <span class="o">=</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">recordSendTotalPerTopicMetric</span><span class="p">(</span><span class="n">producerTopic</span><span class="p">);</span>
+    <span class="n">ProducerMetric</span> <span class="n">bytesTotalMetric</span> <span class="o">=</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">recordByteTotalPerTopicMetric</span><span class="p">(</span><span class="n">producerTopic</span><span class="p">);</span>
+    <span class="n">ProducerMetric</span> <span class="n">recordsPerSecMetric</span> <span class="o">=</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">recordSendRatePerTopicMetric</span><span class="p">(</span><span class="n">producerTopic</span><span class="p">);</span>
+    <span class="n">ProducerMetric</span> <span class="n">bytesPerSecondAvgMetric</span> <span class="o">=</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">recordByteRatePerTopicMetric</span><span class="p">(</span><span class="n">producerTopic</span><span class="p">);</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS PER TOPIC&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS TOPIC &quot;</span> <span class="o">+</span> <span class="n">producerTopic</span> <span class="o">+</span> <span class="s2">&quot; TOTAL RECORDS: &quot;</span>
+            <span class="o">+</span> <span class="n">recordsTotalMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; rec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS TOPIC &quot;</span> <span class="o">+</span> <span class="n">producerTopic</span> <span class="o">+</span> <span class="s2">&quot; TOTAL BYTES: &quot;</span>
+            <span class="o">+</span> <span class="n">bytesTotalMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; bytes&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS TOPIC &quot;</span> <span class="o">+</span> <span class="n">producerTopic</span> <span class="o">+</span> <span class="s2">&quot; AVG RECORDS PER SEC: &quot;</span>
+            <span class="o">+</span> <span class="n">decimalFormat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recordsPerSecMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot; rec/sec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PRODUCER METRICS TOPIC &quot;</span> <span class="o">+</span> <span class="n">producerTopic</span> <span class="o">+</span> <span class="s2">&quot; AVG BYTES PER SEC: &quot;</span>
+            <span class="o">+</span> <span class="n">bytesPerSecondAvgMetric</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; bytes/sec&quot;</span><span class="p">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The first step is to instance the Kafka cluster to run the example. The
+constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in charge of doing
+that. After this, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts running the
+producer to send messages calling the method <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> and
+start the metrics collecting thread.</p>
+<p>The metrics thread has two parameters which are needed to be configured:
+-The metrics sampling period before to get metrics, setted with
+<code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_INITIAL_DELAY</span></code> value, which is time before start
+collecting metrics. - The the period of time to get the metrics from
+Kafka, setted with <code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_PERIOD</span></code>.</p>
+<p>After the producer and the metrics thread starts, the sample shows the
+metrics with values.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible to get the producer
+metrics from the Kakfka cluster. <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> calls
+<code class="docutils literal notranslate"><span class="pre">getProducerByClientIdMetrics()</span></code> to get the producer metrics for an
+associated clientId and also calls
+<code class="docutils literal notranslate"><span class="pre">getProducerByClientIdAndTopicMetrics()</span></code> to get the producer metrics
+for an associated clientId with an specific topic.</p>
+<p>The producer metrics associated to a clientId obtained are the
+following:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Metric Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>record-send-total</td>
+<td>The total number of records sent.</td>
+</tr>
+<tr class="row-odd"><td>record-send-rate</td>
+<td>The average number of records sent per
+second.</td>
+</tr>
+<tr class="row-even"><td>record-size-avg</td>
+<td>The average record size.</td>
+</tr>
+<tr class="row-odd"><td>record-size-max</td>
+<td>The maximum record size.</td>
+</tr>
+<tr class="row-even"><td>record-error-total</td>
+<td>The total number of record sends that
+resulted in errors.</td>
+</tr>
+<tr class="row-odd"><td>record-error-rate</td>
+<td>The average per-second number of record sends
+that resulted in errors.</td>
+</tr>
+<tr class="row-even"><td>batch-size-max</td>
+<td>The max number of bytes sent per partition
+per-request.</td>
+</tr>
+<tr class="row-odd"><td>batch-size-avg</td>
+<td>The average number of bytes sent per
+partition per-request.</td>
+</tr>
+</tbody>
+</table>
+<p>The producer metrics associated to a clientId and a topicId are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Metric Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>record-send-total</td>
+<td>The total number of records sent for a topic.</td>
+</tr>
+<tr class="row-odd"><td>record-send-rate</td>
+<td>The average number of records sent per second
+for a topic.</td>
+</tr>
+<tr class="row-even"><td>record-error-total</td>
+<td>The total number of record sent that resulted
+in errors for a topic.</td>
+</tr>
+<tr class="row-odd"><td>record-error-rate</td>
+<td>The average per-second number of record sent
+that resulted in errors for a topic.</td>
+</tr>
+<tr class="row-even"><td>byte-total</td>
+<td>The total number of bytes sent for a topic.</td>
+</tr>
+<tr class="row-odd"><td>byte-rate</td>
+<td>The average number of bytes sent per second
+for a topic.</td>
+</tr>
+</tbody>
+</table>
+<p>Further information about Kafka monitoring and metrics can be found
+<a class="reference external" href="https://kafka.apache.org/documentation/#monitoring">here</a>.</p>
+</div>
+<div class="section" id="run-the-sample">
+<h2>Run the sample<a class="headerlink" href="#run-the-sample" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Java Development Kit 8 (JDK 8) or later.</li>
+</ul>
+</div>
+<div class="section" id="running">
+<h3>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h3>
+<p>To run this sample execute the runsample script as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./runsample sample.ProducerMetricsExample
+</pre></div>
+</div>
+<p>The output shows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Zookeeper</span> <span class="n">node</span> <span class="n">started</span><span class="p">:</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">2182</span>
+<span class="n">Kafka</span> <span class="n">broker</span> <span class="n">started</span><span class="p">:</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">9092</span>
+<span class="n">Producer</span> <span class="n">started</span>
+<span class="o">**************************************************************************************</span>
+
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span>
+
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span> <span class="n">producer</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="n">sample</span> <span class="n">TOTAL</span> <span class="n">RECORDS</span><span class="p">:</span> <span class="mf">5090324.0</span> <span class="n">rec</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span> <span class="n">producer</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="n">sample</span> <span class="n">MAX</span> <span class="n">BYTES</span> <span class="n">BATCH</span> <span class="n">SIZE</span><span class="p">:</span> <span class="mf">149975.0</span> <span class="nb">bytes</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span> <span class="n">producer</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="n">sample</span> <span class="n">MAX</span> <span class="n">RECORDS</span> <span class="n">SIZE</span><span class="p">:</span> <span class="mi">143</span> <span class="n">rec</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span> <span class="n">producer</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="n">sample</span> <span class="n">AVG</span> <span class="n">RECORDS</span> <span class="n">PER</span> <span class="n">SEC</span><span class="p">:</span> <span class="mf">128.524</span> <span class="n">rec</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span> <span class="n">producer</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="n">sample</span> <span class="n">AVG</span> <span class="n">BYTES</span> <span class="n">BATCH</span> <span class="n">SIZE</span> <span class="n">PER</span> <span class="n">SEC</span><span class="p">:</span> <span class="mf">88.554</span> <span class="nb">bytes</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">CLIENT</span> <span class="n">ID</span> <span class="n">producer</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="n">sample</span> <span class="n">AVG</span> <span class="n">RECORDS</span> <span class="n">SIZE</span> <span class="n">PER</span> <span class="n">SEC</span><span class="p">:</span> <span class="mi">143</span> <span class="nb">bytes</span><span class="o">/</span><span class="n">rec</span>
+
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">PER</span> <span class="n">TOPIC</span>
+
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">TOPIC</span> <span class="n">topic1</span> <span class="n">TOTAL</span> <span class="n">RECORDS</span><span class="p">:</span> <span class="mf">5090324.0</span> <span class="n">rec</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">TOPIC</span> <span class="n">topic1</span> <span class="n">TOTAL</span> <span class="n">BYTES</span><span class="p">:</span> <span class="mf">3.41020172E8</span> <span class="nb">bytes</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">TOPIC</span> <span class="n">topic1</span> <span class="n">AVG</span> <span class="n">RECORDS</span> <span class="n">PER</span> <span class="n">SEC</span><span class="p">:</span> <span class="mf">128.521</span> <span class="n">rec</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">PRODUCER</span> <span class="n">METRICS</span> <span class="n">TOPIC</span> <span class="n">topic1</span> <span class="n">AVG</span> <span class="n">BYTES</span> <span class="n">PER</span> <span class="n">SEC</span><span class="p">:</span> <span class="mf">8610098.517938748</span> <span class="nb">bytes</span><span class="o">/</span><span class="n">sec</span>
+
+<span class="o">**************************************************************************************</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="basic-producer-consumer-example.html" class="btn btn-neutral" title="Producer Consumer Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McAfee LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

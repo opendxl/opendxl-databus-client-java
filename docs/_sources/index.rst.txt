@@ -32,4 +32,5 @@ Basic
     .. toctree::
 	    :maxdepth: 1
 
-	    basic-consumer-producer-example
+	    basic-producer-consumer-example
+	    producer-metrics-sample
