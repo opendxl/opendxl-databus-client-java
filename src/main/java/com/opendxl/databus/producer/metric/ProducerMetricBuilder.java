@@ -108,9 +108,20 @@ public class ProducerMetricBuilder {
      *      </ol>
      */
     private static class TagsBuilder {
+        /**
+         * The client id tag.
+         */
         private static final String CLIENT_ID_TAG = "client-id";
+
+        /**
+         * The topic tag.
+         */
         private static final String TOPIC_TAG = "topic";
 
+
+        /**
+         * The key value map of tags.
+         */
         Map<String, String> tags;
 
         private TagsBuilder() {
