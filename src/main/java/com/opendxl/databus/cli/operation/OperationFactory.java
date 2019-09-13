@@ -44,7 +44,7 @@ public class OperationFactory {
     }
 
     /**
-     *
+     * Gets a specific operation for the command line instance
      * @param operationsOpt Operations supported by command line cli
      * @return Command line operation instance
      */

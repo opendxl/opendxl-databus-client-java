@@ -25,7 +25,14 @@ import java.util.Optional;
  */
 public class DatabusMessage implements Serializable {
 
+    /**
+     * The map of Headers contained in the Databus Message
+     */
     private  Map<String, String> headers;
+
+    /**
+     * The byte payload which is the data itself for the DatabusMessage
+     */
     private  byte[] payload;
 
     private DatabusMessage() {
@@ -44,7 +51,7 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
-     * Headers
+     * Gets the headers of a DatabusMessage instance
      *
      * @return {@link Headers} of the message
      */
@@ -55,6 +62,7 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
+     * Delete an specific header passing a header name as a parameter
      *
      * @param key the key to be removed from headers
      */
@@ -63,9 +71,9 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
-     * Payload
+     * Gets the payload data
      *
-     * @return payload as byte[]
+     * @return A payload as array of byte
      */
     public byte[] getPayload() {
         return payload;
@@ -73,6 +81,7 @@ public class DatabusMessage implements Serializable {
 
 
     /**
+     * Overrides equals method for DatabusMessage
      *
      * @param obj getInstance to be compared to
      * @return true if both objects are equals
@@ -97,8 +106,9 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
+     * Overrides equals method for DatabusMessage
      *
-     * @return hashCode
+     * @return HashCode as a product of payload hashcode and headers hashcode
      */
     @Override
     public int hashCode() {

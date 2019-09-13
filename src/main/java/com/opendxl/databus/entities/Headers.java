@@ -22,11 +22,13 @@ import java.util.stream.Collectors;
  */
 public class Headers implements Cloneable {
 
-
+    /**
+     * The map of Headers
+     */
     private Map<String, String> headers;
 
     /**
-     *
+     * Headers constructor with a map of headers as a parameter
      * @param headers a key-value pair Map with header to be transported. A null value is replcaed by a empty String
      */
     public Headers(final Map<String, String> headers) {
@@ -40,22 +42,44 @@ public class Headers implements Cloneable {
 
     }
 
+    /**
+     * Headers default constructor with and empty map of headers
+     */
     public Headers() {
         this.headers = new HashMap<>();
     }
 
+    /**
+     * Puts an specific header in the headers map
+     * @param headerKey the header key to add
+     * @param value the header value to add
+     * @return the previous value associated
+     */
     public String put(final String headerKey, final String value) {
         return this.headers.put(headerKey, Optional.ofNullable(value).orElse(""));
     }
 
+    /**
+     * Gets an specific header in the headers map
+     * @param key the header key to get the header value
+     * @return the header value
+     */
     public String get(final String key) {
         return headers.get(key);
     }
 
+    /**
+     * Gets the headers maps
+     * @return the Headers map
+     */
     public Map<String, String> getAll() {
         return headers;
     }
 
+    /**
+     * A clone object of Headers instance
+     * @return a new cloned instance of Headers
+     */
     @Override
     public Headers clone() {
         Map<String, String> clonedHeaders = new HashMap<>(headers);

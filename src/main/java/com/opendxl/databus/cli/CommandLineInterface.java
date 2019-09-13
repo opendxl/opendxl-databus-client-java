@@ -28,6 +28,7 @@ public class CommandLineInterface {
      * Represents the set of options arguments in the command line
      */
     private OptionSet options;
+
     /**
      * Operation is a CommandLineOperation instance suitable to {@link Channel} API method that will be executed.
      * Each API method is associated to an specific Operation, e.g.:
@@ -36,6 +37,7 @@ public class CommandLineInterface {
      * etc. Goal of each Operation class is to call its associated API method from the command line.
      */
     private CommandLineOperation operation;
+
     /**
      * Parses command line arguments
      */

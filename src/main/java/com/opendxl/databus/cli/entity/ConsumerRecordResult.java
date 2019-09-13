@@ -58,7 +58,7 @@ public class ConsumerRecordResult {
     private final long timestamp;
 
     /**
-     *  Constructor
+     *  Constructor with all parameters
      *
      * @param shardingKey Sharding Key
      * @param payload message

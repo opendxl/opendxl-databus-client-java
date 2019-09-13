@@ -76,6 +76,7 @@ public enum Options {
     private final String optionName;
 
     /**
+     * Sets and option name
      *
      * @param optionName the option name
      */
@@ -85,6 +86,7 @@ public enum Options {
     }
 
     /**
+     * Gets and specific option name
      *
      * @return option name as string
      */

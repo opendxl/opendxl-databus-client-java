@@ -27,7 +27,6 @@ public enum OperationArguments {
         this.argumentName = argumentName;
     }
 
-
     /**
      * The argument name for the OperationArgument
      */

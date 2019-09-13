@@ -13,8 +13,18 @@ package com.opendxl.databus.exception;
  */
 public class DatabusClientRuntimeException extends RuntimeException {
 
+    /**
+     * The exception class name
+     */
     private final String causedByClass;
 
+    /**
+     * Constructor with all parameters
+     *
+     * @param message the exception message
+     * @param cause the exception cause
+     * @param causedByClass the class name which triggers the exception
+     */
     public DatabusClientRuntimeException(final String message,
                                          final Throwable cause,
                                          final Class causedByClass) {
@@ -22,12 +32,19 @@ public class DatabusClientRuntimeException extends RuntimeException {
         this.causedByClass = causedByClass.getName();
     }
 
+    /**
+     * Constructor with message and cuasedByClass parameters
+     *
+     * @param message the exception message
+     * @param causedByClass the class name which triggers the exception
+     */
     public DatabusClientRuntimeException(final String message,
                                          final Class causedByClass) {
         this(message, null, causedByClass);
     }
 
     /**
+     * Gets the class name of the thew exception
      *
      * @return The class name that throws the exception
      */
