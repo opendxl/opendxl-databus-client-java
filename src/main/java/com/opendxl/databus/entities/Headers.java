@@ -51,9 +51,9 @@ public class Headers implements Cloneable {
 
     /**
      * Puts an specific header in the headers map
-     * @param headerKey the header key to add
-     * @param value the header value to add
-     * @return the previous value associated
+     * @param headerKey The header key to add
+     * @param value The header value to add
+     * @return The previous value associated
      */
     public String put(final String headerKey, final String value) {
         return this.headers.put(headerKey, Optional.ofNullable(value).orElse(""));
@@ -61,8 +61,8 @@ public class Headers implements Cloneable {
 
     /**
      * Gets an specific header in the headers map
-     * @param key the header key to get the header value
-     * @return the header value
+     * @param key The header key to get the header value
+     * @return The header value as String
      */
     public String get(final String key) {
         return headers.get(key);
@@ -70,7 +70,7 @@ public class Headers implements Cloneable {
 
     /**
      * Gets the headers maps
-     * @return the Headers map
+     * @return The Headers map
      */
     public Map<String, String> getAll() {
         return headers;
@@ -78,7 +78,7 @@ public class Headers implements Cloneable {
 
     /**
      * A clone object of Headers instance
-     * @return a new cloned instance of Headers
+     * @return A new cloned instance of Headers
      */
     @Override
     public Headers clone() {

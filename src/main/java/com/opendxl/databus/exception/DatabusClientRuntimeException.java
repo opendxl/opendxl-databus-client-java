@@ -21,9 +21,9 @@ public class DatabusClientRuntimeException extends RuntimeException {
     /**
      * Constructor with all parameters
      *
-     * @param message the exception message
-     * @param cause the exception cause
-     * @param causedByClass the class name which triggers the exception
+     * @param message The exception message
+     * @param cause The exception cause
+     * @param causedByClass The class name which triggers the exception
      */
     public DatabusClientRuntimeException(final String message,
                                          final Throwable cause,
@@ -33,10 +33,10 @@ public class DatabusClientRuntimeException extends RuntimeException {
     }
 
     /**
-     * Constructor with message and cuasedByClass parameters
+     * Constructor with message and causedByClass parameters
      *
-     * @param message the exception message
-     * @param causedByClass the class name which triggers the exception
+     * @param message The exception message
+     * @param causedByClass The class name which triggers the exception
      */
     public DatabusClientRuntimeException(final String message,
                                          final Class causedByClass) {

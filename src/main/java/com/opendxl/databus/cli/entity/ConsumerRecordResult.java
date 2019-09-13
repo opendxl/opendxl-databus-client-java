@@ -60,15 +60,15 @@ public class ConsumerRecordResult {
     /**
      *  Constructor with all parameters
      *
-     * @param shardingKey Sharding Key
-     * @param payload message
-     * @param composedTopic topic name including the tenant group if apply
-     * @param topic topic name
-     * @param tenantGroup tenant group
-     * @param headers headers
-     * @param offset message offset
-     * @param partition partition
-     * @param timestamp message timestamp
+     * @param shardingKey The sharding Key
+     * @param payload Message payload
+     * @param composedTopic Topic name including the tenant group if apply
+     * @param topic Topic name
+     * @param tenantGroup Tenant group
+     * @param headers Headers
+     * @param offset Message offset number
+     * @param partition Partition number
+     * @param timestamp Message timestamp
      */
     public ConsumerRecordResult(final String shardingKey,
                                 final String payload,

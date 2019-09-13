@@ -353,7 +353,7 @@ public abstract class Producer<P> {
     /**
      * Set the clientId to the producer
      *
-     * @param clientId the clientId associated to the producer
+     * @param clientId The clientId associated to the producer
      */
     protected void setClientId(final String clientId) {
         this.clientId = clientId;

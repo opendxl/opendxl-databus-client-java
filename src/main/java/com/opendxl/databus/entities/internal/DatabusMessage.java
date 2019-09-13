@@ -42,8 +42,8 @@ public class DatabusMessage implements Serializable {
      * A DatabusMessage is created by providing a {@link Headers} and a payload as byte[].
      * If they are not provided, empty instances of them will be created.
      *
-     * @param headers key-value map that contains message headers
-     * @param payload payload as byte[]
+     * @param headers Key-value map that contains message headers
+     * @param payload Payload as byte[]
      */
     public DatabusMessage(final Headers headers, final byte[] payload) {
         this.headers = Optional.ofNullable(headers).orElse(new Headers()).getAll();
@@ -64,7 +64,7 @@ public class DatabusMessage implements Serializable {
     /**
      * Delete an specific header passing a header name as a parameter
      *
-     * @param key the key to be removed from headers
+     * @param key The key to be removed from headers
      */
     public void removeHeader(final String key) {
         headers.remove(key);
@@ -83,8 +83,8 @@ public class DatabusMessage implements Serializable {
     /**
      * Overrides equals method for DatabusMessage
      *
-     * @param obj getInstance to be compared to
-     * @return true if both objects are equals
+     * @param obj An instance to be compared to
+     * @return True if both objects are equals
      */
     @Override
     public boolean equals(final Object obj) {

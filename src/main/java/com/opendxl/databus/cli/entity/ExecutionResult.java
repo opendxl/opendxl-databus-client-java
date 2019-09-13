@@ -33,8 +33,8 @@ public class ExecutionResult {
      * Result of a command line operation.
      *
      * @param code OK | ERROR
-     * @param result output data returned by the executed command line operation.
-     * @param options list of input options entered for the operation
+     * @param result Output data returned by the executed command line operation.
+     * @param options List of input options entered for the operation
      */
     public ExecutionResult(final String code, final Object result, final Map<OptionSpec<?>, List<?>> options) {
 

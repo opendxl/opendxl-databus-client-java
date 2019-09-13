@@ -57,7 +57,7 @@ public class ConsumeOperation implements CommandLineOperation {
      * Constructor
      *
      * @param optionSpecMap Map of options spec
-     * @param options       parsed options
+     * @param options Parsed options
      */
     public ConsumeOperation(final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap,
                             final OptionSet options) {
@@ -139,7 +139,7 @@ public class ConsumeOperation implements CommandLineOperation {
     /**
      * Subscribe to topics
      *
-     * @param consumer consumer instance
+     * @param consumer Consumer instance
      */
     private void subscribeToTopics(Consumer<byte[]> consumer) {
         final String commaSeparatedTopics = options.valueOf(mandatoryOptions.get(Options.FROM_TOPIC)).toString();
@@ -161,7 +161,7 @@ public class ConsumeOperation implements CommandLineOperation {
      *
      * @param config Consumer configuration
      *
-     * @return a String that states if the consumer has to explicitlly commit records.
+     * @return A String that states if the consumer has to explicitlly commit records.
      */
     private String getAutoCommit(final Map config) {
         String enableAutoCommit = (String) config.get(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG);
@@ -207,10 +207,10 @@ public class ConsumeOperation implements CommandLineOperation {
      * Poll records from Kafka till consumeTimeoutMs expires or number of records read matches consumRecords.
      * Then, collect them and returns a List of records
      *
-     * @param consumer consumer instance
-     * @param consumeTimeoutMs max time to read records
-     * @param consumeRecords max number of records to be read
-     * @param enableAutoCommit if false then performs a manual comit
+     * @param consumer Consumer instance
+     * @param consumeTimeoutMs Max time to read records
+     * @param consumeRecords Max number of records to be read
+     * @param enableAutoCommit If false then performs a manual comit
      * @return Map of records to be serialized as results
      */
     private List<ConsumerRecordResult> getConsumerRecordResults(final Consumer<byte[]> consumer,

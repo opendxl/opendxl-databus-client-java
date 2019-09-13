@@ -78,7 +78,7 @@ public enum Options {
     /**
      * Sets and option name
      *
-     * @param optionName the option name
+     * @param optionName The option name
      */
     Options(final String optionName) {
         this.optionName = optionName;
@@ -88,7 +88,7 @@ public enum Options {
     /**
      * Gets and specific option name
      *
-     * @return option name as string
+     * @return The option name as string
      */
     public String getOptionName() {
         return optionName;

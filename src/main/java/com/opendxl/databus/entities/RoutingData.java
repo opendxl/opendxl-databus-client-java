@@ -92,7 +92,7 @@ public class RoutingData {
     /**
      * Gets the topic name
      *
-     * @return An String with the topic name
+     * @return A String with the topic name
      */
     public String getTopic() {
         return topic;
@@ -101,7 +101,7 @@ public class RoutingData {
     /**
      * Gets the sharding key
      *
-     * @return An String with the sharding key
+     * @return A String with the sharding key
      */
     public String getShardingKey() {
         return shardingKey;
@@ -110,7 +110,7 @@ public class RoutingData {
     /**
      * Gets the tenant group
      *
-     * @return An String with the tentant group
+     * @return A String with the tentant group
      */
     public String getTenantGroup() {
         return tenantGroup;
