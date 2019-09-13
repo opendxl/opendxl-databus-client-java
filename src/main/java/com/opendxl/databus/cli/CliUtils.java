@@ -54,7 +54,6 @@ public class CliUtils {
         printUsageAndFinish(parser, message, null);
     }
 
-
     /**
      * This method is invoked when the command line made up by options and argument
      * are ill formed or do not meet options spec. Then , it shows the usage and exit with a error
@@ -76,7 +75,6 @@ public class CliUtils {
         Runtime.getRuntime().exit(1);
     }
 
-
     /**
      * This method validate the mandatory arguments for a specific operation
      *
@@ -97,7 +95,6 @@ public class CliUtils {
             }
         });
     }
-
 
     /**
      * Get properties from comma-separated config String

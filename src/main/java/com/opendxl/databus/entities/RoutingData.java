@@ -23,33 +23,59 @@ import java.util.Optional;
  * </p>
  */
 public class RoutingData {
+
+    /**
+     * A default tenant group with default value "group0"
+     */
     private static final String DEFAULT_TENANT_GROUP = "group0";
+
+    /**
+     * The partition number
+     */
     private final Integer partition;
+
+    /**
+     * The topic name
+     */
     private String topic = null;
+
+    /**
+     * The sharding key value
+     */
     private String shardingKey = null;
+
+    /**
+     * The tenant group
+     */
     private String tenantGroup = DEFAULT_TENANT_GROUP;
 
     /**
-     * @param topic       name where the message must be sent
+     * RoutingData constructor with only topic name parameter
+     *
+     * @param topic The topic name where the message must be sent
      */
     public RoutingData(final String topic) {
         this(topic, null, null, null);
     }
 
     /**
-     * @param topic       name where the message must be sent
-     * @param shardingKey databus key
-     * @param tenantGroup a name that groups topics
+     * RoutingData constructor with topic name sharding key and tenant group parameters
+     *
+     * @param topic The topic name where the message must be sent
+     * @param shardingKey The Databus sharding key
+     * @param tenantGroup The name that groups topics
      */
     public RoutingData(final String topic, final String shardingKey, final String tenantGroup) {
         this(topic, shardingKey, tenantGroup, null);
     }
 
     /**
-     * @param topic       name where the message must be sent
-     * @param shardingKey databus key
-     * @param tenantGroup a name that groups topics
-     * @param partition   partition
+     * RoutingData constructor with all parameters
+     *
+     * @param topic The topic name where the message must be sent
+     * @param shardingKey The Databus sharding key
+     * @param tenantGroup The name that groups topics
+     * @param partition The partition number
      */
     public RoutingData(final String topic, final String shardingKey, final String tenantGroup,
                        final Integer partition) {
@@ -63,18 +89,38 @@ public class RoutingData {
         this.partition = partition;
     }
 
+    /**
+     * Gets the topic name
+     *
+     * @return A String with the topic name
+     */
     public String getTopic() {
         return topic;
     }
 
+    /**
+     * Gets the sharding key
+     *
+     * @return A String with the sharding key
+     */
     public String getShardingKey() {
         return shardingKey;
     }
 
+    /**
+     * Gets the tenant group
+     *
+     * @return A String with the tentant group
+     */
     public String getTenantGroup() {
         return tenantGroup;
     }
 
+    /**
+     * Gets the partition number
+     *
+     * @return An Integer with the partition number
+     */
     public Integer getPartition() {
         return partition;
     }

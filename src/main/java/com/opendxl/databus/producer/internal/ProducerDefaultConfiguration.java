@@ -19,13 +19,21 @@ import java.util.Properties;
 public final class ProducerDefaultConfiguration {
 
     /**
+     * The max time in ms that controls how long the producer will block when calling send() method
+     */
+    public static final String MAX_BLOCK_MS_CONFIG_DEFAULT_VALUE = "5000";
+
+    /**
+     * The key name of the max block ms configuration parameter
+     */
+    public static final String MAX_BLOCK_MS_CONFIG_KEY = ProducerConfig.MAX_BLOCK_MS_CONFIG;
+
+    /**
      * This configuration properties controls how long {@link Producer#send}
      * and {@link Producer#partitionsFor} will block.
      * These methods can be blocked either because the buffer is full or metadata
      * unavailable. Blocking in the user-supplied serializers or partitioner will not be counted against this timeout.
      */
-    public static final String MAX_BLOCK_MS_CONFIG_DEFAULT_VALUE = "5000";
-    public static final String MAX_BLOCK_MS_CONFIG_KEY = ProducerConfig.MAX_BLOCK_MS_CONFIG;
     private static Properties configuration = new Properties();
 
     static {

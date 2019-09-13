@@ -75,7 +75,7 @@ public class ProduceOperation implements CommandLineOperation {
      * Constructor
      *
      * @param optionSpecMap Map of options spec
-     * @param options       parsed options
+     * @param options       Parsed options
      */
     public ProduceOperation(final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap,
                             final OptionSet options) {

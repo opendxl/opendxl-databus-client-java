@@ -93,17 +93,22 @@ package com.opendxl.databus.entities;
  */
 public final class MessagePayload<P> {
 
+    /**
+     * A payload contained in the MessagePayload instance
+     */
     private final P payload;
 
-    /**
-     * @param payload payload
+    /** The message payload constructor
+     *
+     * @param payload A playload parameter to assing in the MessagePayload
      */
     public MessagePayload(final P payload) {
         this.payload = payload;
     }
 
-    /**
-     * @return a payload
+    /** Gets the payload Message Instance
+     *
+     * @return A MessagePayload instance
      */
     public P getPayload() {
         return payload;

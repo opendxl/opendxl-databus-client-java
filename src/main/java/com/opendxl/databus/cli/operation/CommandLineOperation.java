@@ -16,12 +16,14 @@ import java.util.Map;
 public interface CommandLineOperation {
 
     /**
+     * Gets the mandatory options map
      *
      * @return mandatory options for the specific operation
      */
     Map<Options, ArgumentAcceptingOptionSpec> getMandatoryOptions();
 
     /**
+     * Gets the operation name
      *
      * @return the operation name
      */

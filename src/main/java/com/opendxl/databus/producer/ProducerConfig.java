@@ -32,6 +32,9 @@ public class ProducerConfig extends AbstractConfig {
      * CHANGE WILL BREAK USER CODE.
      */
 
+    /**
+     * A Kafka ConfigDef object, used to store the producer configuration.
+     */
     private static final ConfigDef CONFIG;
 
     /** <code>bootstrap.servers</code> */
@@ -390,6 +393,14 @@ public class ProducerConfig extends AbstractConfig {
         return CommonClientConfigs.postProcessReconnectBackoffConfigs(this, parsedValues);
     }
 
+    /**
+     * Adds a serializer object to the config map
+     *
+     * @param configs A map of config object
+     * @param keySerializer A serializer object for keys
+     * @param valueSerializer A serializer object for values
+     * @return A map with the serializers config added
+     */
     public static Map<String, Object> addSerializerToConfig(Map<String, Object> configs,
                                                             Serializer<?> keySerializer,
                                                             Serializer<?> valueSerializer) {
@@ -402,6 +413,14 @@ public class ProducerConfig extends AbstractConfig {
         return newConfigs;
     }
 
+    /**
+     * Adds a serializer object to the Properties map
+     *
+     * @param properties An instance of Properties object
+     * @param keySerializer A serializer object for keys
+     * @param valueSerializer A serializer object for values
+     * @return A map with the serializers entries to the Properties instance
+     */
     public static Properties addSerializerToConfig(Properties properties,
                                                    Serializer<?> keySerializer,
                                                    Serializer<?> valueSerializer) {
@@ -414,18 +433,39 @@ public class ProducerConfig extends AbstractConfig {
         return newProperties;
     }
 
+    /**
+     * ProducerConfig constructor
+     *
+     * @param props An instance of Properties object
+     */
     public ProducerConfig(Properties props) {
         super(CONFIG, props);
     }
 
+    /**
+     * ProducerConfig constructor
+     *
+     * @param props A map of properties object
+     */
     public ProducerConfig(Map<String, Object> props) {
         super(CONFIG, props);
     }
 
+    /**
+     * ProducerConfig constructor
+     *
+     * @param props A map of properties object
+     * @param doLog Whether the configurations should be logged
+     */
     ProducerConfig(Map<?, ?> props, boolean doLog) {
         super(CONFIG, props, doLog);
     }
 
+    /**
+     * Gets the config names
+     *
+     * @return A set of String with the names of the config object
+     */
     public static Set<String> configNames() {
         return CONFIG.names();
     }

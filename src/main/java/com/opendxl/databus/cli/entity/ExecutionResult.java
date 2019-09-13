@@ -18,10 +18,12 @@ public class ExecutionResult {
      * Status Code
      */
     private final String code;
+
     /**
      * <p>Object showing the data returned by the executed command. The data varies according to the executed Operation,
      */
     private final Object result;
+
     /**
      * List of options used for a specific operation command line
      */
@@ -29,9 +31,10 @@ public class ExecutionResult {
 
     /**
      * Result of a command line operation.
-     *  @param code OK | ERROR
-     * @param result output data returned by the executed command line operation.
-     * @param options list of input options entered for the operation
+     *
+     * @param code OK | ERROR
+     * @param result Output data returned by the executed command line operation.
+     * @param options List of input options entered for the operation
      */
     public ExecutionResult(final String code, final Object result, final Map<OptionSpec<?>, List<?>> options) {
 
@@ -41,6 +44,7 @@ public class ExecutionResult {
     }
 
     /**
+     * Gets the result code of an Execution result
      *
      * @return result code
      */
@@ -49,6 +53,7 @@ public class ExecutionResult {
     }
 
     /**
+     * Gets the result of an Execution result
      *
      * @return a object that represents the result according to the specific operation
      */
@@ -57,6 +62,7 @@ public class ExecutionResult {
     }
 
     /**
+     * Gets the option list for the operation
      *
      * @return list of input options entered for the operation
      */

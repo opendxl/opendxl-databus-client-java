@@ -25,7 +25,14 @@ import java.util.Optional;
  */
 public class DatabusMessage implements Serializable {
 
+    /**
+     * The map of Headers contained in the Databus Message
+     */
     private  Map<String, String> headers;
+
+    /**
+     * The byte payload which is the data itself for the DatabusMessage
+     */
     private  byte[] payload;
 
     private DatabusMessage() {
@@ -35,8 +42,8 @@ public class DatabusMessage implements Serializable {
      * A DatabusMessage is created by providing a {@link Headers} and a payload as byte[].
      * If they are not provided, empty instances of them will be created.
      *
-     * @param headers key-value map that contains message headers
-     * @param payload payload as byte[]
+     * @param headers Key-value map that contains message headers
+     * @param payload Payload as byte[]
      */
     public DatabusMessage(final Headers headers, final byte[] payload) {
         this.headers = Optional.ofNullable(headers).orElse(new Headers()).getAll();
@@ -44,7 +51,7 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
-     * Headers
+     * Gets the headers of a DatabusMessage instance
      *
      * @return {@link Headers} of the message
      */
@@ -55,17 +62,18 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
+     * Delete an specific header passing a header name as a parameter
      *
-     * @param key the key to be removed from headers
+     * @param key The key to be removed from headers
      */
     public void removeHeader(final String key) {
         headers.remove(key);
     }
 
     /**
-     * Payload
+     * Gets the payload data
      *
-     * @return payload as byte[]
+     * @return A payload as array of byte
      */
     public byte[] getPayload() {
         return payload;
@@ -73,9 +81,10 @@ public class DatabusMessage implements Serializable {
 
 
     /**
+     * Overrides equals method for DatabusMessage
      *
-     * @param obj getInstance to be compared to
-     * @return true if both objects are equals
+     * @param obj An instance to be compared to
+     * @return True if both objects are equals
      */
     @Override
     public boolean equals(final Object obj) {
@@ -97,8 +106,9 @@ public class DatabusMessage implements Serializable {
     }
 
     /**
+     * Overrides equals method for DatabusMessage
      *
-     * @return hashCode
+     * @return HashCode as a product of payload hashcode and headers hashcode
      */
     @Override
     public int hashCode() {

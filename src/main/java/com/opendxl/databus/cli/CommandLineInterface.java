@@ -28,6 +28,7 @@ public class CommandLineInterface {
      * Represents the set of options arguments in the command line
      */
     private OptionSet options;
+
     /**
      * Operation is a CommandLineOperation instance suitable to {@link Channel} API method that will be executed.
      * Each API method is associated to an specific Operation, e.g.:
@@ -36,6 +37,7 @@ public class CommandLineInterface {
      * etc. Goal of each Operation class is to call its associated API method from the command line.
      */
     private CommandLineOperation operation;
+
     /**
      * Parses command line arguments
      */
@@ -44,7 +46,7 @@ public class CommandLineInterface {
     /**
      * Constructor
      *
-     * @param args options and arguments passing in command line
+     * @param args Options and arguments passing in command line
      */
     public CommandLineInterface(final String[] args) {
 
@@ -185,7 +187,7 @@ public class CommandLineInterface {
      * all mandatory option being included in command line. Finally, it create a {@link CommandLineOperation}
      * used later to perform the specific one.
      *
-     * @param optionSpecMap keeps a relationship between a {@link Options} and a Option Spec
+     * @param optionSpecMap Keeps a relationship between a {@link Options} and a Option Spec
      */
     private CommandLineOperation buildOperation(
             final Map<Options, ArgumentAcceptingOptionSpec> optionSpecMap) {
@@ -206,7 +208,7 @@ public class CommandLineInterface {
     /**
      * Execute an operation
      *
-     * @return ExceutionResult
+     * @return ExecutionResult
      */
     public ExecutionResult execute() {
         return operation.execute();
@@ -229,7 +231,7 @@ public class CommandLineInterface {
      * It parses command line options and their arguments values. If they do not meet spec requirements, it shows
      * the usage and exists with a error.
      *
-     * @param args options and arguments values passed in command line
+     * @param args Options and arguments values passed in command line
      */
     private void parseOptions(String[] args) {
 
