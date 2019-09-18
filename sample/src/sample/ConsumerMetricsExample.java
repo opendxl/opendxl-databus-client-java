@@ -40,14 +40,17 @@ public class ConsumerMetricsExample {
     private final ExecutorService executor;
     private final ScheduledExecutorService reportMetricsScheduler;
     private Consumer<byte[]> consumer;
-    private String producerTopic = "topic1";
-    private String consumerTopic = "topic1";
     private final DecimalFormat decimalFormat;
 
-
+    private static final String PRODUCER_TOPIC = "topic1";
+    private static final String CONSUMER_TOPIC = "topic1";
     private static final long PRODUCER_TIME_CADENCE_MS = 0;
     private static final long CONSUMER_TIME_CADENCE_MS = 100;
     private static final long CONSUMER_POLL_TIMEOUT = 500;
+    private static final long REPORT_METRICS_INITIAL_DELAY = 10000;
+    private static final long REPORT_METRICS_PERIOD = 10000;
+    private static final int BROKER_PORT = 9092;
+    private static final int ZOOKEEPER_PORT = 2182;
 
     private static final String INTEGER_FORMAT_PATTERN = "###,###,###,###,###,###";
 
@@ -62,8 +65,8 @@ public class ConsumerMetricsExample {
         // Start Kafka cluster
         ClusterHelper
                 .getInstance()
-                .addBroker(9092)
-                .zookeeperPort(2181)
+                .addBroker(BROKER_PORT)
+                .zookeeperPort(ZOOKEEPER_PORT)
                 .start();
 
         // Prepare a Producer
@@ -73,7 +76,7 @@ public class ConsumerMetricsExample {
         this.consumer = getConsumer();
 
         // Subscribe to topic
-        this.consumer.subscribe(Collections.singletonList(consumerTopic));
+        this.consumer.subscribe(Collections.singletonList(CONSUMER_TOPIC));
 
         this.executor = Executors.newFixedThreadPool(2);
 
@@ -113,14 +116,10 @@ public class ConsumerMetricsExample {
 
                 // user should provide the encoding
                 final byte[] payload = message.getBytes(Charset.defaultCharset());
-                final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
-                //final ProducerRecord<byte[]> producerRecord2 = getProducerRecord("topic2", payload);
-
+                final ProducerRecord<byte[]> producerRecord = getProducerRecord(PRODUCER_TOPIC, payload);
 
                 // Send the record
                 producer.send(producerRecord);
-                //producer.send(producerRecord2);
-
 
                 justWait(PRODUCER_TIME_CADENCE_MS);
             }
@@ -242,8 +241,8 @@ public class ConsumerMetricsExample {
         executor.submit(producerTask);
 
         reportMetricsScheduler.scheduleAtFixedRate(reportMetrics(),
-                10000,
-                10000,
+                REPORT_METRICS_INITIAL_DELAY,
+                REPORT_METRICS_PERIOD,
                 TimeUnit.MILLISECONDS);
 
         Runtime.getRuntime().addShutdownHook(
