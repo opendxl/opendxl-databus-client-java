@@ -8,7 +8,7 @@ Introduction
 .. toctree::
 	:maxdepth: 1
 
-	overview
+	Overview.rst
 	architecture
 	features
 
@@ -18,7 +18,7 @@ Java SDK Overview and Prerequisites
 .. toctree::
 	:maxdepth: 1
 
-	prerequisites
+	Prerequisites.rst
 
 API Documentation
 -----------------
@@ -29,7 +29,24 @@ Samples
 -------
 
 Basic
-    .. toctree::
-	    :maxdepth: 1
 
-	    basic-consumer-producer-example
+.. toctree::
+	:maxdepth: 1
+
+	Basic-producer-consumer-example.rst
+
+.. toctree::
+	:maxdepth: 1
+
+	Producer-metrics-sample.rst
+
+.. toctree::
+	:maxdepth: 1
+
+	Consumer-metrics-sample.rst
+
+.. toctree::
+        :maxdepth: 1
+
+        CLI-Example.rst
+
