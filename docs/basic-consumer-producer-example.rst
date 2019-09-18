@@ -1,2 +1,0 @@
-Consumer and Producer Example
-=============================
