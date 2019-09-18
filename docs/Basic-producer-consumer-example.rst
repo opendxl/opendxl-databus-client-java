@@ -33,7 +33,6 @@ Sample Code
 
             // Subscribe to topic
             this.consumer.subscribe(Collections.singletonList(consumerTopic));
-            //this.consumer.subscribe(Arrays.asList("topic1","topic2"));
 
             this.executor = Executors.newFixedThreadPool(2);
         }
@@ -81,7 +80,6 @@ Sample Code
                                     " HEADERS:" + headers +
                                     " PAYLOAD:" + new String(record.getMessagePayload().getPayload()));
                         }
-                        //consumer.commitSync();
                         consumer.commitAsync();
                     }
                 } catch (Exception e) {
