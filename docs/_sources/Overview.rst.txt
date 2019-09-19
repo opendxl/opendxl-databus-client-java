@@ -1,0 +1,12 @@
+Overview
+--------
+
+| The OpenDXL Databus Java client library is used to produce and consume
+  records
+| from a `Data Exchange
+  Layer <http://www.mcafee.com/us/solutions/data-exchange-layer.aspx>`__
+  (DXL) Streaming Service.
+
+| The DXL Databus exposes a client library that communicates
+| with Kafka to produce and consume records, and expose consumer and
+  producer metrics from Kafka.

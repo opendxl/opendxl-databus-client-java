@@ -1,0 +1,632 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Consumer Metrics Example" href="Consumer-metrics-sample.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenDXL Databus Java Client Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CLI (Command Line Interface)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#supported-operations">Supported Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#operation-arguments">Operation Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#produce">produce</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#consume">consume</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenDXL Databus Java Client Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>CLI (Command Line Interface)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cli-command-line-interface">
+<h1>CLI (Command Line Interface)<a class="headerlink" href="#cli-command-line-interface" title="Permalink to this headline">¶</a></h1>
+<p>OpenDXL Databus client can be invoked from command line interface (CLI)
+for testing or checking purposes. Executing CLI like a standard Java
+library with no arguments, the output shows the help:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar opendxldatabusclient-java-sdk-&lt;VERSION&gt;.jar
+
+ERROR: There are not options
+Option (* = required)                  Description
+---------------------                  -----------
+* --brokers &lt;String: broker list&gt;      Comma-separated broker list:  Example:
+                                         broker1:port1,broker2:port2,...,
+                                         brokerN:portN
+--cg &lt;String: cg&gt;                      The consumer group name.
+--config [String: config]              The producer/consumer configuration
+                                         list: Example: linger.ms=1000,batch.
+                                         size=100000,compression.type=lz4
+--consume-records &lt;Integer: consume-   Consume Poll expected records. Number
+  records&gt;                               of expected records.  (default: 1)
+--consume-timeout &lt;Integer: consume-   Consume Poll Timeout. Time in ms that
+  timeout&gt;                               the consumer waits for new records
+                                         during a consume operation.
+                                         Optional parameter, if absent, it
+                                         defaults to 5000 ms. (default: 15000)
+--from-topic &lt;String: from-topic&gt;      Coma-separated topic name list to
+                                         consume. Example: topic1,topic2,...,
+                                         topicN
+--headers [String: headers]            The producer headers:  (default: )
+--msg &lt;String: message&gt;                message to be produced
+--operation &lt;String: operation&gt;      Operations: produce | consume
+--partition [String: partition]        The partition number:  (default: )
+--sharding-key [String: sharding-key]  Sharding key (default: )
+--tenant-group [String: tenant-group]  Tenant Group (default: )
+--to-topic &lt;String: to-topic&gt;          Topic name to produce
+</pre></div>
+</div>
+<p><em>Note:</em> <code class="docutils literal notranslate"><span class="pre">&lt;String:</span> <span class="pre">FIELD&gt;</span></code> are mandatory placeholders which you should
+respectively replace with the correct field name. <code class="docutils literal notranslate"><span class="pre">[String:</span> <span class="pre">FIELD]</span></code>
+are optional placeholders which you should respectively replace with the
+correct field name.</p>
+<div class="section" id="supported-operations">
+<h2>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h2>
+<p>In order to get records from Databus client, the user has to invoke a
+few CLI operations. Operations arguments are placed after
+<code class="docutils literal notranslate"><span class="pre">--operation</span></code> option. For instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar opendxldatabusclient-java-sdk-&lt;VERSION&gt;.jar --operation &lt;OPERATION_ARGUMENT&gt; ...
+</pre></div>
+</div>
+<div class="section" id="operation-arguments">
+<h3>Operation Arguments<a class="headerlink" href="#operation-arguments" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Operation Arguments</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--produce</span></code></td>
+<td>produce a message to a Kafka topic.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--consume</span></code></td>
+<td>consume a message from a Kafka topic.</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line">The invocation of CLI operations to get records is: <code class="docutils literal notranslate"><span class="pre">produce</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">consume</span></code> .</div>
+<div class="line">First of all, a message is needed to be produced to a topic and then
+start consuming it.</div>
+</div>
+</div>
+<div class="section" id="produce">
+<h3>produce<a class="headerlink" href="#produce" title="Permalink to this headline">¶</a></h3>
+<p>It is an operation which produces a message to a specific broker with an
+associated topic. Optional arguments can be added to attach partition,
+sharding key, tenant group and headers.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Mandatory Arguments
+for produce</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--operation</span></code></td>
+<td>The operation name. In this case, always the
+operation name is <code class="docutils literal notranslate"><span class="pre">produce</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--to-topic</span></code></td>
+<td>The topic name which will send the message.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--msg</span></code></td>
+<td>The message payload.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--brokers</span></code></td>
+<td>The brokers list comma separated. Host and ports.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="47%" />
+<col width="19%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Optional Arguments
+for produce</th>
+<th class="head">Description</th>
+<th class="head">Default
+value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--partition</span></code></td>
+<td>The partition number, valid
+numbers for partition are
+&gt;= 0.</td>
+<td>Blank,
+which
+assignes
+any kafka
+valid
+partition
+created.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--sharding-key</span></code></td>
+<td>The key associated to the
+message.</td>
+<td>Blank with
+empty
+string</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--tenant-group</span></code></td>
+<td>The associated tenant
+group.</td>
+<td>Blank with
+empty
+string</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--headers</span></code></td>
+<td>The associated producer
+headers.</td>
+<td>Blank with
+empty
+string</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--config</span></code></td>
+<td>The producer configuration.
+For example:
+linger.ms=1000,batch.size=1
+00000,compression.type=lz4</td>
+<td>Blank with
+empty
+string</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="example">
+<h4>example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar opendxlstreamingclient-java-sdk-&lt;VERSION&gt;.jar \
+--operation produce \
+--to-topic &lt;TOPIC_NAME&gt; \
+--brokers &lt;0.0.0.0&gt;:&lt;PORT&gt; \
+--msg &lt;MESSAGE&gt; \
+--tenant-group &lt;TENANT-GROUP&gt; \
+--sharding-key &lt;KEY&gt; \
+--partition &lt;PARTITION-NUMBER&gt; \
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;code&quot;</span><span class="p">:</span><span class="s2">&quot;OK&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;SHARDING-KEY: &lt;KEY&gt; TOPICS:&lt;TOPIC_NAME&gt;-&lt;TENANT-GROUP&gt; PARTITION:&lt;PARTITION-NUMBER&gt; OFFSET:0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;options&quot;</span><span class="p">:{</span>
+        <span class="s2">&quot;[to-topic]&quot;</span><span class="p">:[</span><span class="o">&lt;</span><span class="n">TOPIC_NAME</span><span class="o">&gt;</span><span class="p">],</span>
+        <span class="s2">&quot;[brokers]&quot;</span><span class="p">:[</span><span class="o">&lt;</span><span class="mf">0.0</span><span class="o">.</span><span class="mf">0.0</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">PORT</span><span class="o">&gt;</span> <span class="p">],</span>
+        <span class="s2">&quot;[msg]&quot;</span><span class="p">:[</span><span class="o">&lt;</span><span class="n">MESSAGE</span><span class="o">&gt;</span><span class="p">],</span>
+        <span class="s2">&quot;[consume-timeout]&quot;</span><span class="p">:[</span><span class="mi">15000</span><span class="p">],</span>
+        <span class="s2">&quot;[headers]&quot;</span><span class="p">:[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;[cg]&quot;</span><span class="p">:[],</span>
+        <span class="s2">&quot;[sharding-key]&quot;</span><span class="p">:[</span><span class="o">&lt;</span><span class="n">KEY</span><span class="o">&gt;</span><span class="p">],</span>
+        <span class="s2">&quot;[from-topic]&quot;</span><span class="p">:[],</span>
+        <span class="s2">&quot;[tenant-group]&quot;</span><span class="p">:[</span><span class="o">&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">&gt;</span><span class="p">],</span>
+        <span class="s2">&quot;[partition]&quot;</span><span class="p">:[</span><span class="o">&lt;</span><span class="n">PARTITION</span><span class="o">-</span><span class="n">NUMBER</span><span class="o">&gt;</span><span class="p">],</span>
+        <span class="s2">&quot;[consume-records]&quot;</span><span class="p">:[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;[operation]&quot;</span><span class="p">:[</span><span class="s2">&quot;produce&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;[config]&quot;</span><span class="p">:[]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="consume">
+<h3>consume<a class="headerlink" href="#consume" title="Permalink to this headline">¶</a></h3>
+<p>It is an operation which receives messages from specified topics at
+specified brokers. Optional arguments, like consume-records or
+consume-timeout, are supported to refine the record list contained in
+the consumer operation result.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="58%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Mandatory Arguments
+for consume</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--operation</span></code></td>
+<td>The operation
+name. In this
+case, always
+the operation
+name is
+<code class="docutils literal notranslate"><span class="pre">consume</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--brokers</span></code></td>
+<td>The brokers
+list comma
+separated.
+Host and
+ports.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--from-topic</span></code></td>
+<td>A comma
+separated
+string list
+with the topic
+names to
+consume from.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="43%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Optional Arguments
+for consume</th>
+<th class="head">Description</th>
+<th class="head">Default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--tenant-group</span></code></td>
+<td>The associated tenant
+group.</td>
+<td>Blank with
+empty string</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--cg</span></code></td>
+<td>The consumer group to be
+member of.</td>
+<td>Blank with
+empty string</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--config</span></code></td>
+<td>The consumer configuration
+in comma separated
+property-value pairs.For
+example:
+enable.auto.commit=false,re
+quest.timeout.ms=61000,sess
+ion.timeout.ms=60000,auto.o
+ffset.reset=earliest,auto.c
+ommit.interval.ms=0</td>
+<td>Blank with
+empty string</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--consume-records</span></code></td>
+<td>Maximum number of records
+to read within thespecified
+<code class="docutils literal notranslate"><span class="pre">consume-timeout</span></code>. CLI
+polls for new records
+untilwhichever condition is
+first met:timeout has
+elapsed, ormaximum number
+of records were received.</td>
+<td>1 record</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--consume-timeout</span></code></td>
+<td>Maximum time to wait for
+receiving the
+specified<code class="docutils literal notranslate"><span class="pre">consume-record</span>
+<span class="pre">s</span></code>
+number. CLI polls for new
+records untilwhichever
+condition is first
+met:timeout has elapsed
+ornumber of received
+records reached
+<code class="docutils literal notranslate"><span class="pre">consume-records</span></code> value.</td>
+<td>15000
+milliseconds</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id1">
+<h4>example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>This example waits up to \ to receive up to \ records in total for \
+tenant group from \ or \ or \ topics from \ or \ kafka brokers
+using \ consumer group and configuring consumer to enable auto commmit.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">opendxldatabusclient</span><span class="o">-</span><span class="n">java</span><span class="o">-</span><span class="n">sdk</span><span class="o">-&lt;</span><span class="n">VERSION</span><span class="o">&gt;.</span><span class="n">jar</span> \
+<span class="o">--</span><span class="n">operation</span> <span class="n">consume</span> \
+<span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">topic</span> <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="p">,</span><span class="n">TOPIC_2</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">TOPIC_N</span><span class="o">&gt;</span> \
+<span class="o">--</span><span class="n">brokers</span> <span class="o">&lt;</span><span class="n">BROKER_1_IP</span><span class="p">:</span><span class="n">BROKER_1_PORT</span><span class="p">,</span><span class="n">BROKER_2_PORT</span><span class="p">:</span><span class="n">BROKER_2_PORT</span><span class="p">,</span><span class="o">...&gt;</span> \
+<span class="o">--</span><span class="n">consume</span><span class="o">-</span><span class="n">timeout</span> <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">TIMEOUT</span><span class="o">&gt;</span> \
+<span class="o">--</span><span class="n">consume</span><span class="o">-</span><span class="n">records</span> <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">RECORDS</span><span class="o">-</span><span class="n">NUMBER</span><span class="o">&gt;</span> \
+<span class="o">--</span><span class="n">tenant</span><span class="o">-</span><span class="n">group</span> <span class="o">&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span> \
+<span class="o">--</span><span class="n">cg</span> <span class="o">&lt;</span><span class="n">CONSUMER</span><span class="o">-</span><span class="n">GROUP</span><span class="o">&gt;</span>
+<span class="o">--</span><span class="n">config</span> <span class="n">enable</span><span class="o">.</span><span class="n">auto</span><span class="o">.</span><span class="n">commit</span><span class="o">=</span><span class="n">true</span>
+</pre></div>
+</div>
+<p>The response example illustrates that two records are returned.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;shardingKey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;payload&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello Databus 002&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;composedTopic&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TOPIC_2</span><span class="o">&gt;-&lt;</span><span class="n">TENANT_GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TOPIC_2</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s2">&quot;tenantGroup&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s2">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1568303331900</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;shardingKey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;payload&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello Databus 001&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;composedTopic&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="o">&gt;-&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s2">&quot;tenantGroup&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s2">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1568303355250</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;[to-topic]&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;[brokers]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="o">&lt;</span><span class="n">BROKER_1_IP</span><span class="p">:</span><span class="n">BROKER_1_PORT</span><span class="p">,</span><span class="n">BROKER_2_PORT</span><span class="p">:</span><span class="n">BROKER_2_PORT</span><span class="p">,</span><span class="o">...&gt;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[msg]&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;[consume-timeout]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">TIMEOUT</span><span class="o">&gt;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[headers]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[cg]&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;[sharding-key]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[from-topic]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="p">,</span><span class="n">TOPIC_2</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">TOPIC_N</span><span class="o">&gt;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[tenant-group]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="o">&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[partition]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[consume-records]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="mi">2</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[operation]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;consume&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;[config]&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;enable.auto.commit=true&quot;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="Consumer-metrics-sample.html" class="btn btn-neutral" title="Consumer Metrics Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McAfee LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

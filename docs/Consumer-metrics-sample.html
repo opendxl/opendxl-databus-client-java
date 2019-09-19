@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Consumer Metrics Example &mdash; OpenDXL Databus Java Client Library 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CLI (Command Line Interface)" href="CLI-Example.html" />
+    <link rel="prev" title="Producer Metrics Example" href="Producer-metrics-sample.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenDXL Databus Java Client Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Consumer Metrics Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-code">Sample Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-sample">Run the sample</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running">Running</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CLI-Example.html">CLI (Command Line Interface)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenDXL Databus Java Client Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Consumer Metrics Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="consumer-metrics-example">
+<h1>Consumer Metrics Example<a class="headerlink" href="#consumer-metrics-example" title="Permalink to this headline">¶</a></h1>
+<p>This sample demonstrates how to get consumer metrics from the DXL
+Databus client by using a consumer in a running Kafka cluster. The type
+of metrics that can be obtained are the following:</p>
+<ul class="simple">
+<li>Consumer metrics associated to a clientId.</li>
+<li>Consumer metrics associated to a clientId and a topic.</li>
+</ul>
+<p>The example goal is to show <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> metric values varying across
+time, so a <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance is created and it must continuously
+consume records from Kafka. In order to provide these records, the
+example instantiates a <code class="docutils literal notranslate"><span class="pre">Producer</span></code> to keep on producing records to
+specific topics for the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> to consume from. The <code class="docutils literal notranslate"><span class="pre">Producer</span></code>
+instance has only a helper role in this example so it is not covered in
+detail.</p>
+<p>Code highlights are shown below:</p>
+<div class="section" id="sample-code">
+<h2>Sample Code<a class="headerlink" href="#sample-code" title="Permalink to this headline">¶</a></h2>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span>public static void main(String[] args) throws InterruptedException {
+    LOG.info(&quot;Ctrl-C to finish&quot;);
+    new ConsumerMetricsExample().startExample();
+}
+
+public ConsumerMetricsExample() {
+
+    // Start Kafka cluster
+    ClusterHelper
+        .getInstance()
+        .addBroker(BROKER_PORT)
+        .zookeeperPort(ZOOKEEPER_PORT)
+        .start();
+
+    // Prepare a Producer
+    this.producer = getProducer();
+
+    // Prepare a Consumer
+    this.consumer = getConsumer();
+
+    // Subscribe Consumer to topic
+    this.consumer.subscribe(Collections.singletonList(consumerTopic));
+
+    // Set up two threads: one to produce records and another to consume them
+    this.executor = Executors.newFixedThreadPool(2);
+
+    // Set up a thread to periodically collect consumer metrics
+    this.reportMetricsScheduler = Executors.newScheduledThreadPool(1);
+
+    // Decimal format to apply to collected consumer metrics
+    decimalFormat = new DecimalFormat(INTEGER_FORMAT_PATTERN);
+
+}
+
+// Create consumer instance
+public Consumer&lt;byte[]&gt; getConsumer() {
+    final Properties consumerProps = new Properties();
+    consumerProps.put(ConsumerConfiguration.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+    consumerProps.put(ConsumerConfiguration.GROUP_ID_CONFIG, &quot;consumer-group-1&quot;);
+    consumerProps.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, &quot;true&quot;);
+    consumerProps.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, &quot;30000&quot;);
+    consumerProps.put(ConsumerConfiguration.CLIENT_ID_CONFIG, &quot;consumer-id-sample&quot;);
+    return new DatabusConsumer&lt;&gt;(consumerProps, new ByteArrayDeserializer());
+}
+
+// Start the consumer metrics sample
+public void startExample() throws InterruptedException {
+
+    Runnable consumerTask = getConsumerTask();
+    Runnable producerTask = getProducerTask();
+
+    executor.submit(consumerTask);
+    executor.submit(producerTask);
+
+    reportMetricsScheduler.scheduleAtFixedRate(reportMetrics(),
+            REPORT_METRICS_INITIAL_DELAY,
+            REPORT_METRICS_PERIOD,
+            TimeUnit.MILLISECONDS);
+
+    Runtime.getRuntime().addShutdownHook(
+            new Thread(
+                new Runnable() {
+                    public void run() {
+                        stopExample(executor);
+                        LOG.info(&quot;Example finished&quot;);
+                    }
+                }));
+
+}
+
+// Consumer loop to continuously get records from Kafka
+private Runnable getConsumerTask() {
+    return () -&gt; {
+        try {
+            LOG.info(&quot;Consumer started&quot;);
+            int pollCount = 0;
+            while (!closed.get()) {
+
+                // Polling the databus
+                consumer.poll(CONSUMER_POLL_TIMEOUT);
+
+                consumer.commitSync();
+                justWait(CONSUMER_TIME_CADENCE_MS);
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        } finally {
+            consumer.unsubscribe();
+            consumer.close();
+            LOG.info(&quot;Consumer closed&quot;);
+        }
+    };
+}
+
+// Instance a thread to get Kafka consumer metrics
+private Runnable reportMetrics() {
+    return () -&gt; {
+        try {
+            ConsumerMetricPerClientIdAndTopics recordsTotalMetric
+                    = consumer.recordsTotalMetric();
+            ConsumerMetricPerClientIdAndTopics bytesTotalMetric
+                    = consumer.bytesTotalMetric();
+            ConsumerMetricPerClientIdAndTopics recordsPerSecMetric
+                    = consumer.recordsPerSecondAvgMetric();
+            ConsumerMetricPerClientIdAndTopics bytesPerSecondAvgMetric
+                    = consumer.bytesPerSecondAvgMetric();
+            ConsumerMetricPerClientIdAndTopicPartitions recordsLagPerTopicPartition
+                    = consumer.recordsLagPerTopicPartition();
+
+            LOG.info(&quot;&quot;);
+            LOG.info(&quot;CONSUMER TOTAL:&quot;
+                    + decimalFormat.format(recordsTotalMetric.getValue()) + &quot;rec &quot;
+                    + decimalFormat.format(bytesTotalMetric.getValue()) + &quot;bytes&quot;);
+             LOG.info(&quot;CONSUMER RATE:&quot;
+                    + decimalFormat.format(recordsPerSecMetric.getValue()) + &quot;rec &quot;
+                    + decimalFormat.format(bytesPerSecondAvgMetric.getValue()) + &quot;bytes&quot;);
+
+            for(Map.Entry&lt;String, ConsumerMetric &gt; topicMetric
+                    : recordsPerSecMetric.getTopicMetrics().entrySet()) {
+                LOG.info(&quot; - &quot; + topicMetric.getKey()
+                         + &quot;:&quot; + decimalFormat.format(topicMetric.getValue().getValue())
+                         + &quot;rec/sec&quot;);
+            }
+
+            for(Map.Entry&lt;String, ConsumerMetric &gt; topicMetric
+                    : bytesPerSecondAvgMetric.getTopicMetrics().entrySet()) {
+                LOG.info(&quot; - &quot; + topicMetric.getKey()
+                         + &quot;:&quot; + decimalFormat.format(topicMetric.getValue().getValue())
+                         + &quot;bytes/sec&quot;);
+            }
+            LOG.info(&quot;CONSUMER MAX LAG FOR ANY PARTITION:&quot;
+                     + decimalFormat.format(consumer.recordsLagMaxMetric().getValue())
+                     + &quot;rec&quot;);
+
+            Map&lt;TopicPartition, ConsumerMetric&gt; topicPartitionsMetrics =
+                    recordsLagPerTopicPartition.getTopicPartitionsMetrics();
+
+            for( Map.Entry&lt;TopicPartition, ConsumerMetric&gt; tpMetric
+                   : topicPartitionsMetrics.entrySet()) {
+                LOG.info(&quot; - &quot; + tpMetric.getKey().topic()
+                         + &quot;-&quot; + tpMetric.getKey().partition()
+                         + &quot; &quot; + decimalFormat.format(tpMetric.getValue().getValue())
+                         + &quot;rec&quot;);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+    };
+}
+
+// Producer loop to continuously produce records to Kafka
+private Runnable getProducerTask() {
+    return () -&gt; {
+        LOG.info(&quot;Producer started&quot;);
+        while (!closed.get()) {
+
+            // Prepare a record
+            final String message = &quot;Hello World at:&quot; + LocalDateTime.now();
+
+            // user should provide the encoding
+            final byte[] payload = message.getBytes(Charset.defaultCharset());
+            final ProducerRecord&lt;byte[]&gt; producerRecord = getProducerRecord(producerTopic,
+                                                                            payload);
+
+            // Send the record
+            producer.send(producerRecord);
+
+            justWait(PRODUCER_TIME_CADENCE_MS);
+        }
+        producer.close();
+        LOG.info(&quot;Producer closed&quot;);
+
+    };
+}
+</pre></div>
+</div>
+<p>The first step is to instance the Kafka cluster, the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> and
+the helper <code class="docutils literal notranslate"><span class="pre">Producer</span></code> to run the example. The constructor method
+<code class="docutils literal notranslate"><span class="pre">ConsumerMetricsExample()</span></code> is in charge of doing that. It also
+subscribes <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> to the selected topic <code class="docutils literal notranslate"><span class="pre">CONSUMER_TOPIC</span></code>.</p>
+<p>At second step, <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method creates a consumer thread by
+calling <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and it starts the thread for the
+<code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance to continuously receive records.</p>
+<p>At third step, <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method also creates a producer thread
+by calling <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> and it starts the thread for the
+<code class="docutils literal notranslate"><span class="pre">Producer</span></code> to send records to the topic where the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> is
+subscribed to.</p>
+<p>Finally, <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts the metrics collecting thread
+which will periodically call <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code>. The metrics thread has
+two parameters which are needed to be configured:</p>
+<ul class="simple">
+<li>the waiting period before to get metrics, set with
+REPORT_METRICS_INITIAL_DELAY value, which is time before start
+collecting metrics.</li>
+<li>the period of time to periodically get the metrics from Kafka, set
+with REPORT_METRICS_PERIOD.</li>
+</ul>
+<p>After the consumer, producer and metrics threads have started, the
+sample shows the consumer metrics with values periodically.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible to get the consumer
+metrics from the Kafka cluster.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> metrics obtained by the sample are the following:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="38%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Metric Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>records-consumed-total</td>
+<td>Total number of records consumed per
+consumer and its topics.</td>
+</tr>
+<tr class="row-odd"><td>bytes-consumed-total</td>
+<td>Total bytes consumed per consumer and
+its topics.</td>
+</tr>
+<tr class="row-even"><td>records-consumed-rate</td>
+<td>Average number of records consumed per
+seconds for each consumer and its
+topics.</td>
+</tr>
+<tr class="row-odd"><td>bytes-consumed-rate</td>
+<td>Average bytes consumed per second for
+each consumer and its topics.</td>
+</tr>
+<tr class="row-even"><td>records-lag-max</td>
+<td>The maximum lag in terms of number of
+records for any partition.</td>
+</tr>
+<tr class="row-odd"><td>records-lag</td>
+<td>The latest lag of the partition.</td>
+</tr>
+</tbody>
+</table>
+<p>Further information about Kafka monitoring and metrics can be found
+<a class="reference external" href="https://kafka.apache.org/documentation/#monitoring">here</a>.</p>
+<p>Finally, the sample shuts down gracefully by pressing <code class="docutils literal notranslate"><span class="pre">CTRL+C</span></code>. The
+shut down steps involve:</p>
+<ul class="simple">
+<li>stop produce thread and close <code class="docutils literal notranslate"><span class="pre">Producer</span></code> instance</li>
+<li>stop consumer thread, unsubscribe <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance from topics
+and close it</li>
+<li>stop Kafka cluster</li>
+</ul>
+</div>
+<div class="section" id="run-the-sample">
+<h2>Run the sample<a class="headerlink" href="#run-the-sample" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Java Development Kit 8 (JDK 8) or later.</li>
+</ul>
+</div>
+<div class="section" id="running">
+<h3>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h3>
+<p>To run this sample execute the runsample script as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./runsample sample.ConsumerMetricsExample
+</pre></div>
+</div>
+<p>The output shows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ctrl</span><span class="o">-</span><span class="n">C</span> <span class="n">to</span> <span class="n">finish</span>
+<span class="n">Zookeeper</span> <span class="n">node</span> <span class="n">started</span><span class="p">:</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">2182</span>
+<span class="n">Kafka</span> <span class="n">broker</span> <span class="n">started</span><span class="p">:</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">9092</span>
+<span class="n">Consumer</span> <span class="n">started</span>
+<span class="n">Producer</span> <span class="n">started</span>
+
+<span class="n">CONSUMER</span> <span class="n">TOTAL</span><span class="p">:</span><span class="mi">12</span><span class="p">,</span><span class="mi">220</span><span class="n">rec</span> <span class="mi">822</span><span class="p">,</span><span class="mi">133</span><span class="nb">bytes</span>
+<span class="n">CONSUMER</span> <span class="n">RATE</span><span class="p">:</span><span class="mi">382</span><span class="n">rec</span> <span class="mi">25</span><span class="p">,</span><span class="mi">698</span><span class="nb">bytes</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">382</span><span class="n">rec</span><span class="o">/</span><span class="n">sec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">25</span><span class="p">,</span><span class="mi">697</span><span class="nb">bytes</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">CONSUMER</span> <span class="n">MAX</span> <span class="n">LAG</span> <span class="n">FOR</span> <span class="n">ANY</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">9</span><span class="p">,</span><span class="mi">984</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">1</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">0</span> <span class="mi">6</span><span class="p">,</span><span class="mi">984</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">3</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">2</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">5</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">4</span> <span class="mi">0</span><span class="n">rec</span>
+
+<span class="n">CONSUMER</span> <span class="n">TOTAL</span><span class="p">:</span><span class="mi">49</span><span class="p">,</span><span class="mi">703</span><span class="n">rec</span> <span class="mi">3</span><span class="p">,</span><span class="mi">343</span><span class="p">,</span><span class="mi">564</span><span class="nb">bytes</span>
+<span class="n">CONSUMER</span> <span class="n">RATE</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="mi">184</span><span class="n">rec</span> <span class="mi">79</span><span class="p">,</span><span class="mi">641</span><span class="nb">bytes</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="mi">184</span><span class="n">rec</span><span class="o">/</span><span class="n">sec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">79</span><span class="p">,</span><span class="mi">641</span><span class="nb">bytes</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">CONSUMER</span> <span class="n">MAX</span> <span class="n">LAG</span> <span class="n">FOR</span> <span class="n">ANY</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">18</span><span class="p">,</span><span class="mi">847</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">1</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">0</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">3</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">2</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">5</span> <span class="mi">10</span><span class="p">,</span><span class="mi">847</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">4</span> <span class="mi">0</span><span class="n">rec</span>
+
+<span class="n">CONSUMER</span> <span class="n">TOTAL</span><span class="p">:</span><span class="mi">94</span><span class="p">,</span><span class="mi">409</span><span class="n">rec</span> <span class="mi">6</span><span class="p">,</span><span class="mi">351</span><span class="p">,</span><span class="mi">728</span><span class="nb">bytes</span>
+<span class="n">CONSUMER</span> <span class="n">RATE</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="mi">816</span><span class="n">rec</span> <span class="mi">122</span><span class="p">,</span><span class="mi">189</span><span class="nb">bytes</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="mi">816</span><span class="n">rec</span><span class="o">/</span><span class="n">sec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">122</span><span class="p">,</span><span class="mi">186</span><span class="nb">bytes</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">CONSUMER</span> <span class="n">MAX</span> <span class="n">LAG</span> <span class="n">FOR</span> <span class="n">ANY</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">63</span><span class="p">,</span><span class="mi">553</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">1</span> <span class="mi">18</span><span class="p">,</span><span class="mi">007</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">0</span> <span class="mi">55</span><span class="p">,</span><span class="mi">553</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">3</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">2</span> <span class="mi">0</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">5</span> <span class="mi">3</span><span class="p">,</span><span class="mi">948</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">4</span> <span class="mi">7</span><span class="p">,</span><span class="mi">511</span><span class="n">rec</span>
+
+<span class="n">CONSUMER</span> <span class="n">TOTAL</span><span class="p">:</span><span class="mi">138</span><span class="p">,</span><span class="mi">297</span><span class="n">rec</span> <span class="mi">9</span><span class="p">,</span><span class="mi">306</span><span class="p">,</span><span class="mi">623</span><span class="nb">bytes</span>
+<span class="n">CONSUMER</span> <span class="n">RATE</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">324</span><span class="n">rec</span> <span class="mi">290</span><span class="p">,</span><span class="mi">987</span><span class="nb">bytes</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">324</span><span class="n">rec</span><span class="o">/</span><span class="n">sec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="p">:</span><span class="mi">290</span><span class="p">,</span><span class="mi">987</span><span class="nb">bytes</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">CONSUMER</span> <span class="n">MAX</span> <span class="n">LAG</span> <span class="n">FOR</span> <span class="n">ANY</span> <span class="n">PARTITION</span><span class="p">:</span><span class="mi">238</span><span class="p">,</span><span class="mi">941</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">1</span> <span class="mi">18</span><span class="p">,</span><span class="mi">007</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">0</span> <span class="mi">48</span><span class="p">,</span><span class="mi">235</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">3</span> <span class="mi">100</span><span class="p">,</span><span class="mi">829</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">2</span> <span class="mi">157</span><span class="p">,</span><span class="mi">391</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">5</span> <span class="mi">231</span><span class="p">,</span><span class="mi">441</span><span class="n">rec</span>
+ <span class="o">-</span> <span class="n">topic1</span><span class="o">-</span><span class="mi">4</span> <span class="mi">7</span><span class="p">,</span><span class="mi">511</span><span class="n">rec</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="CLI-Example.html" class="btn btn-neutral float-right" title="CLI (Command Line Interface)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Producer-metrics-sample.html" class="btn btn-neutral" title="Producer Metrics Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McAfee LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

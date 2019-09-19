@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Producer Metrics Example" href="producer-metrics-sample.html" />
-    <link rel="prev" title="Prerequisites" href="prerequisites.html" /> 
+    <link rel="next" title="Producer Metrics Example" href="Producer-metrics-sample.html" />
+    <link rel="prev" title="Prerequisites" href="Prerequisites.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -84,12 +84,10 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Producer Consumer Example</a><ul>
@@ -103,7 +101,15 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CLI-Example.html">CLI (Command Line Interface)</a></li>
 </ul>
 
             
@@ -195,7 +201,6 @@ public BasicConsumerProducerExample() {
 
     // Subscribe to topic
     this.consumer.subscribe(Collections.singletonList(consumerTopic));
-    //this.consumer.subscribe(Arrays.asList(&quot;topic1&quot;,&quot;topic2&quot;));
 
     this.executor = Executors.newFixedThreadPool(2);
 }
@@ -243,7 +248,6 @@ private Runnable getConsumerTask() {
                             &quot; HEADERS:&quot; + headers +
                             &quot; PAYLOAD:&quot; + new String(record.getMessagePayload().getPayload()));
                 }
-                //consumer.commitSync();
                 consumer.commitAsync();
             }
         } catch (Exception e) {
@@ -297,12 +301,15 @@ synchronized private void stopExample(final ExecutorService executor) {
 }
 </pre></div>
 </div>
-<p>The first step is to create the instance of the Kafka cluster to run the
-example. The constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in
-charge of doing that. This method also creates a DatabusConsumer
-instance calling to <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same
-approach, calling to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of
-DatabusProducer.</p>
+<div class="line-block">
+<div class="line">The first step is to create the instance of the Kafka cluster to run
+the example.</div>
+<div class="line">The constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in charge of
+doing that.</div>
+<div class="line">This method also creates a DatabusConsumer instance calling to
+<code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same approach, calling
+to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of DatabusProducer.</div>
+</div>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">Consumer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getConsumer</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">final</span> <span class="n">Properties</span> <span class="n">consumerProps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Properties</span><span class="p">();</span>
     <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">BOOTSTRAP_SERVERS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="p">);</span>
@@ -323,13 +330,13 @@ DatabusProducer.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>DatabusConsumer and DatabusProducer are created with configurarion maps
-setted as parameters.</p>
-<p>DatabusConsumer recieves the following configuration:</p>
+<p>DatabusConsumer and DatabusProducer are created with configuration maps
+set as parameters.</p>
+<p>DatabusConsumer receives the following configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="33%" />
-<col width="67%" />
+<col width="43%" />
+<col width="57%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -337,32 +344,29 @@ setted as parameters.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_C</span>
-<span class="pre">ONFIG</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_CONFIG</span></code></td>
 <td>The Kafka broker and port to listen.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">GROUP_ID_CONFIG</span></code></td>
 <td>The consumer group associated.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ENABLE_AUTO_COMMIT_</span>
-<span class="pre">CONFIG</span></code></td>
-<td>If autocommit be enabled or not.</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ENABLE_AUTO_COMMIT_CONFIG</span></code></td>
+<td>If auto-commit will be enabled or not.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">SESSION_TIMEOUT_MS_</span>
-<span class="pre">CONFIG</span></code></td>
-<td>The hearbeat interval in ms to check if the
-Kakfa broker is alive.</td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">SESSION_TIMEOUT_MS_CONFIG</span></code></td>
+<td>The heartbeat interval in ms to check
+if the Kakfa broker is alive.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">CLIENT_ID_CONFIG</span></code></td>
 <td>The related clientId.</td>
 </tr>
 </tbody>
 </table>
-<p>DatabusProducer recieves the following configuration:</p>
+<p>DatabusProducer receives the following configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="33%" />
-<col width="67%" />
+<col width="42%" />
+<col width="58%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -370,8 +374,7 @@ Kakfa broker is alive.</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_C</span>
-<span class="pre">ONFIG</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_CONFIG</span></code></td>
 <td>The Kafka broker and port to listen.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">CLIENT_ID_CONFIG</span></code></td>
@@ -383,23 +386,24 @@ additional messages before sending the
 current batch.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">BATCH_SIZE_CONFIG</span></code></td>
-<td>the amount of memory in bytes (not messages!)</td>
-</tr>
-<tr class="row-even"><td>that will be used for
-each batch.</td>
-<td>&#160;</td>
+<td>the amount of memory in bytes (not
+messages!) that will be used for each
+batch.</td>
 </tr>
 </tbody>
 </table>
-<p>After this, the consumer suscribes to a topic in the following line:</p>
+<p>After this, the consumer subscribes to a topic in the following line:</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Collections</span><span class="o">.</span><span class="n">singletonList</span><span class="p">(</span><span class="n">consumerTopic</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>Then the <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> constructor is executed, the
-<code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two internal
+<div class="line-block">
+<div class="line">Then the <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> constructor is executed,
+the</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two internal
 methods for the producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and
-<code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to produce
-and consume messages respectively.</p>
+<code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to
+produce and consume messages respectively.</div>
+</div>
 <p>Here in detail both methods will be explained:</p>
 </div>
 <div class="section" id="getconsumertask">
@@ -452,16 +456,19 @@ the produced records.</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">CONSUMER_TIME_CADENCE_MS</span></code> is the time, in ms, spent waiting in
 poll if data is not available.</p>
-<p>When the poll finished the consumer logs the data of the recieved
+<p>When the poll finished the consumer logs the data of the received
 messages and calls the commit method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">commitAsync</span><span class="p">();</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">commitAsync()</span></code>, commits the last offset and carry on.</p>
-<p>When the sample stops, unsuscribe and close method of the consumer are
-called. These methods do the following: - Unsubscribe from topics
-currently subscribed. - Close the consumer. This will close the network
-connections and sockets.</p>
+<p>When the sample stops, unsubscribe and close method of the consumer are
+called. These methods do the following:</p>
+<ul class="simple">
+<li>Unsubscribe from topics currently subscribed.</li>
+<li>Close the consumer. This will close the network connections and
+sockets.</li>
+</ul>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">();</span>
 <span class="n">consumer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
 </pre></div>
@@ -500,9 +507,12 @@ connections and sockets.</p>
 <p>Producer thread runs until sample stops or an exception is triggered.
 When this happens the while loop breaks. Until that, the producer sends
 the produced records.</p>
-<p>First the producer creates a message and make it into an array of bytes.
-After this, a producer record is created calling to the
-<code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code> method.</p>
+<div class="line-block">
+<div class="line">First the producer creates a message and make it into an array of
+bytes.</div>
+<div class="line">After this, a producer record is created calling to the
+<code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code> method.</div>
+</div>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">ProducerRecord</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getProducerRecord</span><span class="p">(</span><span class="n">final</span> <span class="n">String</span> <span class="n">topic</span><span class="p">,</span> <span class="n">final</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">payload</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">currentTimeMillis</span><span class="p">());</span>
     <span class="n">RoutingData</span> <span class="n">routingData</span> <span class="o">=</span> <span class="n">new</span> <span class="n">RoutingData</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">null</span><span class="p">);</span>
@@ -520,13 +530,16 @@ producer calls the send method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">producerRecord</span><span class="p">,</span> <span class="n">new</span> <span class="n">MyCallback</span><span class="p">(</span><span class="n">producerRecord</span><span class="o">.</span><span class="n">getRoutingData</span><span class="p">()</span><span class="o">.</span><span class="n">getShardingKey</span><span class="p">()));</span>
 </pre></div>
 </div>
-<p>This method sends a producer record and associates a callback for each
-sended execution. The callback is used because send is asynchronous and
+<div class="line-block">
+<div class="line">This method sends a producer record and associates a callback for each
+sent execution. The callback is used because send is asynchronous and
 this method will return immediately once the record has been stored in
 the buffer of records waiting to be sent. This allows sending many
-records in parallel without blocking to wait for the response after each
-one. Fully non-blocking usage can make use of the callback parameter to
-provide a callback that will be invoked when the request is complete.</p>
+records in parallel without blocking to wait for the response after
+each one.</div>
+<div class="line">Fully non-blocking usage can make use of the callback parameter to
+provide a callback that will be invoked when the request is complete.</div>
+</div>
 <p>After send method executes the <code class="docutils literal notranslate"><span class="pre">justWait()</span></code> method is called to wait
 and produce a new record. <code class="docutils literal notranslate"><span class="pre">PRODUCER_TIME_CADENCE_MS</span></code> is the time in ms
 that the producer waits to send a new message.</p>
@@ -589,10 +602,10 @@ threads, and buffers associated with the producer.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="producer-metrics-sample.html" class="btn btn-neutral float-right" title="Producer Metrics Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Producer-metrics-sample.html" class="btn btn-neutral float-right" title="Producer Metrics Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="prerequisites.html" class="btn btn-neutral" title="Prerequisites" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Prerequisites.html" class="btn btn-neutral" title="Prerequisites" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

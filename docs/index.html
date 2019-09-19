@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Exchange Layer (DXL) Databus Java SDK Documentation &mdash; OpenDXL Databus Java Client Library 0.1.0 documentation</title>
+  <title>Welcome to OpenDXL Databus Java Client Library &mdash; OpenDXL Databus Java Client Library 0.1.0 documentation</title>
   
 
   
@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Overview" href="overview.html" /> 
+    <link rel="next" title="Overview" href="Overview.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -83,16 +83,22 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="basic-producer-consumer-example.html">Producer Consumer Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="producer-metrics-sample.html">Producer Metrics Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CLI-Example.html">CLI (Command Line Interface)</a></li>
 </ul>
 
             
@@ -138,7 +144,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Data Exchange Layer (DXL) Databus Java SDK Documentation</li>
+      <li>Welcome to OpenDXL Databus Java Client Library</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -155,45 +161,125 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="data-exchange-layer-dxl-databus-java-sdk-documentation">
-<h1>Data Exchange Layer (DXL) Databus Java SDK Documentation<a class="headerlink" href="#data-exchange-layer-dxl-databus-java-sdk-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+  <div class="section" id="welcome-to-opendxl-databus-java-client-library">
+<h1>Welcome to OpenDXL Databus Java Client Library<a class="headerlink" href="#welcome-to-opendxl-databus-java-client-library" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>The OpenDXL Databus Java client library is used to consume and produce
+records from/to a <a class="reference external" href="http://www.mcafee.com/us/solutions/data-exchange-layer.aspx">Data Exchange
+Layer</a>
+(DXL) Streaming Service.</p>
+</div>
+<div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<p>The OpenDXL Databus Java client library is used to consume and produce
+records from/to a <a class="reference external" href="http://www.mcafee.com/us/solutions/data-exchange-layer.aspx">Data Exchange
+Layer</a>
+(DXL) Streaming Service.</p>
+<p>See the <a class="reference external" href="https://opendxl.github.io/opendxl-databus-client-java/docs/index.html">OpenDXL Databus Java Client Library
+Documentation</a>
+for API documentation and examples.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>To start using the OpenDXL Databus Java Client Library:</p>
+<ul class="simple">
+<li>Download the <a class="reference external" href="https://github.com/opendxl/opendxl-databus-client-java/releases/latest">Latest
+Release</a></li>
+<li>Extract the release .zip file</li>
+<li>View the <code class="docutils literal notranslate"><span class="pre">README.html</span></code> file located at the root of the extracted
+files.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">README</span></code> links to the documentation which includes installation
+instructions, API details, and samples.</li>
+<li>The SDK documentation is also available on-line
+<a class="reference external" href="https://opendxl.github.io/opendxl-databus-client-java/docs/javadoc/index.html">here</a>.</li>
 </ul>
+</div>
+<div class="section" id="maven-repository">
+<h1>Maven Repository<a class="headerlink" href="#maven-repository" title="Permalink to this headline">¶</a></h1>
+<div class="line-block">
+<div class="line">Visit the <a class="reference external" href="https://search.maven.org/artifact/com.opendxl/dxldatabus">OpenDXL Databus Java Client Maven
+Repository</a>
+for</div>
+<div class="line">access to all released versions including the appropriate dependency
+syntax for a large number of management</div>
+<div class="line">systems (Maven, Gradle, SBT, Ivy, Grape, etc.).</div>
+</div>
+<p>Maven:</p>
+<div class="code xml highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">dependency</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">groupId</span><span class="o">&gt;</span><span class="n">com</span><span class="o">.</span><span class="n">opendxl</span><span class="o">.</span><span class="n">databus</span><span class="o">&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">opendxldatabusclient</span><span class="o">-</span><span class="n">java</span><span class="o">-</span><span class="n">sdk</span><span class="o">&lt;/</span><span class="n">artifactId</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mf">0.1</span><span class="o">.</span><span class="mi">0</span><span class="o">&lt;/</span><span class="n">version</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dependency</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>or Gradle:</p>
+<div class="code groovy highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">compile</span> <span class="s1">&#39;com.opendxl.streaming:opendxldatabusclient-java-sdk:0.1.0&#39;</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="java-sdk-overview-and-prerequisites">
-<h2>Java SDK Overview and Prerequisites<a class="headerlink" href="#java-sdk-overview-and-prerequisites" title="Permalink to this headline">¶</a></h2>
+<h1>Java SDK Overview and Prerequisites<a class="headerlink" href="#java-sdk-overview-and-prerequisites" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 </ul>
 </div>
 </div>
 <div class="section" id="api-documentation">
-<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><a class="reference external" href="javadoc/index.html">JavaDoc API Documentation</a></li>
 </ul>
 </div>
 <div class="section" id="samples">
-<h2>Samples<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>Basic</dt>
-<dd><div class="toctree-wrapper first last compound">
+<h1>Samples<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h1>
+<p>Basic</p>
+<div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="basic-producer-consumer-example.html">Producer Consumer Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="producer-metrics-sample.html">Producer Metrics Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
 </ul>
 </div>
-</dd>
-</dl>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+</ul>
 </div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CLI-Example.html">CLI (Command Line Interface)</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="bugs-and-feedback">
+<h1>Bugs and Feedback<a class="headerlink" href="#bugs-and-feedback" title="Permalink to this headline">¶</a></h1>
+<div class="line-block">
+<div class="line">For bugs, questions and discussions please use the</div>
+<div class="line"><a class="reference external" href="https://github.com/opendxl/opendxl-databus-client-java/issues">GitHub
+Issues</a>.</div>
+</div>
+</div>
+<div class="section" id="license">
+<h1>LICENSE<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<p>Copyright 2019 McAfee, LLC</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
 </div>
 
 
@@ -204,7 +290,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

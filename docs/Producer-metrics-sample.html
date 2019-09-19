@@ -29,7 +29,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Producer Consumer Example" href="basic-producer-consumer-example.html" /> 
+    <link rel="next" title="Consumer Metrics Example" href="Consumer-metrics-sample.html" />
+    <link rel="prev" title="Producer Consumer Example" href="Basic-producer-consumer-example.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -83,15 +84,15 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="basic-producer-consumer-example.html">Producer Consumer Example</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Producer Metrics Example</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#sample-code">Sample Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-the-sample">Run the sample</a><ul>
@@ -101,6 +102,12 @@
 </li>
 </ul>
 </li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CLI-Example.html">CLI (Command Line Interface)</a></li>
 </ul>
 
             
@@ -286,20 +293,28 @@ of metrics that can be obtained are the following:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The first step is to instance the Kafka cluster to run the example. The
-constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in charge of doing
-that. After this, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts running the
-producer to send messages calling the method <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> and
-start the metrics collecting thread.</p>
-<p>The metrics thread has two parameters which are needed to be configured:
--The metrics sampling period before to get metrics, setted with
+<div class="line-block">
+<div class="line">The first step is to instance the Kafka cluster to run the example.</div>
+<div class="line">The constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in charge of
+doing that.</div>
+<div class="line">After this, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts running the producer
+to send messages calling the method <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> and start
+the metrics collecting thread.</div>
+</div>
+<p>The metrics thread has two parameters which are needed to be configured:</p>
+<ul class="simple">
+<li>The metrics sampling period before to get metrics, setted with
 <code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_INITIAL_DELAY</span></code> value, which is time before start
-collecting metrics. - The the period of time to get the metrics from
-Kafka, setted with <code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_PERIOD</span></code>.</p>
-<p>After the producer and the metrics thread starts, the sample shows the
-metrics with values.</p>
+collecting metrics.</li>
+<li>The the period of time to get the metrics from Kafka, setted with
+<code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_PERIOD</span></code>.</li>
+</ul>
+<div class="line-block">
+<div class="line">After the producer and the metrics thread starts, the sample shows the</div>
+<div class="line">metrics with values.</div>
+</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible to get the producer
-metrics from the Kakfka cluster. <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> calls
+metrics from the Kafka cluster. <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> calls
 <code class="docutils literal notranslate"><span class="pre">getProducerByClientIdMetrics()</span></code> to get the producer metrics for an
 associated clientId and also calls
 <code class="docutils literal notranslate"><span class="pre">getProducerByClientIdAndTopicMetrics()</span></code> to get the producer metrics
@@ -308,8 +323,8 @@ for an associated clientId with an specific topic.</p>
 following:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="33%" />
-<col width="67%" />
+<col width="35%" />
+<col width="65%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Metric Name</th>
@@ -335,12 +350,12 @@ second.</td>
 resulted in errors.</td>
 </tr>
 <tr class="row-odd"><td>record-error-rate</td>
-<td>The average per-second number of record sends
-that resulted in errors.</td>
+<td>The average per-second number of record
+sends that resulted in errors.</td>
 </tr>
 <tr class="row-even"><td>batch-size-max</td>
-<td>The max number of bytes sent per partition
-per-request.</td>
+<td>The max number of bytes sent per
+partition per-request.</td>
 </tr>
 <tr class="row-odd"><td>batch-size-avg</td>
 <td>The average number of bytes sent per
@@ -351,8 +366,8 @@ partition per-request.</td>
 <p>The producer metrics associated to a clientId and a topicId are:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="33%" />
-<col width="67%" />
+<col width="35%" />
+<col width="65%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Metric Name</th>
@@ -361,26 +376,29 @@ partition per-request.</td>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>record-send-total</td>
-<td>The total number of records sent for a topic.</td>
+<td>The total number of records sent for a
+topic.</td>
 </tr>
 <tr class="row-odd"><td>record-send-rate</td>
-<td>The average number of records sent per second
-for a topic.</td>
+<td>The average number of records sent per
+second for a topic.</td>
 </tr>
 <tr class="row-even"><td>record-error-total</td>
-<td>The total number of record sent that resulted
-in errors for a topic.</td>
+<td>The total number of record sent that
+resulted in errors for a topic.</td>
 </tr>
 <tr class="row-odd"><td>record-error-rate</td>
-<td>The average per-second number of record sent
-that resulted in errors for a topic.</td>
+<td>The average per-second number of record
+sent that resulted in errors for a
+topic.</td>
 </tr>
 <tr class="row-even"><td>byte-total</td>
-<td>The total number of bytes sent for a topic.</td>
+<td>The total number of bytes sent for a
+topic.</td>
 </tr>
 <tr class="row-odd"><td>byte-rate</td>
-<td>The average number of bytes sent per second
-for a topic.</td>
+<td>The average number of bytes sent per
+second for a topic.</td>
 </tr>
 </tbody>
 </table>
@@ -438,8 +456,10 @@ for a topic.</td>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="Consumer-metrics-sample.html" class="btn btn-neutral float-right" title="Consumer Metrics Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="basic-producer-consumer-example.html" class="btn btn-neutral" title="Producer Consumer Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="Basic-producer-consumer-example.html" class="btn btn-neutral" title="Producer Consumer Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
