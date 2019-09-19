@@ -1,27 +1,23 @@
 /*---------------------------------------------------------------------------*
- * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
- *---------------------------------------------------------------------------*/
+* Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+*---------------------------------------------------------------------------*/
 
 package sample;
 
+import broker.ClusterHelper;
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.Consumer;
-import com.opendxl.databus.consumer.ConsumerConfiguration;
-import com.opendxl.databus.consumer.ConsumerRecord;
-import com.opendxl.databus.consumer.ConsumerRecords;
-import com.opendxl.databus.consumer.DatabusConsumer;
+import com.opendxl.databus.consumer.*;
 import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.entities.RoutingData;
-import com.opendxl.databus.producer.Callback;
-import com.opendxl.databus.producer.DatabusProducer;
-import com.opendxl.databus.producer.Producer;
-import com.opendxl.databus.producer.ProducerConfig;
-import com.opendxl.databus.producer.ProducerRecord;
+import com.opendxl.databus.producer.*;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import broker.ClusterHelper;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.errors.AuthorizationException;
+import org.apache.kafka.common.errors.OutOfOrderSequenceException;
+import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
@@ -35,8 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
-public class BasicConsumerProducerExample {
+public class TransactionConsumerProducerExample {
 
     private final Producer<byte[]> producer;
     private final ExecutorService executor;
@@ -44,14 +39,14 @@ public class BasicConsumerProducerExample {
     private String producerTopic = "topic1";
     private String consumerTopic = "topic1";
 
-    private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
+    private static final long PRODUCER_TIME_CADENCE_MS = 10000L;
     private static final long CONSUMER_TIME_CADENCE_MS = 1000L;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private static Logger LOG = Logger.getLogger(BasicConsumerProducerExample.class);
 
 
-    public BasicConsumerProducerExample() {
+    public TransactionConsumerProducerExample() {
 
         // Start Kafka cluster
         ClusterHelper
@@ -79,6 +74,7 @@ public class BasicConsumerProducerExample {
         config.put(ProducerConfig.CLIENT_ID_CONFIG, "producer-id-sample");
         config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
         config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
+        config.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "producer-transactional-id-sample");
         return new DatabusProducer<>(config, new ByteArraySerializer());
     }
 
@@ -97,18 +93,32 @@ public class BasicConsumerProducerExample {
             LOG.info("Producer started");
             while (!closed.get()) {
 
-                // Prepare a record
-                final String message = "Hello World at:" + LocalDateTime.now();
+                producer.initTransactions();
 
-                // user should provide the encoding
-                final byte[] payload = message.getBytes(Charset.defaultCharset());
-                final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+                try {
+                    producer.beginTransaction();
+                    for (int i = 0; i < 2; i++) {
+                        // Prepare a record
+                        String message = "Hello World at:" + LocalDateTime.now() + "-" + i;
 
-                // Send the record
-                producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
-                LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
-                        " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
-                        " PAYLOAD:" + message);
+                        // user should provide the encoding
+                        final byte[] payload = message.getBytes(Charset.defaultCharset());
+                        final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+
+                        // Send the record
+                        producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
+                        LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
+                                " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
+                                " PAYLOAD:" + message);
+                        producer.commitTransaction();
+                    }
+                } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
+                    // We can't recover from these exceptions, so our only option is to close the producer and exit.
+                    //producer.close();
+                } catch (KafkaException e) {
+                    // For all other exceptions, just abort the transaction and try again.
+                    //producer.abortTransaction();
+                }
 
                 justWait(PRODUCER_TIME_CADENCE_MS);
             }
@@ -228,10 +238,8 @@ public class BasicConsumerProducerExample {
 
     }
 
-
     public static void main(String[] args) throws InterruptedException {
         LOG.info("Ctrl-C to finish");
         new BasicConsumerProducerExample().startExample();
     }
-
 }

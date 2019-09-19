@@ -102,8 +102,10 @@ public class ClusterHelper {
             config.setProperty("log.dir", logFile.getAbsolutePath());
             config.setProperty("log.flush.interval.messages", String.valueOf(1));
             config.setProperty("delete.topic.enable", String.valueOf(true));
-            config.setProperty("offsets.topic.replication.factor", String.valueOf(1));
-            config.setProperty("num.partitions", String.valueOf(6));
+            config.setProperty("offsets.topic.replication.factor", String.valueOf(3));
+            config.setProperty("num.partitions", String.valueOf(3));
+            config.setProperty("transaction.state.log.replication.factor", String.valueOf(3));
+            config.setProperty("min.insync.replicas", String.valueOf(2));
         } catch (Exception e) {
             e.printStackTrace();
         }

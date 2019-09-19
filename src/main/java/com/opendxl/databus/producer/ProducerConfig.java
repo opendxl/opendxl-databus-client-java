@@ -261,6 +261,25 @@ public class ProducerConfig extends AbstractConfig {
             + "setting for production; for development you can change this, by adjusting broker "
             + "setting `transaction.state.log.replication.factor`.";
 
+    /** <code> min.insync.replicas </code> */
+    /*
+    public static final String MIN_INSYNC_REPLICAS = "min.insync.replicas";
+    public static final String MIN_INSYNC_REPLICAS_DOC = "When a producer sets acks to \"all\" (or \"-1\"), " +
+            "this configuration specifies the minimum number of replicas that must acknowledge a write for " +
+            "the write to be considered successful. If this minimum cannot be met, then the producer will " +
+            "raise an exception (either NotEnoughReplicas or NotEnoughReplicasAfterAppend).\n" +
+            "When used together, min.insync.replicas and acks allow you to enforce greater" +
+            " durability guarantees. A typical scenario would be to create a topic with a replication factor" +
+            " of 3, set min.insync.replicas to 2, and produce with acks of \"all\". This will ensure that the" +
+            " producer raises an exception if a majority of replicas do not receive a write.";
+
+            .define(MIN_INSYNC_REPLICAS,
+                        ConfigDef.Type.INT,
+                        1,
+                        ConfigDef.Importance.LOW,
+                        MIN_INSYNC_REPLICAS_DOC)
+     */
+
     static {
         CONFIG = new ConfigDef().define(BOOTSTRAP_SERVERS_CONFIG, ConfigDef.Type.LIST, Collections.emptyList(),
                 new ConfigDef.NonNullValidator(), ConfigDef.Importance.HIGH, CommonClientConfigs.BOOTSTRAP_SERVERS_DOC)
