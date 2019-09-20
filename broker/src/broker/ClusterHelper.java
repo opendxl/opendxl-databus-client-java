@@ -45,7 +45,7 @@ public class ClusterHelper {
     }
 
     public void addTransactionalTopic(final String topicName, final int replicationFactor, final
-    int partitions){
+    int partitions) {
             String[] arguments = {"--create",
                     "--zookeeper",
                     zkhost.concat(":").concat(String.valueOf(zookeeperPort)),
