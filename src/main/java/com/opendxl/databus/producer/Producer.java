@@ -422,7 +422,7 @@ public abstract class Producer<P> {
      *         transactional.id is not authorized. See the exception for more details
      * <p>KafkaException if the producer has encountered a previous fatal error or for any other unexpected error
      */
-    public void initTransactions() {
+    public void  initTransactions() {
         try {
             producer.initTransactions();
         } catch (Exception e) {

@@ -14,10 +14,6 @@ import com.opendxl.databus.entities.RoutingData;
 import com.opendxl.databus.producer.*;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import org.apache.kafka.common.KafkaException;
-import org.apache.kafka.common.errors.AuthorizationException;
-import org.apache.kafka.common.errors.OutOfOrderSequenceException;
-import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
@@ -39,7 +35,7 @@ public class TransactionConsumerProducerExample {
     private String producerTopic = "topic1";
     private String consumerTopic = "topic1";
 
-    private static final long PRODUCER_TIME_CADENCE_MS = 10000L;
+    private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
     private static final long CONSUMER_TIME_CADENCE_MS = 1000L;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -52,8 +48,12 @@ public class TransactionConsumerProducerExample {
         ClusterHelper
                 .getInstance()
                 .addBroker(9092)
+                .addBroker(9093)
+                .addBroker(9094)
                 .zookeeperPort(2181)
                 .start();
+
+        ClusterHelper.getInstance().addTransactionalTopic(producerTopic,3,3);
 
         // Prepare a Producer
         this.producer = getProducer();
@@ -65,7 +65,6 @@ public class TransactionConsumerProducerExample {
         this.consumer.subscribe(Collections.singletonList(consumerTopic));
 
         this.executor = Executors.newFixedThreadPool(2);
-
     }
 
     public Producer<byte[]> getProducer() {
@@ -75,6 +74,8 @@ public class TransactionConsumerProducerExample {
         config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
         config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
         config.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "producer-transactional-id-sample");
+        config.put(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, "7000");
+        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "5000");
         return new DatabusProducer<>(config, new ByteArraySerializer());
     }
 
@@ -85,18 +86,18 @@ public class TransactionConsumerProducerExample {
         consumerProps.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, "true");
         consumerProps.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, "30000");
         consumerProps.put(ConsumerConfiguration.CLIENT_ID_CONFIG, "consumer-id-sample");
+        consumerProps.put(ConsumerConfiguration.ISOLATION_LEVEL_CONFIG, "read_committed");
         return new DatabusConsumer<>(consumerProps, new ByteArrayDeserializer());
     }
 
     private Runnable getProducerTask() {
         return () -> {
             LOG.info("Producer started");
+            producer.initTransactions();
             while (!closed.get()) {
-
-                producer.initTransactions();
-
                 try {
                     producer.beginTransaction();
+
                     for (int i = 0; i < 2; i++) {
                         // Prepare a record
                         String message = "Hello World at:" + LocalDateTime.now() + "-" + i;
@@ -106,26 +107,26 @@ public class TransactionConsumerProducerExample {
                         final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
 
                         // Send the record
-                        producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
+                        producer.send(producerRecord);
                         LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
                                 " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
                                 " PAYLOAD:" + message);
-                        producer.commitTransaction();
                     }
-                } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
-                    // We can't recover from these exceptions, so our only option is to close the producer and exit.
-                    //producer.close();
-                } catch (KafkaException e) {
-                    // For all other exceptions, just abort the transaction and try again.
-                    //producer.abortTransaction();
+
+                    producer.commitTransaction();
+                    LOG.info("SUCCESS TRANSACTION");
+                } catch (Exception e) {
+                    // For all other exceptions, just abort the transaction.
+                    LOG.info("ERROR " + e.getMessage());
+                    producer.abortTransaction();
                 }
 
                 justWait(PRODUCER_TIME_CADENCE_MS);
             }
+
             producer.flush();
             producer.close();
             LOG.info("Producer closed");
-
         };
     }
 
@@ -134,7 +135,6 @@ public class TransactionConsumerProducerExample {
             try {
                 LOG.info("Consumer started");
                 while (!closed.get()) {
-
                     // Polling the databus
                     final ConsumerRecords<byte[]> records = consumer.poll(CONSUMER_TIME_CADENCE_MS);
 
@@ -146,7 +146,7 @@ public class TransactionConsumerProducerExample {
                         record.getHeaders().getAll().forEach((k, v) -> headers.append("[" + k + ":" + v + "]"));
                         headers.append("]");
 
-                        LOG.info("[CONSUMER <- KAFKA][MSG RCEIVED] ID " + record.getKey() +
+                        LOG.info("[CONSUMER <- KAFKA][MSG RECEIVED] ID " + record.getKey() +
                                 " TOPIC:" + record.getComposedTopic() +
                                 " KEY:" + record.getKey() +
                                 " PARTITION:" + record.getPartition() +
@@ -163,9 +163,7 @@ public class TransactionConsumerProducerExample {
                 consumer.unsubscribe();
                 consumer.close();
                 LOG.info("Consumer closed");
-
             }
-
         };
     }
 
@@ -240,6 +238,6 @@ public class TransactionConsumerProducerExample {
 
     public static void main(String[] args) throws InterruptedException {
         LOG.info("Ctrl-C to finish");
-        new BasicConsumerProducerExample().startExample();
+        new TransactionConsumerProducerExample().startExample();
     }
 }

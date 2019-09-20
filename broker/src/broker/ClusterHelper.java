@@ -4,10 +4,16 @@
 
 package broker;
 
+import kafka.admin.TopicCommand;
+import kafka.zk.KafkaZkClient;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.Node;
+import org.apache.kafka.common.internals.Topic;
+import org.apache.kafka.common.security.JaasUtils;
+import org.apache.kafka.common.utils.SystemTime;
+import scala.runtime.AbstractFunction0;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -28,12 +34,32 @@ public class ClusterHelper {
     private static int zookeeperPort = 2181;
     private static Zookeeper zkNode;
     private static List<KafkaBroker> brokers = new ArrayList<>();
+    private static List<Topic> topics = new ArrayList<>();
+    private static String zkhost = "localhost";
 
     public static ClusterHelper getInstance() {
         if (clusterHelper == null) {
             clusterHelper = new ClusterHelper();
         }
         return clusterHelper;
+    }
+
+    public void addTransactionalTopic(final String topicName, final int replicationFactor, final
+    int partitions){
+            String[] arguments = {"--create",
+                    "--zookeeper",
+                    zkhost.concat(":").concat(String.valueOf(zookeeperPort)),
+                    "--replication-factor",
+                    String.valueOf(replicationFactor),
+                    "--partitions",
+                    String.valueOf(partitions),
+                    "--topic",
+                    topicName};
+
+            TopicCommand.TopicCommandOptions opts = new TopicCommand.TopicCommandOptions(arguments);
+            try (KafkaZkClient zkUtils = getZkClient(opts)) {
+                new TopicCommand.ZookeeperTopicService(zkUtils).createTopic(opts);
+            }
     }
 
     public ClusterHelper addBroker(final int port) {
@@ -102,10 +128,8 @@ public class ClusterHelper {
             config.setProperty("log.dir", logFile.getAbsolutePath());
             config.setProperty("log.flush.interval.messages", String.valueOf(1));
             config.setProperty("delete.topic.enable", String.valueOf(true));
-            config.setProperty("offsets.topic.replication.factor", String.valueOf(3));
-            config.setProperty("num.partitions", String.valueOf(3));
-            config.setProperty("transaction.state.log.replication.factor", String.valueOf(3));
-            config.setProperty("min.insync.replicas", String.valueOf(2));
+            config.setProperty("offsets.topic.replication.factor", String.valueOf(1));
+            config.setProperty("num.partitions", String.valueOf(6));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,5 +157,22 @@ public class ClusterHelper {
         }
 
         return nodes;
+    }
+
+    private KafkaZkClient getZkClient(TopicCommand.TopicCommandOptions opts) {
+        final String connectString = opts.zkConnect().getOrElse(new AbstractFunction0<String>() {
+            @Override
+            public String apply() {
+                return "";
+            } });
+
+        return KafkaZkClient.apply(connectString,
+                JaasUtils.isZkSecurityEnabled(),
+                30000,
+                30000,
+                1000,
+                new SystemTime(),
+                "kafka.server",
+                "SessionExpireListener", null);
     }
 }
