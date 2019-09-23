@@ -124,7 +124,7 @@ public class TransactionConsumerProducerExample {
                     // Commit transaction
                     producer.commitTransaction();
 
-                    LOG.info("[TRANSACTION COMMITTED SUCCESS]");
+                    LOG.info("[TRANSACTION COMMITTED SUCCESSFUL]");
                 } catch (Exception e) {
                     // In case of exceptions, just abort the transaction.
                     LOG.info("[TRANSACTION ERROR][ABORTING TRANSACTION] " + e.getMessage());
