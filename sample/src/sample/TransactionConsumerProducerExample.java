@@ -44,7 +44,7 @@ public class TransactionConsumerProducerExample {
     private static Logger LOG = Logger.getLogger(BasicConsumerProducerExample.class);
 
 
-    public TransactionConsumerProducerExample() {
+    public TransactionConsumerProducerExample() throws Exception {
 
         // Start Kafka cluster
         ClusterHelper
@@ -55,7 +55,7 @@ public class TransactionConsumerProducerExample {
                 .zookeeperPort(2181)
                 .start();
 
-        ClusterHelper.getInstance().addTransactionalTopic(producerTopic, TRANSACTIONAL_TOPIC_REPLICATION_FACTOR,
+        ClusterHelper.getInstance().addNewKafkaTopic(producerTopic, TRANSACTIONAL_TOPIC_REPLICATION_FACTOR,
                 TRANSACTIONAL_TOPIC_PARTITION_NUMBER);
 
         // Prepare a Producer
@@ -225,7 +225,7 @@ public class TransactionConsumerProducerExample {
 
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         LOG.info("Ctrl-C to finish");
         new TransactionConsumerProducerExample().startExample();
     }

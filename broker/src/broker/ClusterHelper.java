@@ -42,8 +42,8 @@ public class ClusterHelper {
         return clusterHelper;
     }
 
-    public void addTransactionalTopic(final String topicName, final int replicationFactor, final
-    int partitions) {
+    public void addNewKafkaTopic(final String topicName, final int replicationFactor, final
+    int partitions) throws Exception {
             String[] arguments = {"--create",
                     "--zookeeper",
                     zkhost.concat(":").concat(String.valueOf(zookeeperPort)),
@@ -57,6 +57,9 @@ public class ClusterHelper {
             TopicCommand.TopicCommandOptions opts = new TopicCommand.TopicCommandOptions(arguments);
             try (KafkaZkClient zkUtils = getZkClient(opts)) {
                 new TopicCommand.ZookeeperTopicService(zkUtils).createTopic(opts);
+            } catch (Exception e) {
+                // In case of exceptions, abort topic creation.
+                throw new Exception("Error creating a new Kafka topic");
             }
     }
 
