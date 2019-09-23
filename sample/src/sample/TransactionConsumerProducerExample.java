@@ -5,7 +5,6 @@
 package sample;
 
 import broker.ClusterHelper;
-import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
 import com.opendxl.databus.consumer.*;
 import com.opendxl.databus.entities.Headers;
@@ -37,6 +36,9 @@ public class TransactionConsumerProducerExample {
 
     private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
     private static final long CONSUMER_TIME_CADENCE_MS = 1000L;
+    private static final int TRANSACTIONAL_TOPIC_REPLICATION_FACTOR = 3;
+    private static final int TRANSACTIONAL_TOPIC_PARTITION_NUMBER = 3;
+    private static final int TRANSACTION_MESSAGES_NUMBER = 5;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private static Logger LOG = Logger.getLogger(BasicConsumerProducerExample.class);
@@ -53,7 +55,8 @@ public class TransactionConsumerProducerExample {
                 .zookeeperPort(2181)
                 .start();
 
-        ClusterHelper.getInstance().addTransactionalTopic(producerTopic,3,3);
+        ClusterHelper.getInstance().addTransactionalTopic(producerTopic, TRANSACTIONAL_TOPIC_REPLICATION_FACTOR,
+                TRANSACTIONAL_TOPIC_PARTITION_NUMBER);
 
         // Prepare a Producer
         this.producer = getProducer();
@@ -96,9 +99,14 @@ public class TransactionConsumerProducerExample {
             producer.initTransactions();
             while (!closed.get()) {
                 try {
+
+                    // Start Transaction
                     producer.beginTransaction();
 
-                    for (int i = 0; i < 2; i++) {
+                    LOG.info("[TRANSACTION BEGIN]");
+
+                    // Send Transaction messages
+                    for (int i = 0; i < TRANSACTION_MESSAGES_NUMBER; i++) {
                         // Prepare a record
                         String message = "Hello World at:" + LocalDateTime.now() + "-" + i;
 
@@ -113,11 +121,13 @@ public class TransactionConsumerProducerExample {
                                 " PAYLOAD:" + message);
                     }
 
+                    // Commit transaction
                     producer.commitTransaction();
-                    LOG.info("SUCCESS TRANSACTION");
+
+                    LOG.info("[TRANSACTION COMMITTED SUCCESS]");
                 } catch (Exception e) {
-                    // For all other exceptions, just abort the transaction.
-                    LOG.info("ERROR " + e.getMessage());
+                    // In case of exceptions, just abort the transaction.
+                    LOG.info("[TRANSACTION ERROR][ABORTING TRANSACTION] " + e.getMessage());
                     producer.abortTransaction();
                 }
 
@@ -180,27 +190,6 @@ public class TransactionConsumerProducerExample {
             Thread.sleep(time);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static class MyCallback implements Callback {
-
-        private String shardingKey;
-
-        public MyCallback(String shardingKey) {
-
-            this.shardingKey = shardingKey;
-        }
-
-        public void onCompletion(RecordMetadata metadata, Exception exception) {
-            if (exception != null) {
-                LOG.warn("Error sending a record " + exception.getMessage());
-                return;
-            }
-            LOG.info("[PRODUCER <- KAFKA][OK MSG SENT] ID " + shardingKey +
-                    " TOPIC:" + metadata.topic() +
-                    " PARTITION:" + metadata.partition() +
-                    " OFFSET:" + metadata.offset());
         }
     }
 

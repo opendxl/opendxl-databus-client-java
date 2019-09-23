@@ -10,7 +10,6 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.Node;
-import org.apache.kafka.common.internals.Topic;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.kafka.common.utils.SystemTime;
 import scala.runtime.AbstractFunction0;
@@ -34,7 +33,6 @@ public class ClusterHelper {
     private static int zookeeperPort = 2181;
     private static Zookeeper zkNode;
     private static List<KafkaBroker> brokers = new ArrayList<>();
-    private static List<Topic> topics = new ArrayList<>();
     private static String zkhost = "localhost";
 
     public static ClusterHelper getInstance() {
