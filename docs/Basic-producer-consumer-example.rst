@@ -134,7 +134,7 @@ Sample Code
 
 | The first step is to create the instance of the Kafka cluster to run
   the example.
-| The constructor method ``ProducerMetricsExample()`` is in charge of
+| The constructor method ``BasicConsumerProducerExample()`` is in charge of
   doing that.
 | This method also creates a DatabusConsumer instance calling to
   ``getConsumer()`` method. For producer is the same approach, calling
