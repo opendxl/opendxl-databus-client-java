@@ -77,6 +77,7 @@ public class TransactionConsumerProducerExample {
         config.put(ProducerConfig.CLIENT_ID_CONFIG, "producer-id-sample");
         config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
         config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
+        // Configure transactional Id and transaction timeout to produce transactional messages
         config.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "producer-transactional-id-sample");
         config.put(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, "7000");
         config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "5000");
