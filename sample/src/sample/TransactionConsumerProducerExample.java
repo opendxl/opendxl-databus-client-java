@@ -55,6 +55,7 @@ public class TransactionConsumerProducerExample {
                 .zookeeperPort(2181)
                 .start();
 
+        // Create a new Kafka Transactional topic
         ClusterHelper.getInstance().addNewKafkaTopic(producerTopic, TRANSACTIONAL_TOPIC_REPLICATION_FACTOR,
                 TRANSACTIONAL_TOPIC_PARTITION_NUMBER);
 
@@ -89,6 +90,7 @@ public class TransactionConsumerProducerExample {
         consumerProps.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, "true");
         consumerProps.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, "30000");
         consumerProps.put(ConsumerConfiguration.CLIENT_ID_CONFIG, "consumer-id-sample");
+        // Configure isolation level as read_commited in order to consume transaction messages
         consumerProps.put(ConsumerConfiguration.ISOLATION_LEVEL_CONFIG, "read_committed");
         return new DatabusConsumer<>(consumerProps, new ByteArrayDeserializer());
     }
