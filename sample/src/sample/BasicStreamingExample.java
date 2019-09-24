@@ -19,6 +19,7 @@ import com.opendxl.databus.entities.internal.DatabusMessage;
 import com.opendxl.databus.producer.Callback;
 import com.opendxl.databus.producer.DatabusProducer;
 import com.opendxl.databus.producer.Producer;
+import com.opendxl.databus.producer.ProducerConfig;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
@@ -84,10 +85,10 @@ public class BasicStreamingExample {
 
     public Producer<byte[]> createProducer() {
         final Map config = new HashMap<String, Object>();
-        config.put("bootstrap.servers", "localhost:9092");
-        config.put("client.id", "producer");
-        config.put("linger.ms", "100");
-        config.put("batch.size", "150000");
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ProducerConfig.CLIENT_ID_CONFIG, "producer");
+        config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
+        config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
         return new DatabusProducer<>(config, new ByteArraySerializer());
     }
 
@@ -97,7 +98,7 @@ public class BasicStreamingExample {
         config.put(ConsumerConfiguration.GROUP_ID_CONFIG, "cg");
         config.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, "true");
         config.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, "30000");
-        config.put("client.id", "consumer");
+        config.put(ConsumerConfiguration.CLIENT_ID_CONFIG, "consumer");
         return new DatabusConsumer<>(config, new ByteArrayDeserializer());
     }
 
@@ -231,6 +232,7 @@ public class BasicStreamingExample {
             executor.awaitTermination(5, TimeUnit.SECONDS);
         }
         catch (InterruptedException e) {
+            LOG.warn(e.getMessage());
         }
         finally {
             executor.shutdownNow();
