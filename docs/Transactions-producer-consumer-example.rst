@@ -226,7 +226,7 @@ DatabusConsumer receives the following basic configuration:
 | ``                          |                                        |
 +-----------------------------+----------------------------------------+
 | ``SESSION_TIMEOUT_MS_CONFIG | The heartbeat interval in ms to check  |
-| ``                          | if the Kakfa broker is alive.          |
+| ``                          | if the Kafka broker is alive.          |
 +-----------------------------+----------------------------------------+
 | ``CLIENT_ID_CONFIG``        | The related clientId.                  |
 +-----------------------------+----------------------------------------+
@@ -280,7 +280,7 @@ Then add the configurations parameter to produce transactions messages:
 | G``                         | the transaction coordinator will wait  |
 |                             | for a transaction status update from   |
 |                             | the producer before proactively        |
-|                             | aborting the ongoing transaction.π     |
+|                             | aborting the ongoing transaction.      |
 +-----------------------------+----------------------------------------+
 
 After call ``getProducer()`` and ``getConsumer()`` methods, the consumer
