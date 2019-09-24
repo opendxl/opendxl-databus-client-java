@@ -294,14 +294,14 @@ task replaceVersionInREADME() {
             fileset(dir: '.', includes: 'README.md')
         }
         ant.replaceregexp(match: '<version>(.+)</version>', replace: "<version>${version}</version>", flags: 'g', byline: true) {
-            fileset(dir: 'docs', includes: 'prerequisites.rst')
+            fileset(dir: 'docs', includes: 'index.rst')
         }
         // Gradle
         ant.replaceregexp(match: "com\\.opendxl\\.databus\\:opendxldatabusclient-java-sdk\\:(.+)", replace: "com.opendxl.databus:opendxldatabusclient-java-sdk:${version}'", flags: 'g', byline: true) {
             fileset(dir: '.', includes: 'README.md')
         }
         ant.replaceregexp(match: "com\\.opendxl\\.databus\\:opendxldatabusclient-java-sdk\\:(.+)", replace: "com.opendxl.databus:opendxldatabusclient-java-sdk:${version}'", flags: 'g', byline: true) {
-            fileset(dir: 'docs', includes: 'prerequisites.rst')
+            fileset(dir: 'docs', includes: 'index.rst')
         }
     }
 }

@@ -40,12 +40,12 @@ Maven:
 <dependency>
   <groupId>com.opendxl.databus</groupId>
   <artifactId>opendxldatabusclient-java-sdk</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.opendxl.streaming:opendxldatabusclient-java-sdk:0.1.0'
+compile 'com.opendxl.databus:opendxldatabusclient-java-sdk:0.1.1'
 ```
 
 ## Bugs and Feedback

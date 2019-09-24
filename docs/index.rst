@@ -60,7 +60,7 @@ or Gradle:
 
 .. code:: groovy
 
-    compile 'com.opendxl.streaming:opendxldatabusclient-java-sdk:0.1.1'
+    compile 'com.opendxl.databus:opendxldatabusclient-java-sdk:0.1.1'
 
 Java SDK Overview and Prerequisites
 -----------------------------------
