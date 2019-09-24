@@ -1,27 +1,18 @@
 /*---------------------------------------------------------------------------*
- * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
- *---------------------------------------------------------------------------*/
+* Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+*---------------------------------------------------------------------------*/
 
 package sample;
 
-import com.opendxl.databus.common.RecordMetadata;
+import broker.ClusterHelper;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.Consumer;
-import com.opendxl.databus.consumer.ConsumerConfiguration;
-import com.opendxl.databus.consumer.ConsumerRecord;
-import com.opendxl.databus.consumer.ConsumerRecords;
-import com.opendxl.databus.consumer.DatabusConsumer;
+import com.opendxl.databus.consumer.*;
 import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.entities.RoutingData;
-import com.opendxl.databus.producer.Callback;
-import com.opendxl.databus.producer.DatabusProducer;
-import com.opendxl.databus.producer.Producer;
-import com.opendxl.databus.producer.ProducerConfig;
-import com.opendxl.databus.producer.ProducerRecord;
+import com.opendxl.databus.producer.*;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import broker.ClusterHelper;
 import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
@@ -35,8 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
-public class BasicConsumerProducerExample {
+public class TransactionConsumerProducerExample {
 
     private final Producer<byte[]> producer;
     private final ExecutorService executor;
@@ -46,19 +36,28 @@ public class BasicConsumerProducerExample {
 
     private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
     private static final long CONSUMER_TIME_CADENCE_MS = 1000L;
+    private static final int TRANSACTIONAL_TOPIC_REPLICATION_FACTOR = 3;
+    private static final int TRANSACTIONAL_TOPIC_PARTITION_NUMBER = 3;
+    private static final int TRANSACTION_MESSAGES_NUMBER = 5;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private static Logger LOG = Logger.getLogger(BasicConsumerProducerExample.class);
 
 
-    public BasicConsumerProducerExample() {
+    public TransactionConsumerProducerExample() throws Exception {
 
         // Start Kafka cluster
         ClusterHelper
                 .getInstance()
                 .addBroker(9092)
+                .addBroker(9093)
+                .addBroker(9094)
                 .zookeeperPort(2181)
                 .start();
+
+        // Create a new Kafka Transactional topic
+        ClusterHelper.getInstance().addNewKafkaTopic(producerTopic, TRANSACTIONAL_TOPIC_REPLICATION_FACTOR,
+                TRANSACTIONAL_TOPIC_PARTITION_NUMBER);
 
         // Prepare a Producer
         this.producer = getProducer();
@@ -70,7 +69,6 @@ public class BasicConsumerProducerExample {
         this.consumer.subscribe(Collections.singletonList(consumerTopic));
 
         this.executor = Executors.newFixedThreadPool(2);
-
     }
 
     public Producer<byte[]> getProducer() {
@@ -79,6 +77,10 @@ public class BasicConsumerProducerExample {
         config.put(ProducerConfig.CLIENT_ID_CONFIG, "producer-id-sample");
         config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
         config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
+        // Configure transactional Id and transaction timeout to produce transactional messages
+        config.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "producer-transactional-id-sample");
+        config.put(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, "7000");
+        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "5000");
         return new DatabusProducer<>(config, new ByteArraySerializer());
     }
 
@@ -89,33 +91,55 @@ public class BasicConsumerProducerExample {
         consumerProps.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, "true");
         consumerProps.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, "30000");
         consumerProps.put(ConsumerConfiguration.CLIENT_ID_CONFIG, "consumer-id-sample");
+        // Configure isolation level as read_commited in order to consume transaction messages
+        consumerProps.put(ConsumerConfiguration.ISOLATION_LEVEL_CONFIG, "read_committed");
         return new DatabusConsumer<>(consumerProps, new ByteArrayDeserializer());
     }
 
     private Runnable getProducerTask() {
         return () -> {
             LOG.info("Producer started");
+            producer.initTransactions();
             while (!closed.get()) {
+                try {
 
-                // Prepare a record
-                final String message = "Hello World at:" + LocalDateTime.now();
+                    // Start Transaction
+                    producer.beginTransaction();
 
-                // user should provide the encoding
-                final byte[] payload = message.getBytes(Charset.defaultCharset());
-                final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+                    LOG.info("[TRANSACTION BEGIN]");
 
-                // Send the record
-                producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
-                LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
-                        " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
-                        " PAYLOAD:" + message);
+                    // Send Transaction messages
+                    for (int i = 0; i < TRANSACTION_MESSAGES_NUMBER; i++) {
+                        // Prepare a record
+                        String message = "Hello World at:" + LocalDateTime.now() + "-" + i;
+
+                        // user should provide the encoding
+                        final byte[] payload = message.getBytes(Charset.defaultCharset());
+                        final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+
+                        // Send the record
+                        producer.send(producerRecord);
+                        LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
+                                " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
+                                " PAYLOAD:" + message);
+                    }
+
+                    // Commit transaction
+                    producer.commitTransaction();
+
+                    LOG.info("[TRANSACTION COMMITTED SUCCESSFUL]");
+                } catch (Exception e) {
+                    // In case of exceptions, just abort the transaction.
+                    LOG.info("[TRANSACTION ERROR][ABORTING TRANSACTION] CAUSE " + e.getMessage());
+                    producer.abortTransaction();
+                }
 
                 justWait(PRODUCER_TIME_CADENCE_MS);
             }
+
             producer.flush();
             producer.close();
             LOG.info("Producer closed");
-
         };
     }
 
@@ -124,7 +148,6 @@ public class BasicConsumerProducerExample {
             try {
                 LOG.info("Consumer started");
                 while (!closed.get()) {
-
                     // Polling the databus
                     final ConsumerRecords<byte[]> records = consumer.poll(CONSUMER_TIME_CADENCE_MS);
 
@@ -136,7 +159,7 @@ public class BasicConsumerProducerExample {
                         record.getHeaders().getAll().forEach((k, v) -> headers.append("[" + k + ":" + v + "]"));
                         headers.append("]");
 
-                        LOG.info("[CONSUMER <- KAFKA][MSG RCEIVED] ID " + record.getKey() +
+                        LOG.info("[CONSUMER <- KAFKA][MSG RECEIVED] ID " + record.getKey() +
                                 " TOPIC:" + record.getComposedTopic() +
                                 " KEY:" + record.getKey() +
                                 " PARTITION:" + record.getPartition() +
@@ -153,9 +176,7 @@ public class BasicConsumerProducerExample {
                 consumer.unsubscribe();
                 consumer.close();
                 LOG.info("Consumer closed");
-
             }
-
         };
     }
 
@@ -172,27 +193,6 @@ public class BasicConsumerProducerExample {
             Thread.sleep(time);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static class MyCallback implements Callback {
-
-        private String shardingKey;
-
-        public MyCallback(String shardingKey) {
-
-            this.shardingKey = shardingKey;
-        }
-
-        public void onCompletion(RecordMetadata metadata, Exception exception) {
-            if (exception != null) {
-                LOG.warn("Error sending a record " + exception.getMessage());
-                return;
-            }
-            LOG.info("[PRODUCER <- KAFKA][OK MSG SENT] ID " + shardingKey +
-                    " TOPIC:" + metadata.topic() +
-                    " PARTITION:" + metadata.partition() +
-                    " OFFSET:" + metadata.offset());
         }
     }
 
@@ -228,10 +228,8 @@ public class BasicConsumerProducerExample {
 
     }
 
-
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         LOG.info("Ctrl-C to finish");
-        new BasicConsumerProducerExample().startExample();
+        new TransactionConsumerProducerExample().startExample();
     }
-
 }

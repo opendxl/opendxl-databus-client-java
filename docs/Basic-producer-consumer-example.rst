@@ -134,7 +134,7 @@ Sample Code
 
 | The first step is to create the instance of the Kafka cluster to run
   the example.
-| The constructor method ``ProducerMetricsExample()`` is in charge of
+| The constructor method ``BasicConsumerProducerExample()`` is in charge of
   doing that.
 | This method also creates a DatabusConsumer instance calling to
   ``getConsumer()`` method. For producer is the same approach, calling
@@ -176,7 +176,7 @@ DatabusConsumer receives the following configuration:
 | ``ENABLE_AUTO_COMMIT_CONFIG`` | If auto-commit will be enabled or not.  |
 +-------------------------------+-----------------------------------------+
 | ``SESSION_TIMEOUT_MS_CONFIG`` | The heartbeat interval in ms to check   |
-|                               | if the Kakfa broker is alive.           |
+|                               | if the Kafka broker is alive.           |
 +-------------------------------+-----------------------------------------+
 | ``CLIENT_ID_CONFIG``          | The related clientId.                   |
 +-------------------------------+-----------------------------------------+
