@@ -103,6 +103,11 @@ Basic
 
         CLI-Example.rst
 
+.. toctree::
+        :maxdepth: 1
+
+        Transactions-producer-consumer-example.rst
+
 Bugs and Feedback
 -----------------
 

@@ -1,9 +1,9 @@
-Producer Consumer Example
--------------------------
+Transactions producer consumer example
+--------------------------------------
 
 This sample demonstrates how to produce and consume messages from the
 DXL Databus client by using a DatabusProducer and DatabusConsumer in a
-running Kafka cluster.
+running Kafka cluster with Transactions.
 
 Code highlights are shown below:
 
@@ -12,18 +12,25 @@ Sample Code
 
 .. code:: java
 
-        public static void main(String[] args) throws InterruptedException {
+        public static void main(String[] args) throws Exception {
             LOG.info("Ctrl-C to finish");
-            new BasicConsumerProducerExample().startExample();
+            new TransactionConsumerProducerExample().startExample();
         }
 
-        public BasicConsumerProducerExample() {
+        public TransactionConsumerProducerExample() throws Exception {
+
             // Start Kafka cluster
             ClusterHelper
                     .getInstance()
                     .addBroker(9092)
+                    .addBroker(9093)
+                    .addBroker(9094)
                     .zookeeperPort(2181)
                     .start();
+
+            // Create a new Kafka Transactional topic
+            ClusterHelper.getInstance().addNewKafkaTopic(producerTopic, TRANSACTIONAL_TOPIC_REPLICATION_FACTOR,
+                    TRANSACTIONAL_TOPIC_PARTITION_NUMBER);
 
             // Prepare a Producer
             this.producer = getProducer();
@@ -38,6 +45,7 @@ Sample Code
         }
 
         public void startExample() throws InterruptedException {
+
             Runnable consumerTask = getConsumerTask();
             Runnable producerTask = getProducerTask();
 
@@ -52,6 +60,7 @@ Sample Code
                                     LOG.info("Example finished");
                                 }
                             }));
+
         }
 
         private Runnable getConsumerTask() {
@@ -59,7 +68,6 @@ Sample Code
                 try {
                     LOG.info("Consumer started");
                     while (!closed.get()) {
-
                         // Polling the databus
                         final ConsumerRecords<byte[]> records = consumer.poll(CONSUMER_TIME_CADENCE_MS);
 
@@ -71,7 +79,7 @@ Sample Code
                             record.getHeaders().getAll().forEach((k, v) -> headers.append("[" + k + ":" + v + "]"));
                             headers.append("]");
 
-                            LOG.info("[CONSUMER <- KAFKA][MSG RCEIVED] ID " + record.getKey() +
+                            LOG.info("[CONSUMER <- KAFKA][MSG RECEIVED] ID " + record.getKey() +
                                     " TOPIC:" + record.getComposedTopic() +
                                     " KEY:" + record.getKey() +
                                     " PARTITION:" + record.getPartition() +
@@ -95,27 +103,47 @@ Sample Code
         private Runnable getProducerTask() {
             return () -> {
                 LOG.info("Producer started");
+                producer.initTransactions();
                 while (!closed.get()) {
+                    try {
 
-                    // Prepare a record
-                    final String message = "Hello World at:" + LocalDateTime.now();
+                        // Start Transaction
+                        producer.beginTransaction();
 
-                    // user should provide the encoding
-                    final byte[] payload = message.getBytes(Charset.defaultCharset());
-                    final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+                        LOG.info("[TRANSACTION BEGIN]");
 
-                    // Send the record
-                    producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
-                    LOG.info("[PPODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
-                            " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
-                            " PAYLOAD:" + message);
+                        // Send Transaction messages
+                        for (int i = 0; i < TRANSACTION_MESSAGES_NUMBER; i++) {
+                            // Prepare a record
+                            String message = "Hello World at:" + LocalDateTime.now() + "-" + i;
+
+                            // user should provide the encoding
+                            final byte[] payload = message.getBytes(Charset.defaultCharset());
+                            final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+
+                            // Send the record
+                            producer.send(producerRecord);
+                            LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
+                                    " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
+                                    " PAYLOAD:" + message);
+                        }
+
+                        // Commit transaction
+                        producer.commitTransaction();
+
+                        LOG.info("[TRANSACTION COMMITTED SUCCESSFUL]");
+                    } catch (Exception e) {
+                        // In case of exceptions, just abort the transaction.
+                        LOG.info("[TRANSACTION ERROR][ABORTING TRANSACTION] CAUSE " + e.getMessage());
+                        producer.abortTransaction();
+                    }
 
                     justWait(PRODUCER_TIME_CADENCE_MS);
                 }
+
                 producer.flush();
                 producer.close();
                 LOG.info("Producer closed");
-
             };
         }
 
@@ -134,11 +162,30 @@ Sample Code
 
 | The first step is to create the instance of the Kafka cluster to run
   the example.
-| The constructor method ``BasicConsumerProducerExample()`` is in charge
-  of doing that.
+| The constructor method ``TransactionConsumerProducerExample()`` is in
+  charge of doing that.
 | This method also creates a DatabusConsumer instance calling to
   ``getConsumer()`` method. For producer is the same approach, calling
   to ``getProducer()`` method, to create an instance of DatabusProducer.
+  Also calls the method
+  ``ClusterHelper.getInstance().addNewKafkaTopic()`` to create a
+  transactional topic. A transactional topic is a Kafka topic with 3
+  partitions at least and replication factor of 3 at least, so it's
+  necessary to create this topic a minimum of 3 running brokers. Thats
+  why in the constructor we have to add 3 brokers instances.
+
+.. code:: java
+
+            ClusterHelper
+                    .getInstance()
+                    .addBroker(9092)
+                    .addBroker(9093)
+                    .addBroker(9094)
+                    .zookeeperPort(2181)
+                    .start();
+
+Also ``getConsumer()`` and ``getProducer()`` methods has custom
+configurations to enable transactions:
 
 .. code:: java
 
@@ -149,6 +196,8 @@ Sample Code
             consumerProps.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, "true");
             consumerProps.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, "30000");
             consumerProps.put(ConsumerConfiguration.CLIENT_ID_CONFIG, "consumer-id-sample");
+            // Configure isolation level as read_commited in order to consume transaction messages
+            consumerProps.put(ConsumerConfiguration.ISOLATION_LEVEL_CONFIG, "read_committed");
             return new DatabusConsumer<>(consumerProps, new ByteArrayDeserializer());
         }
 
@@ -158,55 +207,89 @@ Sample Code
             config.put(ProducerConfig.CLIENT_ID_CONFIG, "producer-id-sample");
             config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
             config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
+            // Configure transactional Id and transaction timeout to produce transactional messages
+            config.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "producer-transactional-id-sample");
+            config.put(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, "7000");
+            config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "5000");
             return new DatabusProducer<>(config, new ByteArraySerializer());
         }
 
-DatabusConsumer and DatabusProducer are created with configuration maps
-set as parameters.
+DatabusConsumer receives the following basic configuration:
 
-DatabusConsumer receives the following configuration:
++--------------------------------+-----------------------------------------+
+| Config Parameter Name          | Description                             |
++================================+=========================================+
+| ``BOOTSTRAP_SERVERS_CONFIG``   | The Kafka broker and port to listen.    |
++--------------------------------+-----------------------------------------+
+| ``GROUP_ID_CONFIG``            | The consumer group associated.          |
++--------------------------------+-----------------------------------------+
+| ``ENABLE_AUTO_COMMIT_CONFIG``  | If auto-commit will be enabled or not.  |
++--------------------------------+-----------------------------------------+
+| ``SESSION_TIMEOUT_MS_CONFIG``  | The heartbeat interval in ms to check   |
+|                                | if the Kafka broker is alive.           |
++--------------------------------+-----------------------------------------+
+| ``CLIENT_ID_CONFIG``           | The related clientId.                   |
++--------------------------------+-----------------------------------------+
+
+And this configuration parameter to consume transactions messages:
+
++-------------------------------+-----------------------------------------+
+| Config Parameter Name         | Description                             |
++===============================+=========================================+
+| ``ISOLATION_LEVEL_CONFIG``    | Controls how to read messages written   |
+|                               | transactionally. If set to              |
+|                               | ``read_committed`` ,                    |
+|                               | ``consumer.poll()`` will only return    |
+|                               | transactional messages which have been  |
+|                               | committed.                              |
++-------------------------------+-----------------------------------------+
+
+DatabusProducer receives the following basic configuration:
 
 +-------------------------------+-----------------------------------------+
 | Config Parameter Name         | Description                             |
 +===============================+=========================================+
 | ``BOOTSTRAP_SERVERS_CONFIG``  | The Kafka broker and port to listen.    |
 +-------------------------------+-----------------------------------------+
-| ``GROUP_ID_CONFIG``           | The consumer group associated.          |
-+-------------------------------+-----------------------------------------+
-| ``ENABLE_AUTO_COMMIT_CONFIG`` | If auto-commit will be enabled or not.  |
-+-------------------------------+-----------------------------------------+
-| ``SESSION_TIMEOUT_MS_CONFIG`` | The heartbeat interval in ms to check   |
-|                               | if the Kafka broker is alive.           |
-+-------------------------------+-----------------------------------------+
 | ``CLIENT_ID_CONFIG``          | The related clientId.                   |
 +-------------------------------+-----------------------------------------+
+| ``LINGER_MS_CONFIG``          | The amount of time in ms to wait for    |
+|                               | additional messages before sending the  |
+|                               | current batch.                          |
++-------------------------------+-----------------------------------------+
+| ``BATCH_SIZE_CONFIG``         | the amount of memory in bytes (not      |
+|                               | messages!) that will be used for each   |
+|                               | batch.                                  |
++-------------------------------+-----------------------------------------+
 
-DatabusProducer receives the following configuration:
+Then add the configurations parameter to produce transactions messages:
 
-+------------------------------+-----------------------------------------+
-| Config Parameter Name        | Description                             |
-+==============================+=========================================+
-| ``BOOTSTRAP_SERVERS_CONFIG`` | The Kafka broker and port to listen.    |
-+------------------------------+-----------------------------------------+
-| ``CLIENT_ID_CONFIG``         | The related clientId.                   |
-+------------------------------+-----------------------------------------+
-| ``LINGER_MS_CONFIG``         | The amount of time in ms to wait for    |
-|                              | additional messages before sending the  |
-|                              | current batch.                          |
-+------------------------------+-----------------------------------------+
-| ``BATCH_SIZE_CONFIG``        | the amount of memory in bytes (not      |
-|                              | messages!) that will be used for each   |
-|                              | batch.                                  |
-+------------------------------+-----------------------------------------+
++---------------------------------+-----------------------------------------+
+| Config Parameter Name           | Description                             |
++=================================+=========================================+
+| ``TRANSACTIONAL_ID_CONFIG``     | This enables reliability semantics      |
+|                                 | which span multiple producer sessions   |
+|                                 | since it allows the client to guarantee |
+|                                 | that transactions using the same        |
+|                                 | TransactionalId have been completed     |
+|                                 | prior to starting any new transactions. |
++---------------------------------+-----------------------------------------+
+| ``TRANSACTION_TIMEOUT_CONFIG``  | The maximum amount of time in ms that   |
+|                                 | the transaction coordinator will wait   |
+|                                 | for a transaction status update from    |
+|                                 | the producer before proactively         |
+|                                 | aborting the ongoing transaction.       |
++---------------------------------+-----------------------------------------+
 
-After this, the consumer subscribes to a topic in the following line:
+After call ``getProducer()`` and ``getConsumer()`` methods, the consumer
+subscribes to a topic in the following line:
 
 .. code:: java
 
         this.consumer.subscribe(Collections.singletonList(consumerTopic));
 
-| Then the ``BasicConsumerProducerExample()`` constructor is executed,
-  the
+| Then the ``TransactionConsumerProducerExample()`` constructor is
+  executed, the
 | ``startExample()`` method is called. This method calls two internal
   methods for the producer and consumer: ``getConsumerTask()`` and
   ``getProducerTask()``. Both methods execute threads, in order to
@@ -298,38 +381,66 @@ called. These methods do the following:
     private Runnable getProducerTask() {
             return () -> {
                 LOG.info("Producer started");
+                producer.initTransactions();
                 while (!closed.get()) {
+                    try {
 
-                    // Prepare a record
-                    final String message = "Hello World at:" + LocalDateTime.now();
+                        // Start Transaction
+                        producer.beginTransaction();
 
-                    // user should provide the encoding
-                    final byte[] payload = message.getBytes(Charset.defaultCharset());
-                    final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+                        LOG.info("[TRANSACTION BEGIN]");
 
-                    // Send the record
-                    producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
-                    LOG.info("[PPODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
-                            " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
-                            " PAYLOAD:" + message);
+                        // Send Transaction messages
+                        for (int i = 0; i < TRANSACTION_MESSAGES_NUMBER; i++) {
+                            // Prepare a record
+                            String message = "Hello World at:" + LocalDateTime.now() + "-" + i;
+
+                            // user should provide the encoding
+                            final byte[] payload = message.getBytes(Charset.defaultCharset());
+                            final ProducerRecord<byte[]> producerRecord = getProducerRecord(producerTopic, payload);
+
+                            // Send the record
+                            producer.send(producerRecord);
+                            LOG.info("[PRODUCER -> KAFKA][SENDING MSG] ID " + producerRecord.getRoutingData().getShardingKey() +
+                                    " TOPIC:" + TopicNameBuilder.getTopicName(producerTopic, null) +
+                                    " PAYLOAD:" + message);
+                        }
+
+                        // Commit transaction
+                        producer.commitTransaction();
+
+                        LOG.info("[TRANSACTION COMMITTED SUCCESSFUL]");
+                    } catch (Exception e) {
+                        // In case of exceptions, just abort the transaction.
+                        LOG.info("[TRANSACTION ERROR][ABORTING TRANSACTION] CAUSE " + e.getMessage());
+                        producer.abortTransaction();
+                    }
 
                     justWait(PRODUCER_TIME_CADENCE_MS);
                 }
+
                 producer.flush();
                 producer.close();
                 LOG.info("Producer closed");
-
             };
         }
 
 Producer thread runs until sample stops or an exception is triggered.
 When this happens the while loop breaks. Until that, the producer sends
-the produced records.
+the produced records in a transaction.
 
-| First the producer creates a message and make it into an array of
-  bytes.
-| After this, a producer record is created calling to the
-  ``getProducerRecord()`` method.
+First the producer calls the ``initTransactions()`` method to enable
+transactions in the producer.
+
+Then executes in the loop the ``beginTransactionsMethod()`` to start a
+new Transaction.
+
+| After this the producer creates batch of messages (with an associated
+  producer record) to send in the transaction. The number of messages
+  created for the transaction is determined by the value of the
+  ``TRANSACTION_MESSAGES_NUMBER``.
+| Each producer record is created calling to the ``getProducerRecord()``
+  method.
 
 .. code:: java
 
@@ -361,6 +472,10 @@ producer calls the send method.
 | Fully non-blocking usage can make use of the callback parameter to
   provide a callback that will be invoked when the request is complete.
 
+When all messages are sent the ``commitTransaction()`` method is called.
+This commits the ongoing transaction and will flush any unsent records
+before actually committing the transaction.
+
 After send method executes the ``justWait()`` method is called to wait
 and produce a new record. ``PRODUCER_TIME_CADENCE_MS`` is the time in ms
 that the producer waits to send a new message.
@@ -380,6 +495,11 @@ messages have actually completed.
 Close method closes producer and frees resources such as connections,
 threads, and buffers associated with the producer.
 
+| If for any reason transaction fails, the ``abortTransaction()`` method
+  is called.
+| Any unflushed produced messages will be aborted when this call is
+  made.
+
 Run the sample
 ~~~~~~~~~~~~~~
 
@@ -395,7 +515,7 @@ To run this sample execute the runsample script as follows:
 
 ::
 
-    $ ./runsample sample.BasicConsumerProducerExample
+    $ ./runsample sample.TransactionConsumerProducerExample
 
 The output shows:
 
@@ -403,19 +523,20 @@ The output shows:
 
     Zookeeper node started: localhost:2181
     Kafka broker started: localhost:9092
+    Kafka broker started: localhost:9093
+    Kafka broker started: localhost:9094
+    Created topic topic1.
     Consumer started
     Producer started
-    [PPODUCER -> KAFKA][SENDING MSG] ID 1567720470608 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-05T18:54:30.608
-    [PRODUCER <- KAFKA][OK MSG SENT] ID 1567720470608 TOPIC:topic1 PARTITION:4 OFFSET:0
-    [PPODUCER -> KAFKA][SENDING MSG] ID 1567720471866 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-05T18:54:31.866
-    [PRODUCER <- KAFKA][OK MSG SENT] ID 1567720471866 TOPIC:topic1 PARTITION:5 OFFSET:0
-    [PPODUCER -> KAFKA][SENDING MSG] ID 1567720472871 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-05T18:54:32.870
-    [PRODUCER <- KAFKA][OK MSG SENT] ID 1567720472871 TOPIC:topic1 PARTITION:3 OFFSET:0
-    [PPODUCER -> KAFKA][SENDING MSG] ID 1567720473871 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-05T18:54:33.871
-    [PRODUCER <- KAFKA][OK MSG SENT] ID 1567720473871 TOPIC:topic1 PARTITION:0 OFFSET:0
-    [PPODUCER -> KAFKA][SENDING MSG] ID 1567720474876 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-05T18:54:34.876
-    [PRODUCER <- KAFKA][OK MSG SENT] ID 1567720474876 TOPIC:topic1 PARTITION:1 OFFSET:0
-    [CONSUMER <- KAFKA][MSG RCEIVED] ID 1567720474876 TOPIC:topic1 KEY:1567720474876 PARTITION:1 OFFSET:0 TIMESTAMP:1567720474876 HEADERS:[] PAYLOAD:Hello World at:2019-09-05T18:54:34.876
-    [PPODUCER -> KAFKA][SENDING MSG] ID 1567720475880 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-05T18:54:35.880
-    [PRODUCER <- KAFKA][OK MSG SENT] ID 1567720475880 TOPIC:topic1 PARTITION:1 OFFSET:1
-    [CONSUMER <- KAFKA][MSG RCEIVED] ID 1567720475880 TOPIC:topic1 KEY:1567720475880 PARTITION:1 OFFSET:1 TIMESTAMP:1567720475880 HEADERS:[] PAYLOAD:Hello World at:2019-09-05T18:54:35.880
+    [TRANSACTION BEGIN]
+    [PRODUCER -> KAFKA][SENDING MSG] ID 1569250588449 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-23T11:56:28.449-0
+    [PRODUCER -> KAFKA][SENDING MSG] ID 1569250588449 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-23T11:56:28.449-1
+    [PRODUCER -> KAFKA][SENDING MSG] ID 1569250588450 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-23T11:56:28.450-2
+    [PRODUCER -> KAFKA][SENDING MSG] ID 1569250588450 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-23T11:56:28.450-3
+    [PRODUCER -> KAFKA][SENDING MSG] ID 1569250588450 TOPIC:topic1 PAYLOAD:Hello World at:2019-09-23T11:56:28.450-4
+    [TRANSACTION COMMITTED SUCCESSFUL]
+    [CONSUMER <- KAFKA][MSG RECEIVED] ID 1569250588449 TOPIC:topic1 KEY:1569250588449 PARTITION:2 OFFSET:5 TIMESTAMP:1569250588449 HEADERS:[] PAYLOAD:Hello World at:2019-09-23T11:56:28.449-0
+    [CONSUMER <- KAFKA][MSG RECEIVED] ID 1569250588449 TOPIC:topic1 KEY:1569250588449 PARTITION:2 OFFSET:6 TIMESTAMP:1569250588450 HEADERS:[] PAYLOAD:Hello World at:2019-09-23T11:56:28.449-1
+    [CONSUMER <- KAFKA][MSG RECEIVED] ID 1569250588450 TOPIC:topic1 KEY:1569250588450 PARTITION:2 OFFSET:7 TIMESTAMP:1569250588450 HEADERS:[] PAYLOAD:Hello World at:2019-09-23T11:56:28.450-2
+    [CONSUMER <- KAFKA][MSG RECEIVED] ID 1569250588450 TOPIC:topic1 KEY:1569250588450 PARTITION:2 OFFSET:8 TIMESTAMP:1569250588450 HEADERS:[] PAYLOAD:Hello World at:2019-09-23T11:56:28.450-3
+    [CONSUMER <- KAFKA][MSG RECEIVED] ID 1569250588450 TOPIC:topic1 KEY:1569250588450 PARTITION:2 OFFSET:9 TIMESTAMP:1569250588450 HEADERS:[] PAYLOAD:Hello World at:2019-09-23T11:56:28.450-4
