@@ -32,6 +32,7 @@ import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.state.*;
+import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -53,6 +54,8 @@ public class BasicStreamingExample {
     private static final long PRODUCER_TIME_CADENCE_MS = 2000L;
     private static final long CONSUMER_TIME_CADENCE_MS = 500L;
     private final AtomicBoolean closed = new AtomicBoolean(false);
+
+    private static Logger LOG = Logger.getLogger(BasicStreamingExample.class);
 
 
     public BasicStreamingExample() {
@@ -118,14 +121,14 @@ public class BasicStreamingExample {
         topology.addStateStore(storeBuilder,"PROCESSOR_NAME");
         topology.addSink("SINK_NAME",outputTopic,new DatabusKeySerializer(), new MessageSerializer(), "PROCESSOR_NAME");
 
-        System.out.println(topology.describe());
+        LOG.info(topology.describe());
         return new KafkaStreams(topology, config);
 
     }
 
     private Runnable produceToInputTopic() {
         return () -> {
-            System.out.println("Producer started");
+            LOG.info("Producer started");
             while (!closed.get()) {
 
                 // Prepare a record
@@ -140,22 +143,22 @@ public class BasicStreamingExample {
                     @Override
                     public void onCompletion(RecordMetadata metadata, Exception exception) {
                         if (exception != null) {
-                            System.out.println("Error sending a record " + exception.getMessage());
+                            LOG.info("Error sending a record " + exception.getMessage());
                             return;
                         }
-                        System.out.println(
+                        LOG.info(
                                 "MSG SENT --> TOPIC:" + metadata.topic() + " PARTITION:" + metadata.partition() +
                                         " OFFSET:" + metadata.offset());
 
                     }
                 });
-                System.out.println("SEND MSG --> TOPIC:"+ TopicNameBuilder.getTopicName(inputTopic,null) + " PAYLOAD:"+ message);
+                LOG.info("SEND MSG --> TOPIC:"+ TopicNameBuilder.getTopicName(inputTopic,null) + " PAYLOAD:"+ message);
 
                 justWait(PRODUCER_TIME_CADENCE_MS);
             }
             producer.flush();
             producer.close();
-            System.out.println("Producer closed");
+            LOG.info("Producer closed");
 
         };
     }
@@ -164,7 +167,7 @@ public class BasicStreamingExample {
     private Runnable consumeFromOutputTopic() {
         return () -> {
             try {
-                System.out.println("Consumer started");
+                LOG.info("Consumer started");
                 while (!closed.get()) {
 
                     // Polling the databus
@@ -178,7 +181,7 @@ public class BasicStreamingExample {
                         record.getHeaders().getAll().forEach((k, v) -> headers.append("[" + k + ":" + v + "]"));
                         headers.append("]");
 
-                        System.out.println("MSG RECV <-- TOPIC:" + record.getComposedTopic()
+                        LOG.info("MSG RECV <-- TOPIC:" + record.getComposedTopic()
                                 + " KEY:" + record.getKey()
                                 + " PARTITION:" + record.getPartition()
                                 + " OFFSET:" + record.getOffset()
@@ -192,7 +195,7 @@ public class BasicStreamingExample {
             } finally {
                 consumer.unsubscribe();
                 consumer.close();
-                System.out.println("Consumer closed");
+                LOG.info("Consumer closed");
 
             }
 
@@ -245,7 +248,7 @@ public class BasicStreamingExample {
                         new Runnable() {
                             public void run() {
                                 stopExample(executor);
-                                System.out.println("Example finished");
+                                LOG.info("Example finished");
                             }
                         }));
 
@@ -261,7 +264,7 @@ public class BasicStreamingExample {
                 KeyValueIterator<String, DatabusMessage> iter = keyValueStore.all();
                 while (iter.hasNext()) {
                     KeyValue<String, DatabusMessage> entry = iter.next();
-                    System.out.println(entry.key + entry.value);
+                    LOG.info(entry.key + entry.value);
                 }
             }
         };
@@ -297,7 +300,7 @@ public class BasicStreamingExample {
 
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Ctrl-C to finish");
+        LOG.info("Ctrl-C to finish");
 
         new BasicStreamingExample().startExample();
 
