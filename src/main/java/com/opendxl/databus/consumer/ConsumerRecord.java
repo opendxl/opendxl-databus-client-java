@@ -53,7 +53,6 @@ public class ConsumerRecord<P> {
         this.timestamp = timestamp;
     }
 
-
     /**
      * The Composed Topic name
      *
@@ -82,7 +81,6 @@ public class ConsumerRecord<P> {
         return tenantGroup;
     }
 
-
     /**
      * The Key
      *
@@ -92,7 +90,6 @@ public class ConsumerRecord<P> {
         return key;
     }
 
-
     /**
      * The Headers
      *
@@ -101,7 +98,6 @@ public class ConsumerRecord<P> {
     public Headers getHeaders() {
         return headers;
     }
-
 
     /**
      * The messagePayload

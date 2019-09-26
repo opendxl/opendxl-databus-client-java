@@ -58,7 +58,6 @@ import java.util.UUID;
  */
 public class DatabusConsumer<P> extends Consumer<P> {
 
-
     /**
      * A consumer is instantiated by providing a set of key-value pairs as configuration. Valid configuration strings
      * are documented <a href="http://kafka.apache.org/documentation.html#consumerconfigs" >here</a>. Values can be
@@ -74,7 +73,6 @@ public class DatabusConsumer<P> extends Consumer<P> {
     public DatabusConsumer(final Map<String, Object> configs, final Deserializer<P> messageDeserializer) {
         this(configs, messageDeserializer, null);
     }
-
 
     /**
      * A consumer is instantiated by providing a set of key-value pairs as configuration. Valid configuration strings
@@ -105,8 +103,6 @@ public class DatabusConsumer<P> extends Consumer<P> {
         }
     }
 
-
-
     /**
      * A consumer is instantiated by providing a {@link Properties} object as configuration. Valid
      * configuration strings are documented at {@link org.apache.kafka.clients.consumer.ConsumerConfig}
@@ -123,7 +119,6 @@ public class DatabusConsumer<P> extends Consumer<P> {
     public DatabusConsumer(final Properties properties, final Deserializer<P> messageDeserializer) {
         this(properties, messageDeserializer, null);
     }
-
 
     /**
      * A consumer is instantiated by providing a {@link Properties} object as configuration. Valid

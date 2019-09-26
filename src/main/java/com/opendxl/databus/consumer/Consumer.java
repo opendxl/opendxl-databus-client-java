@@ -140,7 +140,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Subscribe to the given list of topics to get dynamically
      * assigned topicPartitions. <b>Topic subscriptions are not incremental. This list will replace the current
@@ -350,7 +349,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * @throws UnsupportedOperationException because it is not supported
      */
@@ -415,7 +413,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Commit offsets returned on the last {@link #poll(long) poll()} for all the subscribed list of topics
@@ -583,7 +580,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Seek to the first offset for each of the given topicPartitions. This function evaluates lazily, seeking to the
      * final offset in all topicPartitions only when {@link #poll(long)} or {@link #position(TopicPartition)}
@@ -608,7 +604,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Seek to the last offset for each of the given topicPartitions. This function evaluates lazily, seeking to the
@@ -635,7 +630,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Get the offset of the <i>next record</i> that will be fetched (if a record with that offset exists).
@@ -671,7 +665,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Get the last committed offset for the given partition (whether the commit happened by this process or
@@ -712,7 +705,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Get the metrics kept by the consumer
@@ -1021,7 +1013,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Get metadata about topicPartitions for all topics that the user is authorized to view. This method will issue a
      * remote call to the server.
@@ -1110,7 +1101,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Close the consumer, waiting indefinitely for any needed cleanup. If auto-commit is enabled, this

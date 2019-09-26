@@ -15,7 +15,6 @@ public final class OffsetAndMetadata implements Serializable {
 
     private final org.apache.kafka.clients.consumer.OffsetAndMetadata offsetAndMetadata;
 
-
     /**
      * Construct a new OffsetAndMetadata object for committing through {@link Consumer}.
      * @param offset The offset to be committed
