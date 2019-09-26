@@ -4,10 +4,6 @@
 
 package com.opendxl.databus.consumer;
 
-import com.opendxl.databus.entities.internal.DatabusMessage;
-import com.opendxl.databus.exception.DatabusClientRuntimeException;
-import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
-import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import com.opendxl.databus.common.MetricName;
 import com.opendxl.databus.common.OffsetAndTimestamp;
 import com.opendxl.databus.common.PartitionInfo;
@@ -17,20 +13,18 @@ import com.opendxl.databus.common.internal.adapter.MetricNameMapAdapter;
 import com.opendxl.databus.common.internal.adapter.PartitionInfoListAdapter;
 import com.opendxl.databus.common.internal.adapter.TopicPartitionInfoListAdapter;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.metric.ConsumerMetricsBuilder;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientId;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopicPartitions;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopics;
+import com.opendxl.databus.consumer.metric.ConsumerMetricsBuilder;
+import com.opendxl.databus.entities.internal.DatabusMessage;
+import com.opendxl.databus.exception.DatabusClientRuntimeException;
+import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
+import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -40,12 +34,39 @@ import java.util.regex.Pattern;
  */
 public abstract class Consumer<P> {
 
+    /**
+     * The DatabusKeyDeserializer to deserialize incoming messages.
+     */
     private DatabusKeyDeserializer keyDeserializer = null;
+
+    /**
+     * The MessageDeserializer to deserialize a DatabusMessage.
+     */
     private MessageDeserializer valueDeserializer = null;
+
+    /**
+     * The ConsumerRecordsAdapter to deserialize a DatabusMessage.
+     */
     private ConsumerRecordsAdapter<P> consumerRecordsAdapter;
+
+    /**
+     * The client id.
+     */
     private String clientId;
+
+    /**
+     * The topic partition list.
+     */
     private List<TopicPartition> topicPartitions;
+
+    /**
+     * The logger object.
+     */
     private static final Logger LOG = Logger.getLogger(Consumer.class);
+
+    /**
+     * The Kafka associated consumer.
+     */
     private org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer = null;
 
     /**
@@ -1351,31 +1372,66 @@ public abstract class Consumer<P> {
         }
     }
 
+    /**
+     * Sets the Kafka consumer
+     *
+     * @param consumer - The Kafka consumer to set.
+     */
     protected void setConsumer(final org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer) {
         this.consumer = consumer;
     }
 
+    /**
+     * Sets the Key Deserializer
+     *
+     * @param keyDeserializer - The DatabusKeyDeserializer to set.
+     */
     protected void setKeyDeserializer(final DatabusKeyDeserializer keyDeserializer) {
         this.keyDeserializer = keyDeserializer;
     }
 
+    /**
+     * Sets the MessageDeserializer
+     *
+     * @param valueDeserializer - The MessageDeserializer to set.
+     */
     protected void setValueDeserializer(final MessageDeserializer valueDeserializer) {
         this.valueDeserializer = valueDeserializer;
     }
 
+    /**
+     * Sets the ConsumerRecordsAdapter
+     *
+     * @param consumerRecordsAdapter - The ConsumerRecordsAdapter to set.
+     */
     protected void setConsumerRecordsAdapter(final ConsumerRecordsAdapter<P> consumerRecordsAdapter) {
         this.consumerRecordsAdapter = consumerRecordsAdapter;
     }
 
+    /**
+     * Sets the clientId
+     *
+     * @param clientId - The clientId to set.
+     */
     protected void setClientId(final String clientId) {
         this.clientId = clientId;
 
     }
 
+    /**
+     * Gets the Key Deserializer
+     *
+     * @return A DatabusKeyDeserializer.
+     */
     protected DatabusKeyDeserializer getKeyDeserializer() {
         return keyDeserializer;
     }
 
+    /**
+     * Gets the MessageDeserializer to get the message value.
+     *
+     * @return A MessageDeserializer.
+     */
     protected MessageDeserializer getValueDeserializer() {
         return valueDeserializer;
     }

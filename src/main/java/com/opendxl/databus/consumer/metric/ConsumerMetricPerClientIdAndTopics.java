@@ -29,7 +29,7 @@ public class ConsumerMetricPerClientIdAndTopics {
     /**
      * ConsumerMetricPerClientIdAndTopicPartitions constructor.
      * @param clientId An associated clientId.
-     * @param topicPartitionsMetrics An associated map with topic-partition as key an consumerMetric as value.
+     * @param topicMetrics An associated map with topic-partition as key an consumerMetric as value.
      */
     public ConsumerMetricPerClientIdAndTopics(final String clientId,
                                               final ConsumerMetric consumerMetric,

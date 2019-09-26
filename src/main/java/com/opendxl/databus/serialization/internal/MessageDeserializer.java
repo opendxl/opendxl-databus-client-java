@@ -17,9 +17,8 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
     public void configure(final Map<String, ?> map, final boolean b) {
     }
 
-
     /**
-     * @param topic             not used
+     * @param topic
      * @param serializedMessage serialized message
      * @return a {@link DatabusMessage} getInstance
      */
@@ -31,7 +30,6 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
         final InternalDeserializer<DatabusMessage> deserializer = DeserializerRegistry.getDeserializer(version);
         return deserializer.deserialize(topic, messageStructure.getPayload());
     }
-
 
     @Override
     public void close() {
