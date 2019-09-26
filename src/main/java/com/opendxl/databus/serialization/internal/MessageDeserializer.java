@@ -13,14 +13,17 @@ import java.util.Map;
  */
 public final class MessageDeserializer implements org.apache.kafka.common.serialization.Deserializer<DatabusMessage> {
 
+    /**
+     * Not implemented, used as default
+     */
     @Override
     public void configure(final Map<String, ?> map, final boolean b) {
     }
 
     /**
-     * @param topic
-     * @param serializedMessage serialized message
-     * @return a {@link DatabusMessage} getInstance
+     * @param topic The topic name
+     * @param serializedMessage A serialized message
+     * @return A {@link DatabusMessage} getInstance
      */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] serializedMessage) {
@@ -31,6 +34,9 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
         return deserializer.deserialize(topic, messageStructure.getPayload());
     }
 
+    /**
+     * Not implemented, used as default
+     */
     @Override
     public void close() {
 
