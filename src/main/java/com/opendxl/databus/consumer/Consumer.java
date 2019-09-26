@@ -46,7 +46,7 @@ public abstract class Consumer<P> {
     private String clientId;
     private List<TopicPartition> topicPartitions;
     private static final Logger LOG = Logger.getLogger(Consumer.class);
-
+    private org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer = null;
 
     /**
      * Subscribe to the given list of tenantGroups and topics to get dynamically
@@ -843,8 +843,6 @@ public abstract class Consumer<P> {
 
     }
 
-
-
     /**
      * Total number of fetch request for each consumer.
      * A fetch is not equals poll(). A Kafka fetch is governed by a set of consumer configuration prooperties like
@@ -909,7 +907,6 @@ public abstract class Consumer<P> {
 
     }
 
-
     /**
      * Average bytes per fetch request for each consumer and its topics.
      *
@@ -950,7 +947,6 @@ public abstract class Consumer<P> {
                     + e.getMessage(), e, Consumer.class);
         }
     }
-
 
     /**
      *
@@ -1060,7 +1056,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Suspend fetching from the requested topicPartitions. Future calls to {@link #poll(long)} will not return
      * any records from these topicPartitions until they have been resumed using {@link #resume(TopicPartition...)}.
@@ -1133,7 +1128,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Wakeup the consumer. This method is thread-safe and is useful in particular to abort a long poll.
      * The thread which is blocking in an operation will throw {@link org.apache.kafka.common.errors.WakeupException}.
@@ -1149,7 +1143,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg + e.getMessage(), e, Consumer.class);
         }
     }
-
 
     /**
      * Commit the specified offsets for the specified list of topics and topicPartitions to Kafka.
@@ -1191,7 +1184,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Look up the offsets for the given topicPartitions by timestamp. The returned offset for each partition is the
@@ -1299,7 +1291,6 @@ public abstract class Consumer<P> {
 
     }
 
-
     /**
      * Get the end offsets for the given topicPartitions. In the default {@code read_uncommitted} isolation level, the
      * end
@@ -1347,9 +1338,7 @@ public abstract class Consumer<P> {
             LOG.error(msg, e);
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
-
     }
-
 
     /**
      * Get the set of topicPartitions that were previously paused by a call to {@link #pause(TopicPartition...)}.
@@ -1372,8 +1361,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
-
     protected void setConsumer(final org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer) {
         this.consumer = consumer;
     }
@@ -1386,7 +1373,6 @@ public abstract class Consumer<P> {
         this.valueDeserializer = valueDeserializer;
     }
 
-
     protected void setConsumerRecordsAdapter(final ConsumerRecordsAdapter<P> consumerRecordsAdapter) {
         this.consumerRecordsAdapter = consumerRecordsAdapter;
     }
@@ -1396,8 +1382,6 @@ public abstract class Consumer<P> {
 
     }
 
-    private org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer = null;
-
     protected DatabusKeyDeserializer getKeyDeserializer() {
         return keyDeserializer;
     }
@@ -1405,7 +1389,6 @@ public abstract class Consumer<P> {
     protected MessageDeserializer getValueDeserializer() {
         return valueDeserializer;
     }
-
 
     /**
      * ConsumerRebalanceListener Adapter
@@ -1445,7 +1428,6 @@ public abstract class Consumer<P> {
          this.topicPartitions = partitions;
     }
 
-
     /**
      * OffsetCommitCallback Adapter
      */
@@ -1482,7 +1464,6 @@ public abstract class Consumer<P> {
                         exception, OffsetCommitCallbackAdapter.class);
             }
             offsetCommitCallback.onComplete(adaptedOffsets, databusClientException);
-
         }
     }
 
