@@ -12,6 +12,9 @@ import org.junit.*;
 
 import java.util.*;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 public class DatabusConsumerTest {
 
     @Test
@@ -44,28 +47,52 @@ public class DatabusConsumerTest {
         Assert.assertTrue(consumer instanceof DatabusConsumer);
     }
 
-    @Test(expected = DatabusClientRuntimeException.class)
+    @Test
     public void shouldThrowAnExceptionUsingConstructor1() {
         Map<String, Object> config = null;
-        Consumer consumer = new DatabusConsumer(config, new ByteArrayDeserializer());
+        try {
+            Consumer consumer = new DatabusConsumer(config, new ByteArrayDeserializer());
+            Assert.fail("new DatabusConsumer() should fail when configs argument is null");
+        } catch (final DatabusClientRuntimeException e) {
+            assertThat(e.getMessage(), is("A DatabusConsumer instance cannot be created: "
+                    + "config properties cannot be null"));
+        }
     }
 
-    @Test(expected = DatabusClientRuntimeException.class)
+    @Test
     public void shouldThrowAnExceptionUsingConstructor1DeserializerNull() {
         Map<String, Object> config = new HashMap<>();
-        Consumer consumer = new DatabusConsumer(config, null);
+        try {
+            Consumer consumer = new DatabusConsumer(config, null);
+            Assert.fail("new DatabusConsumer() should fail when messageDeserializer argument is null");
+        } catch (final DatabusClientRuntimeException e) {
+            assertThat(e.getMessage(), is("A DatabusConsumer instance cannot be created: "
+                    + "Message Deserializer cannot be null"));
+        }
     }
 
-    @Test(expected = DatabusClientRuntimeException.class)
+    @Test
     public void shouldThrowAnExceptionUsingConstructor3() {
         Properties config = null;
-        Consumer consumer = new DatabusConsumer(config,new ByteArrayDeserializer());
+        try {
+            Consumer consumer = new DatabusConsumer(config, new ByteArrayDeserializer());
+            Assert.fail("new DatabusConsumer() should fail when properties argument is null");
+        } catch (final DatabusClientRuntimeException e) {
+            assertThat(e.getMessage(), is("A DatabusConsumer instance cannot be created: "
+                    + "config properties cannot be null"));
+        }
     }
 
-    @Test(expected = DatabusClientRuntimeException.class)
+    @Test
     public void shouldThrowAnExceptionUsingConstructor3DeserializerNull() {
         Properties config = new Properties();
-        Consumer consumer = new DatabusConsumer(config,null);
+        try {
+            Consumer consumer = new DatabusConsumer(config, null);
+            Assert.fail("new DatabusConsumer() should fail when messageDeserializer argument is null");
+        } catch (final DatabusClientRuntimeException e) {
+            assertThat(e.getMessage(), is("A DatabusConsumer instance cannot be created: "
+                    + "Message Deserializer cannot be null"));
+        }
     }
 
 
