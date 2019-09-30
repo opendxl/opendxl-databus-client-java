@@ -156,7 +156,7 @@ public class ConsumerRecords<P> implements Iterable<ConsumerRecord> {
         }
 
         /**
-         * The iterator patter at itself
+         * The iterator pattern at itself
          *
          * @return An iterator object of Consumer record.
          */

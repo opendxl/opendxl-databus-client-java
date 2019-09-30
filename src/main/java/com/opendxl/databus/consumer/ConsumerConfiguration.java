@@ -559,7 +559,6 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
         super(CONFIG, props, doLog);
     }
 
-
     /**
      * Gets the config names
      *
