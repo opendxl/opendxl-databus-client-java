@@ -149,6 +149,13 @@ public class DatabusConsumer<P> extends Consumer<P> {
         }
      }
 
+
+    /**
+     * Sets the message serializer to the DatabusConsumer.
+     *
+     * @param configuration The consumer configuration map.
+     * @param messageDeserializer  a {@link Deserializer} getInstance implemented by SDK's user.
+     */
     private void setFieldMembers(final Deserializer<P> messageDeserializer, final Map<String, Object> configuration) {
         if (messageDeserializer == null) {
             throw new DatabusClientRuntimeException("Message Deserializer cannot be null" , DatabusConsumer.class);
@@ -160,6 +167,12 @@ public class DatabusConsumer<P> extends Consumer<P> {
         setClientId((String) configuration.get(ConsumerConfiguration.CLIENT_ID_CONFIG));
     }
 
+    /**
+     * Sets the credential to the DatabusConsumer.
+     *
+     * @param configuration The consumer configuration map.
+     * @param credential An identity to authenticate/authorization.
+     */
     private Map<String, Object> configureCredential(final Map<String, Object> configuration,
                                                     final Credential credential) {
         if (credential == null) {
@@ -174,6 +187,11 @@ public class DatabusConsumer<P> extends Consumer<P> {
         return configuration;
     }
 
+    /**
+     * Sets the ClientId to the DatabusConsumer.
+     *
+     * @param configuration The consumer configuration map.
+     */
     private Map<String, Object> configureClientId(final Map<String, Object> configuration) {
         String clientId = (String) configuration.get(ConsumerConfiguration.CLIENT_ID_CONFIG);
         if (clientId != null && !clientId.trim().isEmpty()) {

@@ -27,6 +27,9 @@ import java.util.Map;
 
 public class ConsumerMetricsBuilder {
 
+    /**
+     * The metric group name.
+     */
     private static final String METRIC_GROUP_NAME = "consumer-fetch-manager-metrics";
 
     private ConsumerMetricsBuilder() {

@@ -585,7 +585,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Overrides the fetch offsets that the consumer will use on the next {@link #poll(long) poll(timeout)}. If this API
      * is invoked for the same partition more than once, the latest offset will be used on the next poll(). Note that
@@ -1103,7 +1102,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg + e.getMessage(), e, Consumer.class);
         }
     }
-
 
     /**
      * Resume specified topicPartitions which have been paused with {@link #pause(TopicPartition...)}. New calls to

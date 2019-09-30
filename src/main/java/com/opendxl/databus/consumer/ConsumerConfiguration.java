@@ -252,7 +252,6 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
             + "you to intercept (and possibly mutate) records "
             + "received by the consumer. By default, there are no interceptors.";
 
-
     /** <code>exclude.internal.topics</code> */
     public static final String EXCLUDE_INTERNAL_TOPICS_CONFIG = "exclude.internal.topics";
     private static final String EXCLUDE_INTERNAL_TOPICS_DOC = "Whether records from internal topics (such as offsets) "
