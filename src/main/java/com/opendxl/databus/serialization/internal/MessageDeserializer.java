@@ -32,6 +32,7 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
         final Integer version = messageStructure.getVersion();
         final InternalDeserializer<DatabusMessage> deserializer = DeserializerRegistry.getDeserializer(version);
         return deserializer.deserialize(topic, messageStructure.getPayload());
+
     }
 
     /**

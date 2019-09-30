@@ -15,13 +15,44 @@ import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
  */
 public class ConsumerRecord<P> {
 
+    /**
+     * The key
+     */
     private final String key;
+
+    /**
+     * The message payload
+     */
     private final MessagePayload<P> messagePayload;
+
+    /**
+     * The partition number
+     */
     private final Integer partition;
+
+    /**
+     * The offset number
+     */
     private final long offset;
+
+    /**
+     * The timestamp when the consumer record is created
+     */
     private final long timestamp;
+
+    /**
+     * The Headers
+     */
     private final Headers headers;
+
+    /**
+     * The Topic name
+     */
     private final String topic;
+
+    /**
+     * The tenant group
+     */
     private final String tenantGroup;
 
     /**
@@ -56,16 +87,16 @@ public class ConsumerRecord<P> {
     /**
      * The Composed Topic name
      *
-     * @return The Composed Topic name.
+     * @return The Composed Topic name which includes the String sum of topic name with the tenant group.
      */
     public String getComposedTopic() {
         return TopicNameBuilder.getTopicName(getTopic(), getTenantGroup());
     }
 
     /**
-     * The Topic
+     * The Topic name
      *
-     * @return Topic name.
+     * @return Topic name as String.
      */
     public String getTopic() {
 
@@ -75,7 +106,7 @@ public class ConsumerRecord<P> {
     /**
      * The Tenant Group
      *
-     * @return Tenant Group.
+     * @return Tenant Group as String.
      */
     public String getTenantGroup() {
         return tenantGroup;
@@ -84,7 +115,7 @@ public class ConsumerRecord<P> {
     /**
      * The Key
      *
-     * @return Key
+     * @return The Key as String.
      */
     public String getKey() {
         return key;
@@ -93,23 +124,24 @@ public class ConsumerRecord<P> {
     /**
      * The Headers
      *
-     * @return Headers.
+     * @return The Headers.
      */
     public Headers getHeaders() {
         return headers;
     }
 
     /**
-     * The messagePayload
+     * The message payload
      *
-     * @return Payload
+     * @return A MessagePayload instance
+     *
      */
     public MessagePayload<P> getMessagePayload() {
         return messagePayload;
     }
 
     /**
-     * The Offset
+     * The Offset number
      *
      * @return Offset
      */
@@ -119,18 +151,18 @@ public class ConsumerRecord<P> {
     }
 
     /**
-     *  The Partition
+     * The Partition number
      *
-     * @return Partition
+     * @return The partition number
      */
     public int getPartition() {
         return partition;
     }
 
     /**
-     * The Timestamp
+     * The Timestamp as Long
      *
-     * @return Timestamp
+     * @return Timestamp when the consumer record was created
      */
     public long getTimestamp() {
         return timestamp;

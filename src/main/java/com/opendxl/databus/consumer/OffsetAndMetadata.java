@@ -13,6 +13,9 @@ import java.io.Serializable;
  */
 public final class OffsetAndMetadata implements Serializable {
 
+    /**
+     * An instance of Kafka {@link org.apache.kafka.clients.consumer.OffsetAndMetadata}
+     */
     private final org.apache.kafka.clients.consumer.OffsetAndMetadata offsetAndMetadata;
 
     /**
@@ -34,31 +37,43 @@ public final class OffsetAndMetadata implements Serializable {
     }
 
     /**
-     *
-     * @return offset
+     * Returns the offset value number
+     * @return The Offset value number
      */
     public long offset() {
         return offsetAndMetadata.offset();
     }
 
     /**
-     *
-     * @return metadata
+     * Returns the metadata value as String
+     * @return Metadata of the consumer
      */
     public String metadata() {
         return offsetAndMetadata.metadata();
     }
 
+    /**
+     * Overriding equals method
+     * @return True if {@link org.apache.kafka.clients.consumer.OffsetAndMetadata} is equals
+     */
     @Override
     public boolean equals(final Object o) {
         return offsetAndMetadata.equals(o);
     }
 
+    /**
+     * Get the hashcode of the {@link org.apache.kafka.clients.consumer.OffsetAndMetadata} object
+     * @return The hashcode of the OffsetAndMetadata object as int
+     */
     @Override
     public int hashCode() {
         return offsetAndMetadata.hashCode();
     }
 
+    /**
+     * Get the toString method of the {@link org.apache.kafka.clients.consumer.OffsetAndMetadata} object
+     * @return The toString of the OffsetAndMetadata object
+     */
     @Override
     public String toString() {
         return offsetAndMetadata.toString();
