@@ -90,7 +90,6 @@ public interface ConsumerRebalanceListener {
      */
     void onPartitionsRevoked(Collection<TopicPartition> partitions);
 
-
     /**
      * A callback method the user can implement to provide handling of customized offsets on completion of a successful
      * partition re-assignment. This method will be called after an offset re-assignment completes and before the

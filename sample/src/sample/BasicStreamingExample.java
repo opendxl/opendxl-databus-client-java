@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017 McAfee LLC - All Rights Reserved
+ * Copyright (c) 2019 McAfee LLC - All Rights Reserved
  */
 
 package sample;
@@ -58,7 +58,6 @@ public class BasicStreamingExample {
 
     private static Logger LOG = Logger.getLogger(BasicStreamingExample.class);
 
-
     public BasicStreamingExample() {
 
         // Start Kafka cluster
@@ -74,7 +73,6 @@ public class BasicStreamingExample {
         // Prepare a Consumer
         this.consumer = createConsumer();
         this.consumer.subscribe(Collections.singletonList(outputTopic));
-
 
         // Prepare the stream and run stream processing
         this.stream = createStream();
@@ -101,7 +99,6 @@ public class BasicStreamingExample {
         config.put(ConsumerConfiguration.CLIENT_ID_CONFIG, "consumer");
         return new DatabusConsumer<>(config, new ByteArrayDeserializer());
     }
-
 
     public KafkaStreams createStream() {
         final Properties config = new Properties();
@@ -164,7 +161,6 @@ public class BasicStreamingExample {
         };
     }
 
-
     private Runnable consumeFromOutputTopic() {
         return () -> {
             try {
@@ -203,7 +199,6 @@ public class BasicStreamingExample {
         };
     }
 
-
     public ProducerRecord<byte[]> buildProducerRecord(final String topic, final byte[] payload) {
         String key = String.valueOf(System.currentTimeMillis());
         RoutingData routingData = new RoutingData(topic, key, null);
@@ -219,8 +214,6 @@ public class BasicStreamingExample {
             e.printStackTrace();
         }
     }
-
-
 
     private void stopExample(ExecutorService executor) {
         try {
@@ -272,7 +265,6 @@ public class BasicStreamingExample {
         };
     }
 
-
     private static class DatabusMessageDistributor implements Processor<String, DatabusMessage> {
 
         private ProcessorContext processorContext;
@@ -299,7 +291,6 @@ public class BasicStreamingExample {
 
         }
     }
-
 
     public static void main(String[] args) throws InterruptedException {
         LOG.info("Ctrl-C to finish");

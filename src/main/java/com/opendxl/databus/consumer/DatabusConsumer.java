@@ -58,7 +58,6 @@ import java.util.UUID;
  */
 public class DatabusConsumer<P> extends Consumer<P> {
 
-
     /**
      * A consumer is instantiated by providing a set of key-value pairs as configuration. Valid configuration strings
      * are documented <a href="http://kafka.apache.org/documentation.html#consumerconfigs" >here</a>. Values can be
@@ -74,7 +73,6 @@ public class DatabusConsumer<P> extends Consumer<P> {
     public DatabusConsumer(final Map<String, Object> configs, final Deserializer<P> messageDeserializer) {
         this(configs, messageDeserializer, null);
     }
-
 
     /**
      * A consumer is instantiated by providing a set of key-value pairs as configuration. Valid configuration strings
@@ -105,8 +103,6 @@ public class DatabusConsumer<P> extends Consumer<P> {
         }
     }
 
-
-
     /**
      * A consumer is instantiated by providing a {@link Properties} object as configuration. Valid
      * configuration strings are documented at {@link org.apache.kafka.clients.consumer.ConsumerConfig}
@@ -123,7 +119,6 @@ public class DatabusConsumer<P> extends Consumer<P> {
     public DatabusConsumer(final Properties properties, final Deserializer<P> messageDeserializer) {
         this(properties, messageDeserializer, null);
     }
-
 
     /**
      * A consumer is instantiated by providing a {@link Properties} object as configuration. Valid
@@ -154,6 +149,13 @@ public class DatabusConsumer<P> extends Consumer<P> {
         }
      }
 
+
+    /**
+     * Sets the message serializer to the DatabusConsumer.
+     *
+     * @param configuration The consumer configuration map.
+     * @param messageDeserializer  a {@link Deserializer} getInstance implemented by SDK's user.
+     */
     private void setFieldMembers(final Deserializer<P> messageDeserializer, final Map<String, Object> configuration) {
         if (messageDeserializer == null) {
             throw new DatabusClientRuntimeException("Message Deserializer cannot be null" , DatabusConsumer.class);
@@ -165,6 +167,12 @@ public class DatabusConsumer<P> extends Consumer<P> {
         setClientId((String) configuration.get(ConsumerConfiguration.CLIENT_ID_CONFIG));
     }
 
+    /**
+     * Sets the credential to the DatabusConsumer.
+     *
+     * @param configuration The consumer configuration map.
+     * @param credential An identity to authenticate/authorization.
+     */
     private Map<String, Object> configureCredential(final Map<String, Object> configuration,
                                                     final Credential credential) {
         if (credential == null) {
@@ -179,6 +187,11 @@ public class DatabusConsumer<P> extends Consumer<P> {
         return configuration;
     }
 
+    /**
+     * Sets the ClientId to the DatabusConsumer.
+     *
+     * @param configuration The consumer configuration map.
+     */
     private Map<String, Object> configureClientId(final Map<String, Object> configuration) {
         String clientId = (String) configuration.get(ConsumerConfiguration.CLIENT_ID_CONFIG);
         if (clientId != null && !clientId.trim().isEmpty()) {

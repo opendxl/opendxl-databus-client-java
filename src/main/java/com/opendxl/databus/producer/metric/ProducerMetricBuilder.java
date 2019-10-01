@@ -78,6 +78,7 @@ public class ProducerMetricBuilder {
      * If metric is not found, default value associated is 0.<br>
      * @param metrics The Kafka list metrics.
      * @param metricAttributeName The name of the Kafka metric that will be measured.
+     * @param tags A list of tags to build the metric.
      * @param clientId The clientId associated to the producer.
      * @return A {@link ProducerMetric} instance with an associated value.
      */

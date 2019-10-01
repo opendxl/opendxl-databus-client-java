@@ -23,7 +23,6 @@ import java.util.Map;
 public class ConsumerRecordsAdapter<P>
         implements Adapter<org.apache.kafka.clients.consumer.ConsumerRecords<String, DatabusMessage>, ConsumerRecords> {
 
-
     private final Deserializer<P> messageDeserializer;
 
     /**

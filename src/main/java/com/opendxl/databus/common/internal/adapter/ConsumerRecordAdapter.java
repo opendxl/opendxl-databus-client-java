@@ -13,27 +13,30 @@ import com.opendxl.databus.serialization.Deserializer;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Adapter for ConsumerRecord
+ * Adapter for ConsumerRecord.
  */
 public final class ConsumerRecordAdapter<P> implements
         Adapter<org.apache.kafka.clients.consumer.ConsumerRecord<String, DatabusMessage>,
                 ConsumerRecord<P>> {
 
-
+    /**
+     * The message deserializer.
+     */
     private final Deserializer<P> messageDeserializer;
 
-
-    /**
-     * @param messageDeserializer a {@link Deserializer} getInstance getInstance used for deserializing the payload
+    /** Constructor
+     * @param messageDeserializer a {@link Deserializer} getInstance getInstance used for deserialize the payload.
      */
     public ConsumerRecordAdapter(final Deserializer<P> messageDeserializer) {
         this.messageDeserializer = messageDeserializer;
     }
 
-
     /**
-     * @param sourceConsumerRecord the ConsumerRecord to be adapted
-     * @return a Databus {@link ConsumerRecord}
+     * Adapter pattern implementation for ConsumerRecord.
+     * Adapts a DatabusMessage object to a ConsumerRecord.
+     *
+     * @param sourceConsumerRecord the ConsumerRecord to be adapted.
+     * @return A Databus {@link ConsumerRecord}
      */
     @Override
     public ConsumerRecord<P>
@@ -56,14 +59,13 @@ public final class ConsumerRecordAdapter<P> implements
         return targetConsumerRecord;
     }
 
-
     /**
-     * Get the topic name from headers if it exists. Otherwise, it is taken from source Consumer Record
+     * Get the topic name from headers if it exists. Otherwise, it is taken from source Consumer Record.
      * <p>
      * If the user produce a message by using tenantGroup the the topic name comes into headers.
      *
-     * @param sourceConsumerRecord source Consumer Record
-     * @return topic name
+     * @param sourceConsumerRecord source Consumer Record.
+     * @return The topic name.
      */
     private String
     getTopic(final org.apache.kafka.clients.consumer.ConsumerRecord<String, DatabusMessage> sourceConsumerRecord) {
@@ -76,12 +78,11 @@ public final class ConsumerRecordAdapter<P> implements
         }
     }
 
-
     /**
-     * Get the tenantGroup name from headers if it exists. Otherwise, it is empty
+     * Get the tenantGroup name from headers if it exists. Otherwise, it is empty.
      *
-     * @param sourceConsumerRecord source Consumer Record
-     * @return tenantGroup name from headers if it exists. Otherwise, it return an empty String
+     * @param sourceConsumerRecord source Consumer Record.
+     * @return The tenantGroup name from headers if it exists. Otherwise, it return an empty String.
      */
     private String
     getTenantGroup(final org.apache.kafka.clients.consumer.ConsumerRecord<String, DatabusMessage>

@@ -26,6 +26,10 @@ import static org.apache.kafka.common.config.ConfigDef.ValidString.in;
 
 
 public final class ConsumerConfiguration  extends AbstractConfig   {
+
+    /**
+     * A Kafka ConfigDef object, used to store the producer configuration.
+     */
     private static final ConfigDef CONFIG;
 
     /*
@@ -247,7 +251,6 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
             + "Implementing the <code>org.apache.kafka.clients.consumer.ConsumerInterceptor</code> interface allows "
             + "you to intercept (and possibly mutate) records "
             + "received by the consumer. By default, there are no interceptors.";
-
 
     /** <code>exclude.internal.topics</code> */
     public static final String EXCLUDE_INTERNAL_TOPICS_CONFIG = "exclude.internal.topics";
@@ -494,6 +497,14 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
         return CommonClientConfigs.postProcessReconnectBackoffConfigs(this, parsedValues);
     }
 
+    /**
+     * Adds a serializer object to the config map
+     *
+     * @param configs A map of config object
+     * @param keyDeserializer A deserializer object for keys
+     * @param valueDeserializer A deserializer object for values
+     * @return A map with the serializers config added
+     */
     public static Map<String, Object> addDeserializerToConfig(Map<String, Object> configs,
                                                               Deserializer<?> keyDeserializer,
                                                               Deserializer<?> valueDeserializer) {
@@ -505,6 +516,14 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
         return newConfigs;
     }
 
+    /**
+     * Adds a serializer object to the Properties map
+     *
+     * @param properties An instance of Properties object
+     * @param keyDeserializer A deserializer object for keys
+     * @param valueDeserializer A deserializer object for values
+     * @return A map with the serializers entries to the Properties instance
+     */
     public static Properties addDeserializerToConfig(Properties properties,
                                                      Deserializer<?> keyDeserializer,
                                                      Deserializer<?> valueDeserializer) {
@@ -517,10 +536,20 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
         return newProperties;
     }
 
+    /**
+     * ConsumerConfiguration constructor
+     *
+     * @param props A map of properties object
+     */
     public ConsumerConfiguration(Properties props) {
         super(CONFIG, props);
     }
 
+    /**
+     * ConsumerConfiguration constructor
+     *
+     * @param props A map of properties object
+     */
     public ConsumerConfiguration(Map<String, Object> props) {
         super(CONFIG, props);
     }
@@ -529,6 +558,11 @@ public final class ConsumerConfiguration  extends AbstractConfig   {
         super(CONFIG, props, doLog);
     }
 
+    /**
+     * Gets the config names
+     *
+     * @return A set of String with the names of the config object
+     */
     public static Set<String> configNames() {
         return CONFIG.names();
     }

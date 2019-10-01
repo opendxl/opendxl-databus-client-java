@@ -4,10 +4,6 @@
 
 package com.opendxl.databus.consumer;
 
-import com.opendxl.databus.entities.internal.DatabusMessage;
-import com.opendxl.databus.exception.DatabusClientRuntimeException;
-import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
-import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import com.opendxl.databus.common.MetricName;
 import com.opendxl.databus.common.OffsetAndTimestamp;
 import com.opendxl.databus.common.PartitionInfo;
@@ -17,10 +13,14 @@ import com.opendxl.databus.common.internal.adapter.MetricNameMapAdapter;
 import com.opendxl.databus.common.internal.adapter.PartitionInfoListAdapter;
 import com.opendxl.databus.common.internal.adapter.TopicPartitionInfoListAdapter;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.metric.ConsumerMetricsBuilder;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientId;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopicPartitions;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopics;
+import com.opendxl.databus.consumer.metric.ConsumerMetricsBuilder;
+import com.opendxl.databus.entities.internal.DatabusMessage;
+import com.opendxl.databus.exception.DatabusClientRuntimeException;
+import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
+import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;
 
@@ -40,13 +40,40 @@ import java.util.regex.Pattern;
  */
 public abstract class Consumer<P> {
 
+    /**
+     * The DatabusKeyDeserializer to deserialize incoming messages.
+     */
     private DatabusKeyDeserializer keyDeserializer = null;
+
+    /**
+     * The MessageDeserializer to deserialize a DatabusMessage.
+     */
     private MessageDeserializer valueDeserializer = null;
+
+    /**
+     * The ConsumerRecordsAdapter to deserialize a DatabusMessage.
+     */
     private ConsumerRecordsAdapter<P> consumerRecordsAdapter;
+
+    /**
+     * The client id.
+     */
     private String clientId;
+
+    /**
+     * The topic partition list.
+     */
     private List<TopicPartition> topicPartitions;
+
+    /**
+     * The logger object.
+     */
     private static final Logger LOG = Logger.getLogger(Consumer.class);
 
+    /**
+     * The Kafka associated consumer.
+     */
+    private org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer = null;
 
     /**
      * Subscribe to the given list of tenantGroups and topics to get dynamically
@@ -139,7 +166,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Subscribe to the given list of topics to get dynamically
@@ -350,7 +376,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * @throws UnsupportedOperationException because it is not supported
      */
@@ -415,7 +440,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Commit offsets returned on the last {@link #poll(long) poll()} for all the subscribed list of topics
@@ -561,7 +585,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Overrides the fetch offsets that the consumer will use on the next {@link #poll(long) poll(timeout)}. If this API
      * is invoked for the same partition more than once, the latest offset will be used on the next poll(). Note that
@@ -582,7 +605,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Seek to the first offset for each of the given topicPartitions. This function evaluates lazily, seeking to the
@@ -609,7 +631,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Seek to the last offset for each of the given topicPartitions. This function evaluates lazily, seeking to the
      * final offset in all topicPartitions only when {@link #poll(long)} or {@link #position(TopicPartition)} are
@@ -635,7 +656,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Get the offset of the <i>next record</i> that will be fetched (if a record with that offset exists).
@@ -671,7 +691,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Get the last committed offset for the given partition (whether the commit happened by this process or
@@ -713,9 +732,8 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
-     * Get the metrics kept by the consumer
+     * Get the metrics kept by the consumer.
      *
      * @throws DatabusClientRuntimeException if metrics fails.
      * @return a map of metrics
@@ -734,9 +752,9 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Average number of records consumed per seconds for each consumer and its topics
+     * Average number of records consumed per seconds for each consumer and its topics.
      *
-     * @return ConsumerMetricPerClientIdAndTopics instance
+     * @return ConsumerMetricPerClientIdAndTopics instance.
      */
     public ConsumerMetricPerClientIdAndTopics recordsPerSecondAvgMetric() {
 
@@ -756,9 +774,9 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Total number of records consumed per consumer and its topics
+     * Total number of records consumed per consumer and its topics.
      *
-     * @return ConsumerMetricPerClientIdAndTopics instance
+     * @return ConsumerMetricPerClientIdAndTopics instance.
      */
     public ConsumerMetricPerClientIdAndTopics recordsTotalMetric() {
 
@@ -778,9 +796,9 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Average bytes consumed per second for each consumer and its topics
+     * Average bytes consumed per second for each consumer and its topics.
      *
-     * @return ConsumerMetricPerClientIdAndTopics instance
+     * @return ConsumerMetricPerClientIdAndTopics instance.
      */
     public ConsumerMetricPerClientIdAndTopics bytesPerSecondAvgMetric() {
 
@@ -800,9 +818,9 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Total bytes consumed per consumer and its topics
+     * Total bytes consumed per consumer and its topics.
      *
-     * @return ConsumerMetricPerClientIdAndTopics instance
+     * @return ConsumerMetricPerClientIdAndTopics instance.
      */
     public ConsumerMetricPerClientIdAndTopics bytesTotalMetric() {
 
@@ -822,9 +840,9 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Average number of records gotten per fetch request for each consumer and its topics
+     * Average number of records gotten per fetch request for each consumer and its topics.
      *
-     * @return ConsumerMetricPerClientIdAndTopics instance
+     * @return ConsumerMetricPerClientIdAndTopics instance.
      */
     public ConsumerMetricPerClientIdAndTopics recordsPerRequestAvgMetric() {
 
@@ -843,15 +861,13 @@ public abstract class Consumer<P> {
 
     }
 
-
-
     /**
      * Total number of fetch request for each consumer.
      * A fetch is not equals poll(). A Kafka fetch is governed by a set of consumer configuration prooperties like
      * fetch.min.bytes, fetch.max.wait.ms, max.topicPartitions.fetch.bytes, etc.
      * There might be more poll than fetch request.
      *
-     * @return ConsumerMetricPerClientId instance
+     * @return ConsumerMetricPerClientId instance.
      */
     public ConsumerMetricPerClientId totalFetchRequestMetric() {
 
@@ -870,6 +886,7 @@ public abstract class Consumer<P> {
     }
 
     /**
+     * The number of fetch requests per second.
      *
      * @return ConsumerMetricPerClientId instance
      */
@@ -890,8 +907,9 @@ public abstract class Consumer<P> {
     }
 
     /**
+     * The maximum lag in terms of number of records for any partition in this window.
      *
-     * @return ConsumerMetricPerClientId instance
+     * @return ConsumerMetricPerClientId instance.
      */
     public ConsumerMetricPerClientId recordsLagMaxMetric() {
 
@@ -909,11 +927,10 @@ public abstract class Consumer<P> {
 
     }
 
-
     /**
      * Average bytes per fetch request for each consumer and its topics.
      *
-     * @return ConsumerMetricPerClientIdAndTopics instance
+     * @return ConsumerMetricPerClientIdAndTopics instance.
      */
     public ConsumerMetricPerClientIdAndTopics bytesFetchRequestSizeAvgMetric() {
 
@@ -932,9 +949,9 @@ public abstract class Consumer<P> {
     }
 
     /**
+     * The latest lag of the partition.
      *
-     *
-     * @return ConsumerMetricPerClientIdAndTopicPartitions instance
+     * @return ConsumerMetricPerClientIdAndTopicPartitions instance.
      */
     public ConsumerMetricPerClientIdAndTopicPartitions recordsLagPerTopicPartition() {
         try {
@@ -951,10 +968,10 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
+     * The average lag of the partition.
      *
-     * @return ConsumerMetricPerClientIdAndTopicPartitions instance
+     * @return ConsumerMetricPerClientIdAndTopicPartitions instance.
      */
     public ConsumerMetricPerClientIdAndTopicPartitions recordsLagAvgPerTopicPartition() {
         try {
@@ -971,8 +988,9 @@ public abstract class Consumer<P> {
     }
 
     /**
+     * The max lag of the partition.
      *
-     * @return ConsumerMetricPerClientIdAndTopicPartitions instance
+     * @return ConsumerMetricPerClientIdAndTopicPartitions instance.
      */
     public ConsumerMetricPerClientIdAndTopicPartitions recordsLagMaxPerTopicPartition() {
         try {
@@ -990,8 +1008,7 @@ public abstract class Consumer<P> {
 
     /**
      * Get metadata about the topicPartitions for a given topic. This method will issue a remote call to the server
-     * if it
-     * does not already have any metadata about the given topic.
+     * if it does not already have any metadata about the given topic.
      *
      * @param topic The topic to get partition metadata for
      * @return The list of topicPartitions
@@ -1024,7 +1041,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Get metadata about topicPartitions for all topics that the user is authorized to view. This method will issue a
@@ -1060,7 +1076,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Suspend fetching from the requested topicPartitions. Future calls to {@link #poll(long)} will not return
      * any records from these topicPartitions until they have been resumed using {@link #resume(TopicPartition...)}.
@@ -1087,7 +1102,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg + e.getMessage(), e, Consumer.class);
         }
     }
-
 
     /**
      * Resume specified topicPartitions which have been paused with {@link #pause(TopicPartition...)}. New calls to
@@ -1116,7 +1130,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Close the consumer, waiting indefinitely for any needed cleanup. If auto-commit is enabled, this
      * will commit the current offsets. Note that {@link #wakeup()} cannot be use to interrupt close.
@@ -1133,7 +1146,6 @@ public abstract class Consumer<P> {
         }
     }
 
-
     /**
      * Wakeup the consumer. This method is thread-safe and is useful in particular to abort a long poll.
      * The thread which is blocking in an operation will throw {@link org.apache.kafka.common.errors.WakeupException}.
@@ -1149,7 +1161,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg + e.getMessage(), e, Consumer.class);
         }
     }
-
 
     /**
      * Commit the specified offsets for the specified list of topics and topicPartitions to Kafka.
@@ -1191,7 +1202,6 @@ public abstract class Consumer<P> {
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
     }
-
 
     /**
      * Look up the offsets for the given topicPartitions by timestamp. The returned offset for each partition is the
@@ -1273,7 +1283,6 @@ public abstract class Consumer<P> {
      *  </ul>
      */
     public Map<TopicPartition, Long> beginningOffsets(final List<TopicPartition> partitions) {
-
         try {
             List<org.apache.kafka.common.TopicPartition> kafkaTopicPartition = new ArrayList<>(partitions.size());
 
@@ -1296,9 +1305,7 @@ public abstract class Consumer<P> {
             LOG.error(msg, e);
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
-
     }
-
 
     /**
      * Get the end offsets for the given topicPartitions. In the default {@code read_uncommitted} isolation level, the
@@ -1347,9 +1354,7 @@ public abstract class Consumer<P> {
             LOG.error(msg, e);
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
-
     }
-
 
     /**
      * Get the set of topicPartitions that were previously paused by a call to {@link #pause(TopicPartition...)}.
@@ -1372,40 +1377,69 @@ public abstract class Consumer<P> {
         }
     }
 
-
-
+    /**
+     * Sets the Kafka consumer
+     *
+     * @param consumer - The Kafka consumer to set.
+     */
     protected void setConsumer(final org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer) {
         this.consumer = consumer;
     }
 
+    /**
+     * Sets the Key Deserializer
+     *
+     * @param keyDeserializer - The DatabusKeyDeserializer to set.
+     */
     protected void setKeyDeserializer(final DatabusKeyDeserializer keyDeserializer) {
         this.keyDeserializer = keyDeserializer;
     }
 
+    /**
+     * Sets the MessageDeserializer
+     *
+     * @param valueDeserializer - The MessageDeserializer to set.
+     */
     protected void setValueDeserializer(final MessageDeserializer valueDeserializer) {
         this.valueDeserializer = valueDeserializer;
     }
 
-
+    /**
+     * Sets the ConsumerRecordsAdapter
+     *
+     * @param consumerRecordsAdapter - The ConsumerRecordsAdapter to set.
+     */
     protected void setConsumerRecordsAdapter(final ConsumerRecordsAdapter<P> consumerRecordsAdapter) {
         this.consumerRecordsAdapter = consumerRecordsAdapter;
     }
 
+    /**
+     * Sets the clientId
+     *
+     * @param clientId - The clientId to set.
+     */
     protected void setClientId(final String clientId) {
         this.clientId = clientId;
 
     }
 
-    private org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer = null;
-
+    /**
+     * Gets the Key Deserializer
+     *
+     * @return A DatabusKeyDeserializer.
+     */
     protected DatabusKeyDeserializer getKeyDeserializer() {
         return keyDeserializer;
     }
 
+    /**
+     * Gets the MessageDeserializer to get the message value.
+     *
+     * @return A MessageDeserializer.
+     */
     protected MessageDeserializer getValueDeserializer() {
         return valueDeserializer;
     }
-
 
     /**
      * ConsumerRebalanceListener Adapter
@@ -1413,11 +1447,19 @@ public abstract class Consumer<P> {
      private static class ConsumerRebalanceListenerAdapter<P>
             implements org.apache.kafka.clients.consumer.ConsumerRebalanceListener {
 
-        private final ConsumerRebalanceListener listener;
+        /**
+         * The listener for consumer rebalance
+         */
+         private final ConsumerRebalanceListener listener;
+
+        /**
+         * The consumer to rebalance itself
+         */
         private Consumer consumer;
 
         /**
-         * @param listener listener
+         * @param listener The listener for consumer rebalance
+         * @param consumer The consumer to rebalance itself
          */
         ConsumerRebalanceListenerAdapter(final ConsumerRebalanceListener listener,
                                          final Consumer<P> consumer) {
@@ -1425,6 +1467,14 @@ public abstract class Consumer<P> {
             this.consumer = consumer;
         }
 
+        /**
+         * A callback method the user can implement to provide handling of offset commits to a customized store
+         * on the start of a rebalance operation. This method will be called before a rebalance operation starts and
+         * after the consumer stops fetching data. It is recommended that offsets should be committed in this callback
+         * to either Kafka or a custom offset store to prevent duplicate data.
+         *
+         * @param partitions The list of partitions
+         */
         @Override
         public void onPartitionsRevoked(final Collection<org.apache.kafka.common.TopicPartition> partitions) {
             ArrayList<TopicPartition> adaptedPartitions = new ArrayList<>();
@@ -1432,6 +1482,13 @@ public abstract class Consumer<P> {
             listener.onPartitionsRevoked(adaptedPartitions);
         }
 
+        /**
+         * A callback method the user can implement to provide handling of customized offsets on completion of a
+         * successful partition re-assignment. This method will be called after an offset re-assignment
+         * completes and before the consumer starts fetching data.
+         *
+         * @param partitions The list of partitions
+         */
         @Override
         public void onPartitionsAssigned(final Collection<org.apache.kafka.common.TopicPartition> partitions) {
             ArrayList<TopicPartition> adaptedPartitions = new ArrayList<>();
@@ -1441,10 +1498,14 @@ public abstract class Consumer<P> {
         }
     }
 
+    /**
+     * Sets the consumer topics-partitions.
+     *
+     * @param partitions The topic partitions list.
+     */
     private synchronized void setPartitions(final ArrayList<TopicPartition> partitions) {
          this.topicPartitions = partitions;
     }
-
 
     /**
      * OffsetCommitCallback Adapter
@@ -1452,16 +1513,28 @@ public abstract class Consumer<P> {
      private static class OffsetCommitCallbackAdapter
             implements org.apache.kafka.clients.consumer.OffsetCommitCallback {
 
-        private final OffsetCommitCallback offsetCommitCallback;
+        /**
+         * The OffsetCommitCallbackAdapter instance.
+         */
+         private final OffsetCommitCallback offsetCommitCallback;
 
         /**
+         * The constructor of the OffsetCommitCallbackAdapter.
          *
-         * @param offsetCommitCallback original listener
+         * @param offsetCommitCallback original listener.
          */
         OffsetCommitCallbackAdapter(final OffsetCommitCallback offsetCommitCallback) {
             this.offsetCommitCallback = offsetCommitCallback;
         }
 
+        /**
+         * A callback method the user can implement to provide asynchronous handling of commit request completion.
+         * This method will be called when the commit request sent to the server has been acknowledged.
+         *
+         * @param offsets A map of the offsets and associated metadata that this callback applies to.
+         * @param exception The exception thrown during processing of the request, or null if the commit
+         * completed successfully.
+         */
         @Override
         public void onComplete(
                 final Map<org.apache.kafka.common.TopicPartition,
@@ -1482,7 +1555,6 @@ public abstract class Consumer<P> {
                         exception, OffsetCommitCallbackAdapter.class);
             }
             offsetCommitCallback.onComplete(adaptedOffsets, databusClientException);
-
         }
     }
 
