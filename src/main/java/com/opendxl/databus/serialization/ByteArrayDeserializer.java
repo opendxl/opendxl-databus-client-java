@@ -5,14 +5,15 @@
 package com.opendxl.databus.serialization;
 
 /**
- * Byte Array Deserializer
+ * Byte Array Deserializer.
  */
 public final class ByteArrayDeserializer implements Deserializer<byte[]> {
 
     /**
+     * Deserialize a message.
      *
-     * @param message message to be deserialized
-     * @return message as byte array
+     * @param message Message to be deserialized.
+     * @return Message as byte array.
      */
     @Override
     public byte[] deserialize(final byte[] message) {

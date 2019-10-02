@@ -7,7 +7,7 @@ package com.opendxl.databus.serialization.internal;
 import com.opendxl.databus.entities.internal.DatabusMessage;
 
 /**
- * Deserialize messages produced by Kafka Client
+ * Deserialize messages produced by Kafka Client.
  */
 public final class RawMessageDeserializer implements InternalDeserializer<DatabusMessage> {
 
@@ -15,9 +15,9 @@ public final class RawMessageDeserializer implements InternalDeserializer<Databu
      * It takes binary data from Databus and create a {@link DatabusMessage} with
      * this binary data and empty headers.
      *
-     * @param topic Not used
-     * @param data data to be deserialized
-     * @return a DatabusMessage witw binary data as is.
+     * @param topic Topic name Not used field.
+     * @param data Data to be deserialized.
+     * @return A {@link DatabusMessage} with binary data as is.
      */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] data) {

@@ -14,7 +14,7 @@ import java.util.Map;
 public final class MessageDeserializer implements org.apache.kafka.common.serialization.Deserializer<DatabusMessage> {
 
     /**
-     * Not implemented, used as default
+     * Not implemented.
      */
     @Override
     public void configure(final Map<String, ?> map, final boolean b) {
@@ -38,7 +38,7 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
     }
 
     /**
-     * Not implemented, used as default
+     * Not implemented.
      */
     @Override
     public void close() {

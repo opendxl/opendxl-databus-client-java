@@ -18,6 +18,7 @@ public interface MessageStructure {
 
     /**
      * Gets the version.
+     *
      * @return The version.
      */
     int getVersion();

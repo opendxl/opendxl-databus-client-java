@@ -17,21 +17,37 @@ import java.util.Map;
  */
 public class SerdeDatabus implements Serde<DatabusMessage> {
 
+    /**
+     * Not implemented.
+     */
     @Override
     public void configure(final Map<String, ?> configs, final boolean isKey) {
 
     }
 
+    /**
+     * Not implemented.
+     */
     @Override
     public void close() {
 
     }
 
+    /**
+     * Creates the serializer.
+     *
+     * @return A DatabusMessage serializer instance.
+     */
     @Override
     public Serializer<DatabusMessage> serializer() {
         return new MessageSerializer();
     }
 
+    /**
+     * Creates the deserializer.
+     *
+     * @return A DatabusMessage deserializer instance.
+     */
     @Override
     public Deserializer<DatabusMessage> deserializer() {
         return new MessageDeserializer();

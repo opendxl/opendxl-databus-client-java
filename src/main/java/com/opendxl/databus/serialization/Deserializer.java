@@ -6,16 +6,17 @@ package com.opendxl.databus.serialization;
 
 /**
  * Deserializer
- * SDK's users have to implement this, in order to be able to consume a Dataus message
+ * SDK's users have to implement this, in order to be able to consume a Databus message.
  *
- * @param <P> the data's type
+ * @param <P> the data's type.
  */
 public interface Deserializer<P> {
 
     /**
+     * Deserialize a message.
      *
-     * @param data data to be deserialized
-     * @return data of type P
+     * @param data Data to be deserialized.
+     * @return Data of type P.
      */
     P deserialize(byte[] data);
 }

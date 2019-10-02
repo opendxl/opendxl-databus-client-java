@@ -27,7 +27,7 @@ public final class MessageSerializer implements org.apache.kafka.common.serializ
     }
 
     /**
-     * Not implemented, used default
+     * Not implemented.
      */
     @Override
     public void configure(final Map<String, ?> map, final boolean b) {
@@ -54,7 +54,7 @@ public final class MessageSerializer implements org.apache.kafka.common.serializ
     }
 
     /**
-     * Not implemented, uses default.
+     * Not implemented.
      */
     @Override
     public void close() {
