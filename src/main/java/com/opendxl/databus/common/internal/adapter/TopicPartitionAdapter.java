@@ -12,10 +12,10 @@ import com.opendxl.databus.common.TopicPartition;
 public final class TopicPartitionAdapter implements Adapter<org.apache.kafka.common.TopicPartition, TopicPartition> {
 
     /**
-     * Creates a {@link TopicPartition} getInstance
+     * Gets a {@link TopicPartition} instance.
      *
-     * @param sourceTopicPartition source topic partition
-     * @return {@link TopicPartition} getInstance
+     * @param sourceTopicPartition source topic partition.
+     * @return {@link TopicPartition} instance.
      */
     @Override
     public TopicPartition adapt(final org.apache.kafka.common.TopicPartition sourceTopicPartition) {

@@ -28,12 +28,28 @@ import java.nio.ByteBuffer;
  */
 public final class AvroMessageSerializer implements InternalSerializer<DatabusMessage> {
 
+    /**
+     * The headers field.
+     */
     protected static final String HEADERS_FIELD_NAME = "headers";
+
+    /**
+     * The payload field.
+     */
     protected static final String PAYLOAD_FIELD_NAME = "payload";
+
+    /**
+     * The a record representation.
+     */
     private final GenericData.Record databusValue;
+
+    /**
+     * A Writer data of a schema.
+     */
     private final DatumWriter<GenericRecord> writer;
 
     /**
+     * Constructor
      * @param schema Avro schema
      */
     public AvroMessageSerializer(final Schema schema) {
@@ -41,10 +57,11 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
         this.writer = new GenericDatumWriter<>(schema);
     }
 
-
     /**
-     * @param data data to be serialized
-     * @return a serialized avro message as byte[]
+     * Deserialize a message
+     *
+     * @param data Data to be serialized
+     * @return A serialized avro message as byte[]
      */
     @Override
     public byte[] serialize(final DatabusMessage data) {

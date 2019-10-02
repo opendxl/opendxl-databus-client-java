@@ -8,16 +8,16 @@ package com.opendxl.databus.common.internal.adapter;
 import java.nio.ByteBuffer;
 
 /**
- * Adapter for a Headers deserialized with Avro
+ * Adapter for a Headers deserialized with Avro.
  */
 public final class PayloadHeadersAvroDeserializedAdapter implements Adapter<Object, byte[]> {
 
     /**
-     * Creates a byte[] that represents a bynary payload based on a
-     * Object that represents a deserialized Avro payload
+     * Creates a byte[] that represents a binary payload based on a
+     * Object that represents a deserialized Avro payload.
      *
-     * @param payloadAvroDeserialized getInstance of type S
-     * @return serialized payload
+     * @param payloadAvroDeserialized An common instance for payload payloadAvroDeserialized.
+     * @return An internalized payload.
      */
     @Override
     public byte[] adapt(final Object payloadAvroDeserialized) {

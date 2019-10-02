@@ -16,19 +16,25 @@ import com.opendxl.databus.serialization.Deserializer;
  */
 public final class DatabusMessageAdapter<P> implements Adapter<DatabusMessage, MessagePayload> {
 
+    /**
+     * The message deserializer.
+     */
     private final Deserializer<P> messageDeserializer;
 
     /**
-     * @param messageDeserializer a {@link Deserializer} getInstance used for deserializing the payload
+     * Constructor
+     * @param messageDeserializer a {@link Deserializer} instance used for deserialize the payload.
      */
     public DatabusMessageAdapter(final Deserializer<P> messageDeserializer) {
         this.messageDeserializer = messageDeserializer;
     }
 
-
     /**
-     * @param databusMessage a {@link DatabusMessage} getInstance
-     * @return a {@link MessagePayload} getInstance
+     * Adapter pattern implementation for MessagePayload instance.
+     * Adapts a DatabusMessage to a MessagePayload instance.
+     *
+     * @param databusMessage A {@link DatabusMessage} instance.
+     * @return A {@link MessagePayload} instance.
      */
     @Override
     public MessagePayload<P> adapt(final DatabusMessage databusMessage) {

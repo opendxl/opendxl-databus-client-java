@@ -14,6 +14,8 @@ package com.opendxl.databus.serialization.internal;
 public interface InternalDeserializer<P> {
 
     /**
+     * Deserialize data.
+     *
      * @param topic the topic where the message comes from
      * @param data data to be deserialized
      * @return data of type P

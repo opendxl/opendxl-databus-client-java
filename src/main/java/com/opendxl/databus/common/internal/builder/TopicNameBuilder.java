@@ -17,17 +17,15 @@ import java.util.Optional;
  */
 public final  class TopicNameBuilder {
 
-
-
     private TopicNameBuilder() {
     }
 
     /**
-     * Compose a Kafka topic name based on group and topic
+     * Compose a Kafka topic name based on group and topic.
      *
-     * @param topic       topic name
-     * @param tenantGroup tenant group name
-     * @return a composed topic name
+     * @param topic topic name.
+     * @param tenantGroup tenant group name.
+     * @return a composed topic name.
      */
     public static String getTopicName(final String topic, final String tenantGroup) {
         if (StringUtils.isBlank(topic)) {
@@ -57,9 +55,10 @@ public final  class TopicNameBuilder {
     }
 
     /**
+     * Gets topic name and tenant group composed by topicname-tenantgroup.
      *
-     * @param composedTopicName A topic name composed by topic and tenant group
-     * @return topic name without a tenant group
+     * @param composedTopicName A topic name composed by topic and tenant group.
+     * @return Topic name without a tenant group.
      */
     public static String getTopicFromComposedTopicName(final String composedTopicName) {
         if (StringUtils.isBlank(composedTopicName)) {
@@ -83,9 +82,10 @@ public final  class TopicNameBuilder {
     }
 
     /**
+     * Gets the tenant group.
      *
-     * @param composedTopicName A topic name composed by topic and tenant group
-     * @return topic name without a tenant group
+     * @param composedTopicName A topic name composed by topic and tenant group.
+     * @return Topic name without a tenant group.
      */
     public static String getTenantGroupTopicFromComposedTopicName(final String composedTopicName) {
         if (StringUtils.isBlank(composedTopicName)) {

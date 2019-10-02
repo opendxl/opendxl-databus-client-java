@@ -29,9 +29,19 @@ import org.apache.avro.Schema;
  */
 public final class AvroV1MessageSchema {
 
+    /**
+     * The headers field.
+     */
     private static final String HEADERS_FIELD_NAME = "headers";
+
+    /**
+     * The payload field.
+     */
     private static final String PAYLOAD_FIELD_NAME = "payload";
 
+    /**
+     * The schema and its definition.
+     */
     private static final Schema SCHEMA;
 
     static {
@@ -60,11 +70,10 @@ public final class AvroV1MessageSchema {
     private AvroV1MessageSchema() {
     }
 
-
     /**
-     * Get  Avro version 1 Schema
+     * Gets Avro version 1 Schema
      *
-     * @return a Avro version 1 Schema
+     * @return An Avro version 1 Schema
      */
     public static Schema getSchema() {
         return SCHEMA;

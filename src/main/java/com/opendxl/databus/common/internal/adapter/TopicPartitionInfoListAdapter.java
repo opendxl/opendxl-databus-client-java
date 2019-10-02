@@ -11,15 +11,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Adapter for a Map of Topic and Partition Info
+ * Adapter for a Map of Topic and Partition Info.
  */
 public final class TopicPartitionInfoListAdapter
         implements Adapter<Map<String, List<org.apache.kafka.common.PartitionInfo>>, Map<String, List<PartitionInfo>>> {
 
     /**
+     * Adapter pattern implementation for {@code Map<String, List<PartitionInfo>>} instance.
+     * Adapts a {@code Map<String, List<org.apache.kafka.common.PartitionInfo>>} to a
+     * {@code Map<String, List<com.opendxl.databus.common.PartitionInfo>>} instance.
      *
-     * @param sourceTopicPartitionInfoList a source Map of Topic and Partition Info List
-     * @return a Map of Topic and {@link PartitionInfo } List
+     * @param sourceTopicPartitionInfoList a source Map of Topic and Partition Info List.
+     * @return a Map of Topic and {@link PartitionInfo } List.
      */
     @Override
     public Map<String, List<PartitionInfo>>

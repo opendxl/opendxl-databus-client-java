@@ -23,10 +23,13 @@ import java.util.Map;
 public class ConsumerRecordsAdapter<P>
         implements Adapter<org.apache.kafka.clients.consumer.ConsumerRecords<String, DatabusMessage>, ConsumerRecords> {
 
+    /**
+     * The message deserializer.
+     */
     private final Deserializer<P> messageDeserializer;
 
     /**
-     *
+     * Constructor
      * @param messageDeserializer a {@link Deserializer} getInstance used for deserializing the payload
      */
     public ConsumerRecordsAdapter(final Deserializer<P> messageDeserializer) {
@@ -34,9 +37,11 @@ public class ConsumerRecordsAdapter<P>
     }
 
     /**
+     * Adapter pattern implementation for ConsumerRecords instance.
+     * Adapts a DatabusMessage list object for a given topic partition to a ConsumerRecords instance.
      *
-     * @param sourceConsumerRecords source Consumer Records
-     * @return a {@link ConsumerRecords} getInstance
+     * @param sourceConsumerRecords The consumer records source composed by DatabusMessage list instance.
+     * @return a {@link ConsumerRecords} instance.
      */
     @Override
     public ConsumerRecords

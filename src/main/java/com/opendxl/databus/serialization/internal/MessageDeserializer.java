@@ -21,9 +21,11 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
     }
 
     /**
-     * @param topic The topic name
-     * @param serializedMessage A serialized message
-     * @return A {@link DatabusMessage} getInstance
+     * Deserialize a message to a {@link DatabusMessage}
+     *
+     * @param topic The topic name.
+     * @param serializedMessage A serialized message.
+     * @return A {@link DatabusMessage} instance.
      */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] serializedMessage) {

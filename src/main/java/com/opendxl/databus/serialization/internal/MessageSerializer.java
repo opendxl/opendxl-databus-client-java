@@ -14,21 +14,32 @@ import java.util.Map;
  */
 public final class MessageSerializer implements org.apache.kafka.common.serialization.Serializer<DatabusMessage> {
 
+    /**
+     * An Avro message serializer instance.
+     */
     private final AvroMessageSerializer serializer;
 
+    /**
+     * Constructor
+     */
     public MessageSerializer() {
         this.serializer = new AvroMessageSerializer(AvroV1MessageSchema.getSchema());
     }
 
+    /**
+     * Not implemented, used default
+     */
     @Override
     public void configure(final Map<String, ?> map, final boolean b) {
 
     }
 
     /**
-     * @param topic   Not Used
-     * @param message to be serialized
-     * @return a serialized message as byte[]
+     * Serialize a message, input data to serialize is a {@link DatabusMessage}.
+     *
+     * @param topic The topic Name, not used value.
+     * @param message The message to be serialized.
+     * @return A serialized message as byte[].
      */
     @Override
     public byte[] serialize(final String topic, final DatabusMessage message) {
@@ -42,6 +53,9 @@ public final class MessageSerializer implements org.apache.kafka.common.serializ
         return structure.getMessage();
     }
 
+    /**
+     * Not implemented, uses default.
+     */
     @Override
     public void close() {
 

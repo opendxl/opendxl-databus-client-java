@@ -13,6 +13,7 @@ package com.opendxl.databus.serialization.internal;
 public interface InternalSerializer<P> {
 
     /**
+     * Serialize data.
      *
      * @param message data to be serialized
      * @return data as byte array

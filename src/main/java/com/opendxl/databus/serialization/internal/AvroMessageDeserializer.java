@@ -25,22 +25,30 @@ import org.apache.avro.io.DecoderFactory;
  */
 public final class AvroMessageDeserializer implements InternalDeserializer<DatabusMessage> {
 
+    /**
+     * The schema to define the message.
+     */
     private final Schema schema;
-    private final DatumReader<GenericRecord> reader;
-
 
     /**
-     * @param schema Avro schema
+     * The schema reader.
+     */
+    private final DatumReader<GenericRecord> reader;
+
+    /**
+     * Constructor
+     * @param schema Avro schema.
      */
     public AvroMessageDeserializer(final Schema schema) {
         this.schema = schema;
         this.reader = new GenericDatumReader(schema);
     }
 
-
     /**
-     * @param data the value to serialize
-     * @return a {@link DatabusMessage} getInstance
+     * Deserialize a message
+     *
+     * @param data The data to serialize.
+     * @return A {@link DatabusMessage} instance.
      */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] data) {

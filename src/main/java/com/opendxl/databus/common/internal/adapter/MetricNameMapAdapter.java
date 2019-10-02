@@ -19,8 +19,13 @@ public final class MetricNameMapAdapter implements
                 Map<MetricName, ? extends org.apache.kafka.common.Metric>> {
 
     /**
-     * @param sourceMetricNameMap a Databus Metric Name Map
-     * @return a Map of {@link MetricName} and {@link Metric}
+     * Adapter pattern implementation for a {@code Map<MetricName, Metric>} instance.
+     * Adapts a {@code Map<org.apache.kafka.common.MetricName, ? extends org.apache.kafka.common.Metric>}
+     * to a {@code Map<MetricName, ? extends org.apache.kafka.common.Metric>>} instance.
+     *
+     * @param sourceMetricNameMap a {@code Map<org.apache.kafka.common.MetricName,
+     * ? extends org.apache.kafka.common.Metric>} sourceMetricNameMap.
+     * @return a Map of {@link MetricName} as key and {@link Metric} as value.
      */
     @Override
     public Map<MetricName, ? extends org.apache.kafka.common.Metric>
