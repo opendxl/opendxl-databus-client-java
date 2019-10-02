@@ -4,23 +4,48 @@
 
 package com.opendxl.databus.serialization.internal;
 
+import com.opendxl.databus.entities.internal.DatabusMessage;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
- * Represent a Databus message structure.
+ * Represents a {@link DatabusMessage} structure.
  */
 public final class RegularMessageStructure implements MessageStructure {
 
+    /**
+     * The payload position in the byte array message.
+     */
     private static final int PAYLOAD_START_POSITION = 5;
-    private static final int VERSION_SIZE = 1;
-    private static final int MAGIC_BYTE_SIZE = 4;
+
+    /**
+     * The size in bytes of the version.
+     */
+    private static final int VERSION_SIZE = 4;
+
+    /**
+     * The size in bytes of the magic byte.
+     */
+    private static final int MAGIC_BYTE_SIZE = 1;
+
+    /**
+     * The version.
+     */
     private final int version;
+
+    /**
+     * The payload as byte array.
+     */
     private final byte[] payload;
+
+    /**
+     * The magic byte.
+     */
     private final byte magicByte;
 
     /**
-     * It creates a Regular Message Structure based on a serialized message.
+     * Constructor. Creates a Regular Message Structure based on a serialized message.
      *
      * A regular structure is a byte[] with the following format:
      * |0|0001|payload|
@@ -29,7 +54,7 @@ public final class RegularMessageStructure implements MessageStructure {
      * Version   : size:4 position:1-4 value: int 1
      * Payload   : size n position:5-n value: byte[] serialized by the user
      *
-     * @param serializedMessage serialized message
+     * @param serializedMessage Serialized message as byte array.
      */
     public RegularMessageStructure(final byte[] serializedMessage) {
         final ByteBuffer buffer = ByteBuffer.wrap(serializedMessage);
@@ -39,11 +64,11 @@ public final class RegularMessageStructure implements MessageStructure {
     }
 
     /**
-     * It create a It creates a Regular Message Structure
+     * Constructor. It creates a Regular Message Structure.
      *
-     * @param magicByte message indicator. See {@link RegularMessageStructure}
-     * @param version   message version
-     * @param payload   message payload
+     * @param magicByte The message indicator. See {@link RegularMessageStructure}.
+     * @param version The message version.
+     * @param payload The message payload.
      */
     public RegularMessageStructure(final byte magicByte, final int version, final byte[] payload) {
         this.magicByte = magicByte;
@@ -51,9 +76,10 @@ public final class RegularMessageStructure implements MessageStructure {
         this.payload = payload;
     }
 
-
     /**
-     * @return magic byte
+     * Gets the magic byte.
+     *
+     * @return The magic byte.
      */
     @Override
     public byte getMagicByte() {
@@ -61,7 +87,9 @@ public final class RegularMessageStructure implements MessageStructure {
     }
 
     /**
-     * @return message structure version
+     * Gets the version.
+     *
+     * @return The version.
      */
     @Override
     public int getVersion() {
@@ -69,7 +97,9 @@ public final class RegularMessageStructure implements MessageStructure {
     }
 
     /**
-     * @return message
+     * Gets the payload.
+     *
+     * @return The payload.
      */
     @Override
     public byte[] getPayload() {
@@ -77,7 +107,9 @@ public final class RegularMessageStructure implements MessageStructure {
     }
 
     /**
-     * @return the complete message as byte[]
+     * Gets the message.
+     *
+     * @return The message.
      */
     @Override
     public byte[] getMessage() {
@@ -87,5 +119,4 @@ public final class RegularMessageStructure implements MessageStructure {
                 .putInt(getVersion())
                 .put(getPayload()).array();
     }
-
 }
