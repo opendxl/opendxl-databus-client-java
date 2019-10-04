@@ -27,8 +27,10 @@ import java.util.Map;
 public final class LegacyMessageDeserializer implements InternalDeserializer<DatabusMessage> {
 
     /**
-     * @param data data to be deserialized
-     * @return a {@link DatabusMessage} getInstance
+     * Deserialize data to a {@link DatabusMessage}.
+     *
+     * @param data Data to be deserialized.
+     * @return A {@link DatabusMessage} instance.
      */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] data) {
@@ -54,9 +56,12 @@ public final class LegacyMessageDeserializer implements InternalDeserializer<Dat
         private String payloadBase64String;
 
         /**
-         * @return a {@link DatabusMessage} getInstance
-         * It adds internal headers with Tenant Group and Topic Name to let ConsumerRecord adpeter knows
-         * what the topic and tenant group are
+         * Gets a DatabusMessage. <br/>
+         * Adds internal headers with Tenant Group and Topic Name to let ConsumerRecord adapter knows
+         * what the topic and tenant group are.
+         *
+         * @return A {@link DatabusMessage} instance.
+
          *
          */
         public DatabusMessage getDatabusMessage(final String topic) {

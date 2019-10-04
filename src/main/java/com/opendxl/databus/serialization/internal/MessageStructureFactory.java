@@ -11,14 +11,17 @@ import java.nio.ByteBuffer;
  */
 public final class MessageStructureFactory {
 
+    /**
+     * Default Constructor.
+     */
     private MessageStructureFactory() {
     }
 
     /**
-     * Return a {@link MessageStructure} getInstance based on the first byte (magic byte)
+     * Gets a {@link MessageStructure} instance based on the first byte (magic byte).
      *
-     * @param serializedMessage message serialized
-     * @return a Message Structure getInstance
+     * @param serializedMessage Message serialized.
+     * @return A Message Structure getInstance.
      */
     public static MessageStructure getStructure(final byte[] serializedMessage) {
 

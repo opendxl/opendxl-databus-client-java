@@ -12,10 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * It contains a key-value Collection of message version and Deserializer
+ * Contains a key-value Collection of message version and Deserializer.
  */
+
 public final class DeserializerRegistry {
 
+    /**
+     * A registry of the Avro message version.
+     */
     private static final Map<Integer, InternalDeserializer<DatabusMessage>> REGISTRY;
 
     static {
@@ -27,13 +31,18 @@ public final class DeserializerRegistry {
         REGISTRY = Collections.unmodifiableMap(aMap);
     }
 
+    /**
+     * Default Constructor.
+     */
     private DeserializerRegistry() {
     }
 
 
     /**
-     * @param version message version
-     * @return a {@link InternalDeserializer} getInstance
+     * Gets the Internal deserializer.
+     *
+     * @param version message version.
+     * @return An {@link InternalDeserializer} instance.
      */
     public static InternalDeserializer<DatabusMessage> getDeserializer(final Integer version) {
         return REGISTRY.get(version);

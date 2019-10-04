@@ -11,13 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter a List of PartitionInfo
+ * Adapter a List of PartitionInfo.
  */
 public class PartitionInfoListAdapter
         implements Adapter<List<org.apache.kafka.common.PartitionInfo>, List<PartitionInfo>> {
 
     /**
-     * @param sourcePartitionInfoList a List of source Partition Info
+     * Adapter pattern implementation for PartitionInfo List instance.
+     * Adapts a {@code org.apache.kafka.common.PartitionInfo} to a {@code com.opendxl.databus.common.PartitionInfo}
+     * instance.
+     *
+     * @param sourcePartitionInfoList a List of source org.apache.kafka.common.PartitionInfo.
      * @return a List of {@link PartitionInfo}
      */
     @Override

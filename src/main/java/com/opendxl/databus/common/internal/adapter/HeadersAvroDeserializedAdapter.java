@@ -17,10 +17,10 @@ import java.util.Map;
 public final class HeadersAvroDeserializedAdapter implements Adapter<Object, Headers> {
 
     /**
-     * Create a {@link Headers} based on a Object that represents a map deserialized with Avro
+     * Gets a {@link Headers} based on a Object that represents a map deserialized with Avro.
      *
-     * @param sourceDeserailizedHeaders deserializedHeaders map
-     * @return Databus {@link Headers}
+     * @param sourceDeserailizedHeaders deserializedHeaders map.
+     * @return Databus {@link Headers}.
      */
     @Override
     public Headers adapt(final Object sourceDeserailizedHeaders) {

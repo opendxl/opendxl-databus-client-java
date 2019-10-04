@@ -15,14 +15,18 @@ public class LegacyMessageStructure implements MessageStructure {
     private final byte[] payload;
 
     /**
-     * @param serializedMessage serialized message
+     * Constructor.
+     *
+     * @param serializedMessage A serialized message.
      */
     public LegacyMessageStructure(final byte[] serializedMessage) {
         this.payload = serializedMessage;
     }
 
     /**
-     * @return magic byte
+     * Gets the magic byte.
+     *
+     * @return A magic byte.
      */
     @Override
     public byte getMagicByte() {
@@ -30,7 +34,9 @@ public class LegacyMessageStructure implements MessageStructure {
     }
 
     /**
-     * @return message structure version
+     * Gets the message structure version.
+     *
+     * @return The message structure version.
      */
     @Override
     public int getVersion() {
@@ -38,7 +44,9 @@ public class LegacyMessageStructure implements MessageStructure {
     }
 
     /**
-     * @return message
+     * Gets the message.
+     *
+     * @return The message itself.
      */
     @Override
     public byte[] getMessage() {
@@ -47,7 +55,9 @@ public class LegacyMessageStructure implements MessageStructure {
 
 
     /**
-     * @return payload
+     * Gets the full payload
+     *
+     * @return The payload.
      */
     @Override
     public byte[] getPayload() {
