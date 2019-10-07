@@ -133,7 +133,7 @@ public class DatabusProducer<P> extends Producer<P> {
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException(databusProducerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_PRODUCER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + e.getMessage(), e, DatabusProducer.class);
         }
     }
@@ -181,7 +181,7 @@ public class DatabusProducer<P> extends Producer<P> {
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException(databusProducerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_PRODUCER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + e.getMessage(), e, DatabusProducer.class);
         }
     }
@@ -193,7 +193,7 @@ public class DatabusProducer<P> extends Producer<P> {
      */
     private void setFieldMembers(final Serializer<P> messageSerializer) {
         if (messageSerializer == null) {
-            throw new DatabusClientRuntimeException(databusProducerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_PRODUCER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + "Message Serializer cannot be null" , DatabusProducer.class);
         }
 
@@ -211,7 +211,7 @@ public class DatabusProducer<P> extends Producer<P> {
      */
     private Map<String, Object> overrideConfig(final Map<String, Object> configs) {
         if (configs == null) {
-            throw new DatabusClientRuntimeException(databusProducerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_PRODUCER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + "config properties cannot be null" , DatabusProducer.class);
         }
         Map<String, Object> overrodeConfiguration = new HashMap(configs);
@@ -243,7 +243,7 @@ public class DatabusProducer<P> extends Producer<P> {
      */
     private Properties overrideConfig(final Properties properties) {
         if (properties == null) {
-            throw new DatabusClientRuntimeException(databusProducerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_PRODUCER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + "config properties cannot be null" , DatabusProducer.class);
         }
         Properties overrodeConfiguration = properties;
@@ -289,6 +289,7 @@ public class DatabusProducer<P> extends Producer<P> {
     /**
      * String to prepend to error messages related to creation of DatabusProducer instances
      */
-    private static String databusProducerInstanceCannotBeCreated = "A DatabusProducer instance cannot be created: ";
+    private static final String DATABUS_PRODUCER_INSTANCE_CANNOT_BE_CREATED_MESSAGE =
+            "A DatabusProducer instance cannot be created: ";
 
 }

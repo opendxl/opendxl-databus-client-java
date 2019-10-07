@@ -100,7 +100,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException(databusConsumerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + e.getMessage(), e, DatabusConsumer.class);
         }
     }
@@ -149,14 +149,14 @@ public class DatabusConsumer<P> extends Consumer<P> {
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException(databusConsumerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + e.getMessage(), e, DatabusConsumer.class);
         }
      }
 
     private void setFieldMembers(final Deserializer<P> messageDeserializer, final Map<String, Object> configuration) {
         if (messageDeserializer == null) {
-            throw new DatabusClientRuntimeException(databusConsumerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + "Message Deserializer cannot be null" , DatabusConsumer.class);
         }
 
@@ -169,7 +169,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
     private Map<String, Object> configureCredential(final Map<String, Object> configuration,
                                                     final Credential credential) {
         if (configuration == null) {
-            throw new DatabusClientRuntimeException(databusConsumerInstanceCannotBeCreated
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + "config properties cannot be null" , DatabusConsumer.class);
         }
 
@@ -199,6 +199,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
     /**
      * String to prepend to error messages related to creation of DatabusConsumer instances
      */
-    private static String databusConsumerInstanceCannotBeCreated = "A DatabusConsumer instance cannot be created: ";
+    private static final String DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE =
+            "A DatabusConsumer instance cannot be created: ";
 
 }
