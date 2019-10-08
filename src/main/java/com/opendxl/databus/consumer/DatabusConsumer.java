@@ -92,13 +92,13 @@ public class DatabusConsumer<P> extends Consumer<P> {
                            final Credential credential) {
         try {
             Map<String, Object> configuration = configureCredential(configs, credential);
-            configuration = configureClientId(configs);
+            configuration = configureClientId(configuration);
             setFieldMembers(messageDeserializer, configuration);
             setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("A DatabusConsumer getInstance cannot be created: "
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + e.getMessage(), e, DatabusConsumer.class);
         }
     }
@@ -144,7 +144,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("A DatabusConsumer getInstance cannot be created: "
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + e.getMessage(), e, DatabusConsumer.class);
         }
      }
@@ -158,7 +158,8 @@ public class DatabusConsumer<P> extends Consumer<P> {
      */
     private void setFieldMembers(final Deserializer<P> messageDeserializer, final Map<String, Object> configuration) {
         if (messageDeserializer == null) {
-            throw new DatabusClientRuntimeException("Message Deserializer cannot be null" , DatabusConsumer.class);
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
+                    + "Message Deserializer cannot be null" , DatabusConsumer.class);
         }
 
         setKeyDeserializer(new DatabusKeyDeserializer());
@@ -175,6 +176,11 @@ public class DatabusConsumer<P> extends Consumer<P> {
      */
     private Map<String, Object> configureCredential(final Map<String, Object> configuration,
                                                     final Credential credential) {
+        if (configuration == null) {
+            throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
+                    + "config properties cannot be null" , DatabusConsumer.class);
+        }
+
         if (credential == null) {
             return configuration;
         }
@@ -202,5 +208,11 @@ public class DatabusConsumer<P> extends Consumer<P> {
         configuration.put(ConsumerConfiguration.CLIENT_ID_CONFIG, clientId);
         return configuration;
     }
+
+    /**
+     * String to prepend to error messages related to creation of DatabusConsumer instances
+     */
+    private static final String DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE =
+            "A DatabusConsumer instance cannot be created: ";
 
 }
