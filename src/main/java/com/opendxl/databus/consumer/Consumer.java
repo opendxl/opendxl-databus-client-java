@@ -24,18 +24,15 @@ import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
 /**
  * A abstract consumer, responsible for handling Databus incoming messages. *
+ *
  * @param <P> payload's type
  */
 public abstract class Consumer<P> {
@@ -341,7 +338,7 @@ public abstract class Consumer<P> {
      * <li>A new member is added to an existing consumer group via the join API
      * </ul>
      *
-     * @param pattern Pattern to subscribe to
+     * @param pattern                   Pattern to subscribe to
      * @param consumerRebalanceListener consumer listener for rebalancing databus operations
      * @throws DatabusClientRuntimeException if it fails.
      */
@@ -426,6 +423,62 @@ public abstract class Consumer<P> {
      *                                       </ul>
      */
     public ConsumerRecords poll(final long timeout) {
+        try {
+            final org.apache.kafka.clients.consumer.ConsumerRecords<String, DatabusMessage>
+                    sourceConsumerRecords = consumer.poll(timeout);
+
+            return consumerRecordsAdapter.adapt(sourceConsumerRecords);
+
+        } catch (DatabusClientRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            final String msg = "here was an error when poll: " + e.getMessage();
+            LOG.error(msg, e);
+            throw new DatabusClientRuntimeException(msg, e, Consumer.class);
+        }
+    }
+
+
+    /**
+     * Fetch data for the topics or partitions specified using one of the subscribe/assign APIs. It is an error to not have
+     * subscribed to any topics or partitions before polling for data.
+     * <p>
+     * On each poll, consumer will try to use the last consumed offset as the starting offset and fetch sequentially. The last
+     * consumed offset can be manually set through {@link #seek(TopicPartition, long)} or automatically set as the last committed
+     * offset for the subscribed list of partitions
+     *
+     * <p>
+     * This method returns immediately if there are records available. Otherwise, it will await the passed timeout.
+     * If the timeout expires, an empty record set will be returned. Note that this method may block beyond the
+     * timeout in order to execute custom  {@link ConsumerRebalanceListener} callbacks.
+     *
+     * @param timeout The time, in milliseconds, spent waiting in poll if data is not available. If 0, returns
+     *                immediately with any records that are available now. Must not be negative.
+     *
+     * @return map of topic to records since the last fetch for the subscribed list of topics and topicPartitions
+     * @throws DatabusClientRuntimeException if poll fails.The original cause could be any of these exceptions:
+     * <ul>
+     * <li> org.apache.kafka.clients.consumer.InvalidOffsetException if the offset for a partition or set of
+     *             partitions is undefined or out of range and no offset reset policy has been configured
+     * <li> org.apache.kafka.common.errors.WakeupException if {@link #wakeup()} is called before or while this
+     *             function is called
+     * <li> org.apache.kafka.common.errors.InterruptException if the calling thread is interrupted before or while
+     *             this function is called
+     * <li> org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more details
+     * <li> org.apache.kafka.common.errors.AuthorizationException if caller lacks Read access to any of the subscribed
+     *             topics or to the configured groupId. See the exception for more details
+     * <li> org.apache.kafka.common.KafkaException for any other unrecoverable errors (e.g. invalid groupId or
+     *             session timeout, errors deserializing key/value pairs, or any new error cases in future versions)
+     * <li> java.lang.IllegalArgumentException if the timeout value is negative
+     * <li> java.lang.IllegalStateException if the consumer is not subscribed to any topics or manually assigned any
+     *             partitions to consume from
+     * <li> java.lang.ArithmeticException if the timeout is greater than {@link Long#MAX_VALUE} milliseconds.
+     * <li> org.apache.kafka.common.errors.InvalidTopicException if the current subscription contains any invalid
+     *             topic (per {@link org.apache.kafka.common.internals.Topic#validate(String)})
+     * <li> org.apache.kafka.common.errors.FencedInstanceIdException if this consumer instance gets fenced by broker.
+     * </ul>
+     */
+    public ConsumerRecords poll(final Duration timeout) {
         try {
             final org.apache.kafka.clients.consumer.ConsumerRecords<String, DatabusMessage>
                     sourceConsumerRecords = consumer.poll(timeout);
@@ -589,8 +642,9 @@ public abstract class Consumer<P> {
      * Overrides the fetch offsets that the consumer will use on the next {@link #poll(long) poll(timeout)}. If this API
      * is invoked for the same partition more than once, the latest offset will be used on the next poll(). Note that
      * you may lose data if this API is arbitrarily used in the middle of consumption, to reset the fetch offsets
+     *
      * @param partition partition to seek
-     * @param offset offset to seek
+     * @param offset    offset to seek
      * @throws DatabusClientRuntimeException if a seek fails
      */
     public void seek(final TopicPartition partition,
@@ -610,6 +664,7 @@ public abstract class Consumer<P> {
      * Seek to the first offset for each of the given topicPartitions. This function evaluates lazily, seeking to the
      * final offset in all topicPartitions only when {@link #poll(long)} or {@link #position(TopicPartition)}
      * are called.
+     *
      * @param topicPartitions topicPartitions to seek
      * @throws DatabusClientRuntimeException if it fails
      */
@@ -636,8 +691,8 @@ public abstract class Consumer<P> {
      * final offset in all topicPartitions only when {@link #poll(long)} or {@link #position(TopicPartition)} are
      * called.
      *
-     * @throws DatabusClientRuntimeException if it fails
      * @param topicPartitions topicPartitions to seek
+     * @throws DatabusClientRuntimeException if it fails
      */
     public void seekToEnd(final TopicPartition... topicPartitions) {
         try {
@@ -735,8 +790,8 @@ public abstract class Consumer<P> {
     /**
      * Get the metrics kept by the consumer.
      *
-     * @throws DatabusClientRuntimeException if metrics fails.
      * @return a map of metrics
+     * @throws DatabusClientRuntimeException if metrics fails.
      */
     public Map<MetricName, ? extends org.apache.kafka.common.Metric> metrics() {
         try {
@@ -1013,7 +1068,7 @@ public abstract class Consumer<P> {
      * @param topic The topic to get partition metadata for
      * @return The list of topicPartitions
      * @throws DatabusClientRuntimeException if partitionsFor fails. The original cause could be any of these
-     * exceptions:
+     *                                       exceptions:
      *                                       <ul>
      *                                       <li> org.apache.kafka.common.errors.WakeupException if {@link #wakeup()}
      *                                       is called before or
@@ -1131,14 +1186,38 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Close the consumer, waiting indefinitely for any needed cleanup. If auto-commit is enabled, this
-     * will commit the current offsets. Note that {@link #wakeup()} cannot be use to interrupt close.
+     * Close the consumer, waiting for up to the default timeout of 30 seconds for any needed cleanup.
+     * If auto-commit is enabled, this will commit the current offsets if possible within the default
+     * timeout. See {@link #close(Duration)} for details. Note that {@link #wakeup()}
+     * cannot be used to interrupt close.
      *
      * @throws DatabusClientRuntimeException if it fails.
      */
-    public void close() {
+    public void close() throws IOException {
         try {
             consumer.close();
+        } catch (Exception e) {
+            final String msg = "close cannot be performed: " + e.getMessage();
+            LOG.error(msg, e);
+            throw new DatabusClientRuntimeException(msg + e.getMessage(), e, Consumer.class);
+        }
+    }
+
+    /**
+     * Tries to close the consumer cleanly within the specified timeout. This method waits up to
+     * {@code timeout} for the consumer to complete pending commits and leave the group.
+     * If auto-commit is enabled, this will commit the current offsets if possible within the
+     * timeout. If the consumer is unable to complete offset commits and gracefully leave the group
+     * before the timeout expires, the consumer is force closed. Note that {@link #wakeup()} cannot be
+     * used to interrupt close.
+     *
+     * @param timeout The maximum time to wait for consumer to close gracefully. The value must be
+     *                non-negative. Specifying a timeout of zero means do not wait for pending requests to complete.
+     * @throws DatabusClientRuntimeException If there is a error
+     */
+    public void close(Duration timeout) {
+        try {
+            consumer.close(timeout);
         } catch (Exception e) {
             final String msg = "close cannot be performed: " + e.getMessage();
             LOG.error(msg, e);
@@ -1185,11 +1264,11 @@ public abstract class Consumer<P> {
                     org.apache.kafka.clients.consumer.OffsetAndMetadata> adaptedOffsets = new HashMap(offsets.size());
 
             offsets.forEach((topicPartition, offsetAndMetadata) ->
-                adaptedOffsets.put(
-                        new org.apache.kafka.common.TopicPartition(topicPartition.topic(),
-                                topicPartition.partition()),
-                        new org.apache.kafka.clients.consumer.OffsetAndMetadata(offsetAndMetadata.offset(),
-                                offsetAndMetadata.metadata()))
+                    adaptedOffsets.put(
+                            new org.apache.kafka.common.TopicPartition(topicPartition.topic(),
+                                    topicPartition.partition()),
+                            new org.apache.kafka.clients.consumer.OffsetAndMetadata(offsetAndMetadata.offset(),
+                                    offsetAndMetadata.metadata()))
             );
 
             OffsetCommitCallbackAdapter callbackAdapter =
@@ -1206,28 +1285,27 @@ public abstract class Consumer<P> {
     /**
      * Look up the offsets for the given topicPartitions by timestamp. The returned offset for each partition is the
      * earliest offset whose timestamp is greater than or equal to the given timestamp in the corresponding partition.
-     *
+     * <p>
      * This is a blocking call. The consumer does not have to be assigned the topicPartitions.
      * If the message format version in a partition is before 0.10.0, i.e. the messages do not have timestamps, null
      * will be returned for that partition.
      *
      * @param timestampsToSearch the mapping from partition to the timestamp to look up.
-     *
      * @return a mapping from partition to the timestamp and offset of the first message with timestamp greater
-     *         than or equal to the target timestamp. {@code null} will be returned for the partition if there is no
-     *         such message.
+     * than or equal to the target timestamp. {@code null} will be returned for the partition if there is no
+     * such message.
      * @throws DatabusClientRuntimeException if it fails. The original cause could be any of these exceptions:
-     *  <ul>
-     *  <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
-     *  details
-     *  org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception for
-     *  more details
-     *  <li>IllegalArgumentException if the target timestamp is negative
-     *  <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
-     *         the amount of time allocated by {@code default.api.timeout.ms} expires.
-     *  <li>org.apache.kafka.common.errors.UnsupportedVersionException if the broker does not support looking up
-     *         the offsets by timestamp
-     *  </ul>
+     *                                       <ul>
+     *                                       <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     *                                       details
+     *                                       org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception for
+     *                                       more details
+     *                                       <li>IllegalArgumentException if the target timestamp is negative
+     *                                       <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
+     *                                              the amount of time allocated by {@code default.api.timeout.ms} expires.
+     *                                       <li>org.apache.kafka.common.errors.UnsupportedVersionException if the broker does not support looking up
+     *                                              the offsets by timestamp
+     *                                       </ul>
      */
     public Map<TopicPartition, OffsetAndTimestamp> offsetsForTimes(final Map<TopicPartition, Long> timestampsToSearch) {
 
@@ -1269,18 +1347,19 @@ public abstract class Consumer<P> {
      * Get the first offset for the given topicPartitions.
      * <p>
      * This method does not change the current consumer position of the topicPartitions.
-     **
+     * *
+     *
      * @param partitions the topicPartitions to get the earliest offsets.
      * @return The earliest available offsets for the given topicPartitions
      * @throws DatabusClientRuntimeException if it fails. The original cause could be any of these exceptions:
-     * <ul>
-     *  <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
-     *  details
-     *  <li>org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception
-     *  for more details
-     *  <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
-     *         expiration of the configured {@code default.api.timeout.ms}
-     *  </ul>
+     *                                       <ul>
+     *                                        <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     *                                        details
+     *                                        <li>org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception
+     *                                        for more details
+     *                                        <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
+     *                                               expiration of the configured {@code default.api.timeout.ms}
+     *                                        </ul>
      */
     public Map<TopicPartition, Long> beginningOffsets(final List<TopicPartition> partitions) {
         try {
@@ -1318,18 +1397,17 @@ public abstract class Consumer<P> {
      * <p>
      * This method does not change the current consumer position of the topicPartitions.
      *
-     *
      * @param partitions the topicPartitions to get the end offsets.
      * @return The end offsets for the given topicPartitions.
      * @throws DatabusClientRuntimeException if it fails. The original cause could be any of these exceptions:
-     * <ul>
-     *  <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
-     *  details
-     *  <li>org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception
-     *  for more details
-     *  <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
-     *         the amount of time allocated by {@code request.timeout.ms} expires
-     *  </ul>
+     *                                       <ul>
+     *                                        <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     *                                        details
+     *                                        <li>org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception
+     *                                        for more details
+     *                                        <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
+     *                                               the amount of time allocated by {@code request.timeout.ms} expires
+     *                                        </ul>
      */
     public Map<TopicPartition, Long> endOffsets(final List<TopicPartition> partitions) {
         try {
@@ -1444,13 +1522,13 @@ public abstract class Consumer<P> {
     /**
      * ConsumerRebalanceListener Adapter
      */
-     private static class ConsumerRebalanceListenerAdapter<P>
+    private static class ConsumerRebalanceListenerAdapter<P>
             implements org.apache.kafka.clients.consumer.ConsumerRebalanceListener {
 
         /**
          * The listener for consumer rebalance
          */
-         private final ConsumerRebalanceListener listener;
+        private final ConsumerRebalanceListener listener;
 
         /**
          * The consumer to rebalance itself
@@ -1504,19 +1582,19 @@ public abstract class Consumer<P> {
      * @param partitions The topic partitions list.
      */
     private synchronized void setPartitions(final ArrayList<TopicPartition> partitions) {
-         this.topicPartitions = partitions;
+        this.topicPartitions = partitions;
     }
 
     /**
      * OffsetCommitCallback Adapter
      */
-     private static class OffsetCommitCallbackAdapter
+    private static class OffsetCommitCallbackAdapter
             implements org.apache.kafka.clients.consumer.OffsetCommitCallback {
 
         /**
          * The OffsetCommitCallbackAdapter instance.
          */
-         private final OffsetCommitCallback offsetCommitCallback;
+        private final OffsetCommitCallback offsetCommitCallback;
 
         /**
          * The constructor of the OffsetCommitCallbackAdapter.
@@ -1531,9 +1609,9 @@ public abstract class Consumer<P> {
          * A callback method the user can implement to provide asynchronous handling of commit request completion.
          * This method will be called when the commit request sent to the server has been acknowledged.
          *
-         * @param offsets A map of the offsets and associated metadata that this callback applies to.
+         * @param offsets   A map of the offsets and associated metadata that this callback applies to.
          * @param exception The exception thrown during processing of the request, or null if the commit
-         * completed successfully.
+         *                  completed successfully.
          */
         @Override
         public void onComplete(
@@ -1544,14 +1622,14 @@ public abstract class Consumer<P> {
                     new HashMap<>(offsets.size());
 
             offsets.forEach((topicPartition, offsetAndMetadata) ->
-                adaptedOffsets.put(
-                        new TopicPartition(topicPartition.topic(), topicPartition.partition()),
-                        new OffsetAndMetadata(offsetAndMetadata.offset(), offsetAndMetadata.metadata()))
+                    adaptedOffsets.put(
+                            new TopicPartition(topicPartition.topic(), topicPartition.partition()),
+                            new OffsetAndMetadata(offsetAndMetadata.offset(), offsetAndMetadata.metadata()))
             );
 
             DatabusClientRuntimeException databusClientException = null;
             if (exception != null) {
-                databusClientException =  new DatabusClientRuntimeException(exception.getMessage(),
+                databusClientException = new DatabusClientRuntimeException(exception.getMessage(),
                         exception, OffsetCommitCallbackAdapter.class);
             }
             offsetCommitCallback.onComplete(adaptedOffsets, databusClientException);
