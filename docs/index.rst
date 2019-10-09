@@ -53,14 +53,14 @@ Maven:
     <dependency>
       <groupId>com.opendxl.databus</groupId>
       <artifactId>opendxldatabusclient-java-sdk</artifactId>
-      <version>0.1.1</version>
+      <version>0.1.2</version>
     </dependency>
 
 or Gradle:
 
 .. code:: groovy
 
-    compile 'com.opendxl.databus:opendxldatabusclient-java-sdk:0.1.1'
+    compile 'com.opendxl.databus:opendxldatabusclient-java-sdk:0.1.2'
 
 Java SDK Overview and Prerequisites
 -----------------------------------

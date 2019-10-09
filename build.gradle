@@ -83,10 +83,14 @@ dependencies {
     // https://nvd.nist.gov/vuln/detail/CVE-2019-12814
     // https://nvd.nist.gov/vuln/detail/CVE-2019-14379
     // https://nvd.nist.gov/vuln/detail/CVE-2019-14439
-    compile ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
+    // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-14540
+    // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16335
+    // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16942
+    // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16943
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.10.0') {
         force = true
     }
-    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.9.9.3') {
+    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.10.0') {
         force = true
     }
 
