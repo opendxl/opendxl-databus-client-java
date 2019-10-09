@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Transactions producer consumer example &mdash; OpenDXL Databus Java Client Library 0.1.1 documentation</title>
+  <title>Transactions producer consumer example &mdash; OpenDXL Databus Java Client Library 0.1.2 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -331,21 +331,17 @@ synchronized private void stopExample(final ExecutorService executor) {
 }
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">The first step is to create the instance of the Kafka cluster to run
-the example.</div>
-<div class="line">The constructor method <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code> is in
-charge of doing that.</div>
-<div class="line">This method also creates a DatabusConsumer instance calling to
-<code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same approach, calling
-to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of DatabusProducer.
-Also calls the method
+<p>The first step is to create the instance of the Kafka cluster to run the
+example. The constructor method <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code>
+is in charge of doing that. This method also creates a DatabusConsumer
+instance calling to <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same
+approach, calling to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of
+DatabusProducer. Also calls the method
 <code class="docutils literal notranslate"><span class="pre">ClusterHelper.getInstance().addNewKafkaTopic()</span></code> to create a
 transactional topic. A transactional topic is a Kafka topic with 3
 partitions at least and replication factor of 3 at least, so it’s
-necessary to create this topic a minimum of 3 running brokers. Thats
-why in the constructor we have to add 3 brokers instances.</div>
-</div>
+necessary to create this topic a minimum of 3 running brokers. Thats why
+in the constructor we have to add 3 brokers instances.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ClusterHelper</span>
         <span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
         <span class="o">.</span><span class="n">addBroker</span><span class="p">(</span><span class="mi">9092</span><span class="p">)</span>
@@ -386,8 +382,8 @@ configurations to enable transactions:</p>
 <p>DatabusConsumer receives the following basic configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="44%" />
-<col width="56%" />
+<col width="42%" />
+<col width="58%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -395,16 +391,19 @@ configurations to enable transactions:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_CONFIG</span></code></td>
+<tr class="row-even"><td><a href="#id1"><span class="problematic" id="id2">``</span></a>BOOTSTRAP_SERVERS_CONFIG`
+`</td>
 <td>The Kafka broker and port to listen.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">GROUP_ID_CONFIG</span></code></td>
 <td>The consumer group associated.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ENABLE_AUTO_COMMIT_CONFIG</span></code></td>
+<tr class="row-even"><td><a href="#id3"><span class="problematic" id="id4">``</span></a>ENABLE_AUTO_COMMIT_CONFIG
+``</td>
 <td>If auto-commit will be enabled or not.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">SESSION_TIMEOUT_MS_CONFIG</span></code></td>
+<tr class="row-odd"><td><a href="#id5"><span class="problematic" id="id6">``</span></a>SESSION_TIMEOUT_MS_CONFIG
+``</td>
 <td>The heartbeat interval in ms to check
 if the Kafka broker is alive.</td>
 </tr>
@@ -416,8 +415,8 @@ if the Kafka broker is alive.</td>
 <p>And this configuration parameter to consume transactions messages:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="43%" />
-<col width="57%" />
+<col width="42%" />
+<col width="58%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -438,8 +437,8 @@ committed.</td>
 <p>DatabusProducer receives the following basic configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="43%" />
-<col width="57%" />
+<col width="41%" />
+<col width="59%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -447,7 +446,8 @@ committed.</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_CONFIG</span></code></td>
+<tr class="row-even"><td><a href="#id7"><span class="problematic" id="id8">``</span></a>BOOTSTRAP_SERVERS_CONFIG
+``</td>
 <td>The Kafka broker and port to listen.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">CLIENT_ID_CONFIG</span></code></td>
@@ -468,8 +468,8 @@ batch.</td>
 <p>Then add the configurations parameter to produce transactions messages:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="45%" />
-<col width="55%" />
+<col width="42%" />
+<col width="58%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -480,12 +480,14 @@ batch.</td>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">TRANSACTIONAL_ID_CONFIG</span></code></td>
 <td>This enables reliability semantics
 which span multiple producer sessions
-since it allows the client to guarantee
-that transactions using the same
-TransactionalId have been completed
-prior to starting any new transactions.</td>
+since it allows the client to
+guarantee that transactions using the
+same TransactionalId have been
+completed prior to starting any new
+transactions.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">TRANSACTION_TIMEOUT_CONFIG</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">TRANSACTION_TIMEOUT_CONFI</span>
+<span class="pre">G</span></code></td>
 <td>The maximum amount of time in ms that
 the transaction coordinator will wait
 for a transaction status update from
@@ -499,14 +501,11 @@ subscribes to a topic in the following line:</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Collections</span><span class="o">.</span><span class="n">singletonList</span><span class="p">(</span><span class="n">consumerTopic</span><span class="p">));</span>
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">Then the <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code> constructor is
-executed, the</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two internal
-methods for the producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and
-<code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to
-produce and consume messages respectively.</div>
-</div>
+<p>Then the <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code> constructor is
+executed, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two
+internal methods for the producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to
+produce and consume messages respectively.</p>
 <p>Here in detail both methods will be explained:</p>
 </div>
 <div class="section" id="getconsumertask">
@@ -566,12 +565,9 @@ messages and calls the commit method.</p>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">commitAsync()</span></code>, commits the last offset and carry on.</p>
 <p>When the sample stops, unsubscribe and close method of the consumer are
-called. These methods do the following:</p>
-<ul class="simple">
-<li>Unsubscribe from topics currently subscribed.</li>
-<li>Close the consumer. This will close the network connections and
-sockets.</li>
-</ul>
+called. These methods do the following: - Unsubscribe from topics
+currently subscribed. - Close the consumer. This will close the network
+connections and sockets.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">();</span>
 <span class="n">consumer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
 </pre></div>
@@ -659,16 +655,13 @@ producer calls the send method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">producerRecord</span><span class="p">,</span> <span class="n">new</span> <span class="n">MyCallback</span><span class="p">(</span><span class="n">producerRecord</span><span class="o">.</span><span class="n">getRoutingData</span><span class="p">()</span><span class="o">.</span><span class="n">getShardingKey</span><span class="p">()));</span>
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">This method sends a producer record and associates a callback for each
+<p>This method sends a producer record and associates a callback for each
 sent execution. The callback is used because send is asynchronous and
 this method will return immediately once the record has been stored in
 the buffer of records waiting to be sent. This allows sending many
-records in parallel without blocking to wait for the response after
-each one.</div>
-<div class="line">Fully non-blocking usage can make use of the callback parameter to
-provide a callback that will be invoked when the request is complete.</div>
-</div>
+records in parallel without blocking to wait for the response after each
+one. Fully non-blocking usage can make use of the callback parameter to
+provide a callback that will be invoked when the request is complete.</p>
 <p>When all messages are sent the <code class="docutils literal notranslate"><span class="pre">commitTransaction()</span></code> method is called.
 This commits the ongoing transaction and will flush any unsent records
 before actually committing the transaction.</p>
@@ -686,12 +679,9 @@ records. Flush gives a convenient way to ensure all previously sent
 messages have actually completed.</p>
 <p>Close method closes producer and frees resources such as connections,
 threads, and buffers associated with the producer.</p>
-<div class="line-block">
-<div class="line">If for any reason transaction fails, the <code class="docutils literal notranslate"><span class="pre">abortTransaction()</span></code> method
-is called.</div>
-<div class="line">Any unflushed produced messages will be aborted when this call is
-made.</div>
-</div>
+<p>If for any reason transaction fails, the <code class="docutils literal notranslate"><span class="pre">abortTransaction()</span></code> method
+is called. Any unflushed produced messages will be aborted when this
+call is made.</p>
 </div>
 <div class="section" id="run-the-sample">
 <h2>Run the sample<a class="headerlink" href="#run-the-sample" title="Permalink to this headline">¶</a></h2>
