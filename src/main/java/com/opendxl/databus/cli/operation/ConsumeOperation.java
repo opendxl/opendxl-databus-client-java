@@ -18,6 +18,7 @@ import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionSet;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -130,7 +131,11 @@ public class ConsumeOperation implements CommandLineOperation {
             return result;
         } finally {
             if (consumer != null) {
-                consumer.close();
+                try {
+                    consumer.close();
+                } catch (IOException e) {
+
+                }
             }
         }
 

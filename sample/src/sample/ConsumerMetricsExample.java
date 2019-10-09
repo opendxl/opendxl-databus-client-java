@@ -23,6 +23,7 @@ import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -146,7 +147,10 @@ public class ConsumerMetricsExample {
                 LOG.error(e.getMessage());
             } finally {
                 consumer.unsubscribe();
-                consumer.close();
+                try {
+                    consumer.close();
+                } catch (IOException e) {
+                }
                 LOG.info("Consumer closed");
 
             }

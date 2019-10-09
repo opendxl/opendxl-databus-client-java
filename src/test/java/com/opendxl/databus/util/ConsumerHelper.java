@@ -13,6 +13,7 @@ import com.opendxl.databus.consumer.ConsumerRecords;
 import com.opendxl.databus.consumer.DatabusConsumer;
 import com.opendxl.databus.consumer.OffsetAndMetadata;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -120,7 +121,10 @@ public class ConsumerHelper {
     }
 
     public ConsumerHelper close() {
-        consumer.close();
+        try {
+            consumer.close();
+        } catch (IOException e) {
+        }
         return this;
     }
 
