@@ -1,11 +1,13 @@
 package com.opendxl.databus.consumer;
 
+import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.credential.Credential;
 import com.opendxl.databus.serialization.Deserializer;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.*;
@@ -59,31 +61,64 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     @Override
     public ConsumerRecords poll(final Duration timeout) {
 
-        ConsumerRecords records = super.poll(timeout);
+        boolean stopRequested = false;
+        while(!stopRequested) {
 
-        if(records.count() > 0) {
-            super.pause(assignment());
-            Callable<DatabusPushConsumerListenerResponse> backgroundTask = () -> consumerListener.onConsume(records);
-            Future<DatabusPushConsumerListenerResponse> future = executor.submit(backgroundTask);
+            final Map<TopicPartition, Long> lastPositionPerTopicPartition = new HashMap();
 
-            while(!future.isDone()) {
-                super.poll(0);
+            for(TopicPartition tp : assignment()) {
+                lastPositionPerTopicPartition.put(tp, position(tp));
             }
 
+            ConsumerRecords records = super.poll(timeout);
 
-            try {
-                DatabusPushConsumerListenerResponse onConsumeResponse = future.get();
+            if(records.count() > 0) {
 
-            } catch (InterruptedException e) {
-                //TODO:
-            } catch (ExecutionException e) {
-                //TODO:
-            } finally {
-                super.resume();
+                pause(assignment());
+
+                final Callable<DatabusPushConsumerListenerResponse> backgroundTask
+                        = () -> consumerListener.onConsume(records);
+                final Future<DatabusPushConsumerListenerResponse> future = executor.submit(backgroundTask);
+
+                try {
+                    while(!future.isDone()) {
+                        super.poll(Duration.ofMillis(1000));
+                    }
+
+                    DatabusPushConsumerListenerResponse onConsumeResponse = future.get();
+                    switch(onConsumeResponse) {
+                        case STOP_AND_COMMIT:
+                            commitSync();
+                            stopRequested = true;
+                            break;
+                        case STOP_NO_COMMIT:
+                            stopRequested = true;
+                            break;
+                        case RETRY:
+                            for(TopicPartition tp : assignment()) {
+                                if(lastPositionPerTopicPartition.containsKey(tp)) {
+                                    Long position= lastPositionPerTopicPartition.get(tp);
+                                    seek(tp, position);
+                                }
+                            }
+                            break;
+                        case CONTINUE_AND_COMMIT:
+                        default:
+                            commitSync();
+                            break;
+                    }
+
+                } catch (InterruptedException e) {
+                    //TODO:
+                } catch (ExecutionException e) {
+                    //TODO:
+                } finally {
+                    resume(assignment());
+                }
             }
-
-
         }
+
+
         return null;
 
     }

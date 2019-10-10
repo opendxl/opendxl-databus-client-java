@@ -56,7 +56,7 @@ public class DatabusPushConsumerTest {
         @Override
         public DatabusPushConsumerListenerResponse onConsume(ConsumerRecords records) {
 
-            return DatabusPushConsumerListenerResponse.CONTINUE;
+            return DatabusPushConsumerListenerResponse.CONTINUE_AND_COMMIT;
 
         }
     }

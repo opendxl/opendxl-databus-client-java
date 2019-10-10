@@ -1166,15 +1166,15 @@ public abstract class Consumer<P> {
      * @param partitions The topicPartitions which should be resumed
      * @throws DatabusClientRuntimeException if it fails.
      */
-    public void resume(final TopicPartition... partitions) {
+    public void resume(final Collection<TopicPartition> partitions) {
         try {
             List<org.apache.kafka.common.TopicPartition> adaptedTopicPartition =
-                    new ArrayList<>(partitions.length);
+                    new ArrayList<>(partitions.size());
 
-            for (int i = 0; i < partitions.length; ++i) {
+            for(TopicPartition topicPartition: partitions) {
                 adaptedTopicPartition.add(
-                        new org.apache.kafka.common.TopicPartition(partitions[i].topic(),
-                                partitions[i].partition()));
+                        new org.apache.kafka.common.TopicPartition(topicPartition.topic(),topicPartition.partition())
+                );
             }
 
             consumer.resume(adaptedTopicPartition);
