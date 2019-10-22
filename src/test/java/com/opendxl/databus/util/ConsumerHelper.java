@@ -162,11 +162,11 @@ public class ConsumerHelper {
         consumer.pause(getConsumerAssignment());
     }
 
-    private TopicPartition[] getConsumerAssignment() {
-        TopicPartition tp[] = new TopicPartition[consumer.assignment().size()];
+    private List<TopicPartition> getConsumerAssignment() {
+        List<TopicPartition>  tp = new ArrayList(consumer.assignment().size());
         int i = 0;
-        for (TopicPartition x : consumer.assignment()) {
-            tp[i++] = x;
+        for (TopicPartition element : consumer.assignment()) {
+            tp.add(element);
         }
         return tp;
     }

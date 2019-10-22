@@ -2,7 +2,9 @@ package com.opendxl.databus.consumer;
 
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.credential.Credential;
+import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.Deserializer;
+import org.apache.log4j.Logger;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -10,22 +12,78 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Implements a Databus Consumer with a push model
+ * Extends a {@link DatabusConsumer} to replace poll model for push message model.
+ * {@link DatabusPushConsumer#pushAsync(Duration)} reads messages from an
+ * already-subscribed topic and push them to a {@link DatabusPushConsumerListener} listener
+ * instance implemented by the SDK Databus client.
+ * The listener receives messages read from Databus and it should implement some logic to process them.
+ * The listener returns a {@link DatabusPushConsumerListenerResponse} enum value to let Push Databus Consumer knows
+ * which action should take.
  *
  * @param <P> Message payload type
- *
  */
 public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements Closeable {
 
-
+    /**
+     * The listener implemented by the Databus client to process records
+     */
     private final DatabusPushConsumerListener consumerListener;
 
-    ExecutorService executor = Executors.newFixedThreadPool(1);
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = Logger.getLogger(DatabusPushConsumer.class);
 
+    /**
+     * An executor to spawn the listener thread in async way
+     */
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
+    /**
+     * An future instance to control the listener thread
+     */
+    private Future<DatabusPushConsumerListenerResponse> listenerFuture;
+
+    /**
+     * it states if the main loop should continue or stop
+     */
+    private AtomicBoolean stopRequested = new AtomicBoolean(false);
+
+    /**
+     * An executor to spawn the mail loop thread in async way.
+     */
+    private ExecutorService pushAsyncExecutor = null;
+
+    /**
+     * An future instance to control the main loop
+     */
+    private DatabusPushConsumerFuture databusPushConsumerFuture = null;
+
+    /**
+     * A latch to signal that the main loop has finished.
+     */
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    /**
+     * Constructor
+     *
+     * @param configs             consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     */
     public DatabusPushConsumer(final Map<String, Object> configs,
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener) {
@@ -33,6 +91,12 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         this.consumerListener = consumerListener;
     }
 
+    /**
+     * @param configs             consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param credential          credential to get access to Databus in case security is enabled
+     */
     public DatabusPushConsumer(final Map<String, Object> configs,
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener,
@@ -41,6 +105,11 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         this.consumerListener = consumerListener;
     }
 
+    /**
+     * @param properties          consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     */
     public DatabusPushConsumer(final Properties properties,
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener) {
@@ -49,6 +118,12 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
 
     }
 
+    /**
+     * @param properties          consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param credential          credential to get access to Databus in case security is enabled
+     */
     public DatabusPushConsumer(final Properties properties,
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener,
@@ -57,78 +132,252 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         this.consumerListener = consumerListener;
     }
 
-
+    /**
+     * Not supported by Push Consumer
+     *
+     * @param timeout NA
+     * @return NA
+     * @throws UnsupportedOperationException
+     */
     @Override
     public ConsumerRecords poll(final Duration timeout) {
+        if (stopRequested.get()) {
+            throw new DatabusClientRuntimeException("poll method cannot be performed because "
+                    + "DatabusPushConsumer is closed.", DatabusPushConsumer.class);
+        }
+        if (databusPushConsumerFuture != null) {
+            throw new DatabusClientRuntimeException("poll cannot be performed because a pushAsync is already working.",
+                    DatabusPushConsumer.class);
+        }
+        return super.poll(timeout);
+    }
 
-        boolean stopRequested = false;
-        while(!stopRequested) {
+    /**
+     * Not supported by Push Consumer
+     *
+     * @param timeout NA
+     * @return NA
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public ConsumerRecords poll(final long timeout) {
+        if (stopRequested.get()) {
+            throw new DatabusClientRuntimeException("poll cannot be performed because DatabusPushConsumer is closed.",
+                    DatabusPushConsumer.class);
+        }
+        if (databusPushConsumerFuture != null) {
+            throw new DatabusClientRuntimeException("poll cannot be performed because a pushAsync is already working.",
+                    DatabusPushConsumer.class);
+        }
+        return super.poll(timeout);
+    }
 
-            final Map<TopicPartition, Long> lastPositionPerTopicPartition = new HashMap();
+    /**
+     * Reads messages from Databus and push them to {@link DatabusPushConsumerListener} instance which was passed
+     * in the constructor
+     *
+     * @param timeout The time, in milliseconds, spent waiting in poll if data is not available. If 0, returns
+     *                immediately with any records that are available now. Must not be negative.
+     * @throws DatabusClientRuntimeException if {@link DatabusPushConsumer}is closed.
+     * @return Future to monitoring the message processing
+     */
+    public DatabusPushConsumerFuture pushAsync(final Duration timeout) {
 
-            for(TopicPartition tp : assignment()) {
-                lastPositionPerTopicPartition.put(tp, position(tp));
-            }
-
-            ConsumerRecords records = super.poll(timeout);
-
-            if(records.count() > 0) {
-
-                pause(assignment());
-
-                final Callable<DatabusPushConsumerListenerResponse> backgroundTask
-                        = () -> consumerListener.onConsume(records);
-                final Future<DatabusPushConsumerListenerResponse> future = executor.submit(backgroundTask);
-
-                try {
-                    while(!future.isDone()) {
-                        super.poll(Duration.ofMillis(1000));
-                    }
-
-                    DatabusPushConsumerListenerResponse onConsumeResponse = future.get();
-                    switch(onConsumeResponse) {
-                        case STOP_AND_COMMIT:
-                            commitSync();
-                            stopRequested = true;
-                            break;
-                        case STOP_NO_COMMIT:
-                            stopRequested = true;
-                            break;
-                        case RETRY:
-                            for(TopicPartition tp : assignment()) {
-                                if(lastPositionPerTopicPartition.containsKey(tp)) {
-                                    Long position= lastPositionPerTopicPartition.get(tp);
-                                    seek(tp, position);
-                                }
-                            }
-                            break;
-                        case CONTINUE_AND_COMMIT:
-                        default:
-                            commitSync();
-                            break;
-                    }
-
-                } catch (InterruptedException e) {
-                    //TODO:
-                } catch (ExecutionException e) {
-                    //TODO:
-                } finally {
-                    resume(assignment());
-                }
-            }
+        if (stopRequested.get()) {
+            throw new DatabusClientRuntimeException("pushAsync cannot be performed because DatabusPushConsumer is "
+                    + "closed.", DatabusPushConsumer.class);
+        }
+        if (databusPushConsumerFuture != null) {
+            return databusPushConsumerFuture;
         }
 
+        final DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus
+                = new DatabusPushConsumerListenerStatus.Builder().build();
+        databusPushConsumerFuture = new DatabusPushConsumerFuture(databusPushConsumerListenerStatus, countDownLatch);
 
-        return null;
+        pushAsyncExecutor = Executors.newFixedThreadPool(1);
+        Runnable pushRecordTask = () -> push(databusPushConsumerFuture, timeout);
+        pushAsyncExecutor.submit(pushRecordTask);
+        return databusPushConsumerFuture;
+    }
+
+
+    /**
+     * It implements the read-push main loop. The loop is controlled by the listener.
+     * According to {@link DatabusPushConsumerListenerResponse} listener return value, the main loop will continue
+     * or stop reading messages. Messages read from Databus are sent to listener in an separated and parallel thread.
+     * While the listener is working on messages received from Databus, the Push Consumer pauses topic-partitions
+     * assigned to it and sends heartbeats the Kafka broker in background.
+     * Once the listener has finished, it should returns a
+     * {@link DatabusPushConsumerListenerResponse} value or an Exception in case something was wrong.
+     * Then the maim loop will act accordingly. The main loop keep a {@code databusPushConsumerFuture} future argument
+     *
+     * @param databusPushConsumerFuture a future instance shared which is updated to let the
+     *                                  SDK Databus client know about the process status.
+     * @param timeout                   The time, in milliseconds, spent waiting in poll if data is not available.
+     *                                  If 0, returns
+     *                                  immediately with any records that are available now. Must not be negative.
+     */
+    private void push(final DatabusPushConsumerFuture databusPushConsumerFuture,
+                      final Duration timeout) {
+
+        LOG.info("Consumer " + super.getClientId() + " start");
+        try {
+
+
+            // Main loop. It keeps the reading-pushing mechanism running until either a close() was called or
+            // the listener asks to stop or the listener throws an exception.
+            while (!stopRequested.get()) {
+
+                // It stores the current consumer position based on the partitions assigned.
+                // This is the offset position per topicPartition before polling messages from Databus.  Position
+                // will be used to rewind the consumer in case the listener returns RETRY enum value.
+                final Set<TopicPartition> assignment = super.assignment();
+                final Map<TopicPartition, Long> lastKnownPositionPerTopicPartition = new HashMap(assignment.size());
+                for (TopicPartition tp : assignment) {
+                    long position = super.position(tp);
+                    lastKnownPositionPerTopicPartition.put(tp, position);
+                }
+
+                // poll records from Databus
+                ConsumerRecords records = super.poll(timeout);
+                LOG.info("Consumer " + super.getClientId() + " number of records read: " + records.count());
+
+                if (records.count() > 0) {
+                    super.pause(assignment);
+                    LOG.info("Consumer " + super.getClientId() + " is paused");
+                } else {
+                    continue;
+                }
+
+                // call the listener
+                final Callable<DatabusPushConsumerListenerResponse> backgroundTask
+                        = () -> consumerListener.onConsume(records);
+                listenerFuture = executor.submit(backgroundTask);
+                databusPushConsumerFuture
+                        .setDatabusPushConsumerListenerStatus(
+                                new DatabusPushConsumerListenerStatus.Builder()
+                                        .withStatus(DatabusPushConsumerListenerStatus.Status.PROCESSING)
+                                        .build());
+                LOG.info("Consumer " + getClientId() + " Listener was called");
+
+                DatabusPushConsumerListenerResponse onConsumeResponse = null;
+                boolean listenerIsFinished = false;
+
+                // This loop wait for listener the resutl or manages exceptions that listener might throws.
+                while (!listenerIsFinished && !stopRequested.get()) {
+                    try {
+                        onConsumeResponse = listenerFuture.get(500, TimeUnit.MILLISECONDS);
+                        listenerIsFinished = true;
+                        switch (onConsumeResponse) {
+                            case STOP_AND_COMMIT:
+                                stopRequested.set(true);
+                                super.commitSync();
+                                LOG.info("Consumer " + getClientId() + " listener returns "
+                                        + onConsumeResponse.toString());
+                                break;
+                            case STOP_NO_COMMIT:
+                                stopRequested.set(true);
+                                LOG.info("Consumer " + getClientId() + " listener returns "
+                                        + onConsumeResponse.toString());
+                                break;
+                            case RETRY:
+                                for (TopicPartition tp : super.assignment()) {
+                                    if (lastKnownPositionPerTopicPartition.containsKey(tp)) {
+                                        Long position = lastKnownPositionPerTopicPartition.get(tp);
+                                        super.seek(tp, position);
+                                    }
+                                }
+                                LOG.info("Consumer " + getClientId() + " listener returns "
+                                        + onConsumeResponse.toString());
+                                break;
+                            case CONTINUE_AND_COMMIT:
+                            default:
+                                super.commitSync();
+                                LOG.info("Consumer " + getClientId() + " listener returns "
+                                        + onConsumeResponse.toString());
+                                break;
+                        }
+                        resume(assignment());
+                        databusPushConsumerFuture
+                                .setDatabusPushConsumerListenerStatus(
+                                        new DatabusPushConsumerListenerStatus.Builder()
+                                                .withListenerResult(onConsumeResponse)
+                                                .build());
+
+                        LOG.info("Consumer " + super.getClientId() + " is resumed");
+                    } catch (TimeoutException e) {
+                        // TimeoutException means that listener is still working.
+                        // So, a poll is performed to heartbeat Databus
+                        super.poll(Duration.ofMillis(0));
+                        LOG.info("Consumer " + super.getClientId() + " sends heartbeat to coordinator. "
+                                + "The listener continue processing messages...");
+                    } catch (ExecutionException | InterruptedException e) {
+                        LOG.error("Consumer " + super.getClientId()
+                                + " listener throws an Exception while it was working: " + e.getMessage(), e);
+                        databusPushConsumerFuture
+                                .setDatabusPushConsumerListenerStatus(
+                                        new DatabusPushConsumerListenerStatus.Builder()
+                                                .withException(e)
+                                                .build());
+                        stopRequested.set(true);
+                        break;
+                    } catch (CancellationException e) {
+                        LOG.warn("Consumer " + super.getClientId() + " was cancelled: " + e.getMessage(), e);
+                        databusPushConsumerFuture
+                                .setDatabusPushConsumerListenerStatus(
+                                        new DatabusPushConsumerListenerStatus.Builder().build());
+                        stopRequested.set(true);
+                        break;
+                    } catch (Exception e) {
+                        LOG.warn("Consumer " + super.getClientId() + " exception: " + e.getMessage(), e);
+                        databusPushConsumerFuture
+                                .setDatabusPushConsumerListenerStatus(
+                                        new DatabusPushConsumerListenerStatus.Builder()
+                                                .withException(e)
+                                                .build());
+                        stopRequested.set(true);
+                        break;
+
+                    }
+                }
+            }
+        } finally {
+            try {
+                close();
+            } catch (IOException e) {
+            }
+            countDownLatch.countDown();
+            LOG.info("Consumer " + super.getClientId() + " end");
+        }
 
     }
 
     @Override
-    public void close()  throws IOException {
-        System.out.println("Close");
+    public void close() throws IOException {
 
+        try {
+            databusPushConsumerFuture = null;
+            stopRequested.set(true);
+            if (listenerFuture != null) {
+                listenerFuture.cancel(true);
+            }
+            wakeup();
+            super.close();
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+
+        } finally {
+            executor.shutdownNow();
+            if (pushAsyncExecutor != null) {
+                pushAsyncExecutor.shutdownNow();
+                pushAsyncExecutor = null;
+            }
+
+        }
+        LOG.info("Consumer " + getClientId() + " was closed");
     }
-
 
 
 }

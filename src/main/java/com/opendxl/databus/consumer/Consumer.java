@@ -26,7 +26,13 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 
@@ -440,11 +446,14 @@ public abstract class Consumer<P> {
 
 
     /**
-     * Fetch data for the topics or partitions specified using one of the subscribe/assign APIs. It is an error to not have
+     * Fetch data for the topics or partitions specified using one of the subscribe/assign APIs. It is an error to not
+     * have
      * subscribed to any topics or partitions before polling for data.
      * <p>
-     * On each poll, consumer will try to use the last consumed offset as the starting offset and fetch sequentially. The last
-     * consumed offset can be manually set through {@link #seek(TopicPartition, long)} or automatically set as the last committed
+     * On each poll, consumer will try to use the last consumed offset as the starting offset and fetch sequentially.
+     * The last
+     * consumed offset can be manually set through {@link #seek(TopicPartition, long)} or automatically set as the last
+     * committed
      * offset for the subscribed list of partitions
      *
      * <p>
@@ -464,7 +473,8 @@ public abstract class Consumer<P> {
      *             function is called
      * <li> org.apache.kafka.common.errors.InterruptException if the calling thread is interrupted before or while
      *             this function is called
-     * <li> org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more details
+     * <li> org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     * details
      * <li> org.apache.kafka.common.errors.AuthorizationException if caller lacks Read access to any of the subscribed
      *             topics or to the configured groupId. See the exception for more details
      * <li> org.apache.kafka.common.KafkaException for any other unrecoverable errors (e.g. invalid groupId or
@@ -1145,9 +1155,9 @@ public abstract class Consumer<P> {
             List<org.apache.kafka.common.TopicPartition> adaptedTopicPartition =
                     new ArrayList<>(partitions.size());
 
-            for(TopicPartition topicPartition: partitions) {
+            for (TopicPartition topicPartition : partitions) {
                 adaptedTopicPartition.add(
-                        new org.apache.kafka.common.TopicPartition(topicPartition.topic(),topicPartition.partition())
+                        new org.apache.kafka.common.TopicPartition(topicPartition.topic(), topicPartition.partition())
                 );
             }
             consumer.pause(adaptedTopicPartition);
@@ -1171,9 +1181,9 @@ public abstract class Consumer<P> {
             List<org.apache.kafka.common.TopicPartition> adaptedTopicPartition =
                     new ArrayList<>(partitions.size());
 
-            for(TopicPartition topicPartition: partitions) {
+            for (TopicPartition topicPartition : partitions) {
                 adaptedTopicPartition.add(
-                        new org.apache.kafka.common.TopicPartition(topicPartition.topic(),topicPartition.partition())
+                        new org.apache.kafka.common.TopicPartition(topicPartition.topic(), topicPartition.partition())
                 );
             }
 
@@ -1296,14 +1306,19 @@ public abstract class Consumer<P> {
      * such message.
      * @throws DatabusClientRuntimeException if it fails. The original cause could be any of these exceptions:
      *                                       <ul>
-     *                                       <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     *                                       <li>org.apache.kafka.common.errors.AuthenticationException if
+     *                                       authentication fails. See the exception for more
      *                                       details
-     *                                       org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception for
+     *                                       org.apache.kafka.common.errors.AuthorizationException if not authorized to
+     *                                       the topic(s). See the exception for
      *                                       more details
      *                                       <li>IllegalArgumentException if the target timestamp is negative
-     *                                       <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
-     *                                              the amount of time allocated by {@code default.api.timeout.ms} expires.
-     *                                       <li>org.apache.kafka.common.errors.UnsupportedVersionException if the broker does not support looking up
+     *                                       <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata
+     *                                       could not be fetched before
+     *                                              the amount of time allocated by {@code default.api.timeout.ms}
+     *                                              expires.
+     *                                       <li>org.apache.kafka.common.errors.UnsupportedVersionException if the
+     *                                       broker does not support looking up
      *                                              the offsets by timestamp
      *                                       </ul>
      */
@@ -1353,11 +1368,14 @@ public abstract class Consumer<P> {
      * @return The earliest available offsets for the given topicPartitions
      * @throws DatabusClientRuntimeException if it fails. The original cause could be any of these exceptions:
      *                                       <ul>
-     *                                        <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     *                                        <li>org.apache.kafka.common.errors.AuthenticationException if
+     *                                        authentication fails. See the exception for more
      *                                        details
-     *                                        <li>org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception
+     *                                        <li>org.apache.kafka.common.errors.AuthorizationException if not
+     *                                        authorized to the topic(s). See the exception
      *                                        for more details
-     *                                        <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
+     *                                        <li>org.apache.kafka.common.errors.TimeoutException if the offset
+     *                                        metadata could not be fetched before
      *                                               expiration of the configured {@code default.api.timeout.ms}
      *                                        </ul>
      */
@@ -1401,11 +1419,14 @@ public abstract class Consumer<P> {
      * @return The end offsets for the given topicPartitions.
      * @throws DatabusClientRuntimeException if it fails. The original cause could be any of these exceptions:
      *                                       <ul>
-     *                                        <li>org.apache.kafka.common.errors.AuthenticationException if authentication fails. See the exception for more
+     *                                        <li>org.apache.kafka.common.errors.AuthenticationException if
+     *                                        authentication fails. See the exception for more
      *                                        details
-     *                                        <li>org.apache.kafka.common.errors.AuthorizationException if not authorized to the topic(s). See the exception
+     *                                        <li>org.apache.kafka.common.errors.AuthorizationException if not
+     *                                        authorized to the topic(s). See the exception
      *                                        for more details
-     *                                        <li>org.apache.kafka.common.errors.TimeoutException if the offset metadata could not be fetched before
+     *                                        <li>org.apache.kafka.common.errors.TimeoutException if the offset
+     *                                        metadata could not be fetched before
      *                                               the amount of time allocated by {@code request.timeout.ms} expires
      *                                        </ul>
      */
@@ -1498,6 +1519,16 @@ public abstract class Consumer<P> {
      */
     protected void setClientId(final String clientId) {
         this.clientId = clientId;
+
+    }
+
+    /**
+     * Sets the clientId
+     *
+     * @param clientId - The clientId to set.
+     */
+    protected String getClientId() {
+        return this.clientId;
 
     }
 
