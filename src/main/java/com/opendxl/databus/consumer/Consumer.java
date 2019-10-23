@@ -435,10 +435,8 @@ public abstract class Consumer<P> {
 
             return consumerRecordsAdapter.adapt(sourceConsumerRecords);
 
-        } catch (DatabusClientRuntimeException e) {
-            throw e;
         } catch (Exception e) {
-            final String msg = "here was an error when poll: " + e.getMessage();
+            final String msg = "there was an error when poll: " + e.getMessage();
             LOG.error(msg, e);
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
@@ -495,10 +493,8 @@ public abstract class Consumer<P> {
 
             return consumerRecordsAdapter.adapt(sourceConsumerRecords);
 
-        } catch (DatabusClientRuntimeException e) {
-            throw e;
         } catch (Exception e) {
-            final String msg = "here was an error when poll: " + e.getMessage();
+            final String msg = "there was an error when poll: " + e.getMessage();
             LOG.error(msg, e);
             throw new DatabusClientRuntimeException(msg, e, Consumer.class);
         }
@@ -1143,7 +1139,7 @@ public abstract class Consumer<P> {
 
     /**
      * Suspend fetching from the requested topicPartitions. Future calls to {@link #poll(long)} will not return
-     * any records from these topicPartitions until they have been resumed using {@link #resume(TopicPartition...)}.
+     * any records from these topicPartitions until they have been resumed using {@link #resume(Collection)}.
      * Note that this method does not affect partition subscription. In particular, it does not cause a group
      * rebalance when automatic assignment is used.
      *
@@ -1169,7 +1165,7 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Resume specified topicPartitions which have been paused with {@link #pause(TopicPartition...)}. New calls to
+     * Resume specified topicPartitions which have been paused with {@link #pause(Collection)}. New calls to
      * {@link #poll(long)} will return records from these topicPartitions if there are any to be fetched.
      * If the topicPartitions were not previously paused, this method is a no-op.
      *
@@ -1202,6 +1198,7 @@ public abstract class Consumer<P> {
      * cannot be used to interrupt close.
      *
      * @throws DatabusClientRuntimeException if it fails.
+     * @throws IOException NA
      */
     public void close() throws IOException {
         try {
@@ -1456,7 +1453,7 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Get the set of topicPartitions that were previously paused by a call to {@link #pause(TopicPartition...)}.
+     * Get the set of topicPartitions that were previously paused by a call to {@link #pause(Collection)}.
      *
      * @return The set of paused topicPartitions
      */

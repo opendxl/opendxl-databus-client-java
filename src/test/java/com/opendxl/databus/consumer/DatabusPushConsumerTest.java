@@ -40,7 +40,7 @@ public class DatabusPushConsumerTest {
 
 
     @Test
-    public void shouldConsumeAndPushRecordsToListsner() {
+    public void shouldConsumeAndPushRecordsToListener() {
 
         // Create a topic with 3 partitions
         final String topicName = createTopic()
@@ -68,7 +68,7 @@ public class DatabusPushConsumerTest {
                 })) {
 
             consumer.subscribe(Arrays.asList(topicName));
-            DatabusPushConsumerFuture databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(1000));
+            DatabusPushConsumerFuture databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(2000));
 
 
             // produceWithStreamingSDK records
@@ -83,9 +83,6 @@ public class DatabusPushConsumerTest {
             // Set max.poll.interval.ms timeout
             Assert.assertEquals(numOfRecordsToProduce, recordsProduced.size());
 
-            while(!databusPushConsumerFuture.isDone()) {
-                Thread.sleep(500);
-            }
             DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
             Assert.assertTrue(databusPushConsumerListenerStatus.getException() == null);
             Assert.assertTrue(databusPushConsumerListenerStatus.getListenerResult()
@@ -146,16 +143,14 @@ public class DatabusPushConsumerTest {
             // Set max.poll.interval.ms timeout
             Assert.assertEquals(numOfRecordsToProduce, recordsProduced.size());
 
-            while(!databusPushConsumerFuture.isDone()) {
-                Thread.sleep(500);
-            }
-
             DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+            Assert.assertTrue(databusPushConsumerFuture.isDone());
             Assert.assertTrue(  databusPushConsumerListenerStatus.getException() != null);
             Assert.assertTrue( databusPushConsumerListenerStatus.getException() instanceof ExecutionException );
             Assert.assertTrue( databusPushConsumerListenerStatus.getException().getCause() instanceof ArithmeticException );
             Assert.assertTrue( databusPushConsumerListenerStatus.getListenerResult() == null );
             Assert.assertTrue( databusPushConsumerListenerStatus.getStatus() == DatabusPushConsumerListenerStatus.Status.STOPPED );
+
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             Assert.fail();
@@ -223,16 +218,16 @@ public class DatabusPushConsumerTest {
 
             DatabusPushConsumerFuture databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(1000));
 
-            while(!databusPushConsumerFuture.isDone()) {
-                Thread.sleep(500);
-            }
+            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+            Assert.assertTrue(databusPushConsumerFuture.isDone());
+
 
             Map<TopicPartition, Long> actualPosition = consumerListenerRetry.getPosition();
             Assert.assertTrue(actualPosition.get(tp0) == offsetToSeekForPartition0);
             Assert.assertTrue(actualPosition.get(tp1) == offsetToSeekForPartition1);
             Assert.assertTrue(actualPosition.get(tp2) == offsetToSeekForPartition2);
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+
             Assert.assertTrue( databusPushConsumerListenerStatus.getException() == null);
             Assert.assertTrue( databusPushConsumerListenerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
             Assert.assertTrue( databusPushConsumerListenerStatus.getStatus() == DatabusPushConsumerListenerStatus.Status.STOPPED );
@@ -329,9 +324,9 @@ public class DatabusPushConsumerTest {
 
             DatabusPushConsumerFuture databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(1000));
 
-            while(!databusPushConsumerFuture.isDone()) {
-                Thread.sleep(500);
-            }
+            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+            Assert.assertTrue(databusPushConsumerFuture.isDone());
+
 
             Map<TopicPartition, Long> actualPosition = consumerListenerRetry.getPosition();
             Assert.assertTrue(actualPosition.get(t1p0) == offsetToSeekForT1Partition0);
@@ -341,7 +336,6 @@ public class DatabusPushConsumerTest {
             Assert.assertTrue(actualPosition.get(t2p1) == offsetToSeekForT2Partition1);
             Assert.assertTrue(actualPosition.get(t2p2) == offsetToSeekForT2Partition2);
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
             Assert.assertTrue( databusPushConsumerListenerStatus.getException() == null);
             Assert.assertTrue( databusPushConsumerListenerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
             Assert.assertTrue( databusPushConsumerListenerStatus.getStatus() == DatabusPushConsumerListenerStatus.Status.STOPPED );
@@ -399,9 +393,9 @@ public class DatabusPushConsumerTest {
             // Set max.poll.interval.ms timeout
             Assert.assertEquals(numOfRecordsToProduce, recordsProduced.size());
 
-            while(!databusPushConsumerFuture.isDone()) {
-                Thread.sleep(500);
-            }
+            // wait until finishes.
+            databusPushConsumerFuture.get();
+            Assert.assertTrue(databusPushConsumerFuture.isDone());
 
             consumer.pushAsync(Duration.ofMillis(1000));
             Assert.fail();
@@ -411,13 +405,15 @@ public class DatabusPushConsumerTest {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             Assert.fail();
-        }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            Assert.fail();        }
     }
 
 
 
     @Test
-    public void test6() {
+    public void shouldNotFailWhenTwoOrMorePushAsynAreCalled() {
 
         // Create a topic with 3 partitions
         final String topicName = createTopic()
@@ -458,7 +454,7 @@ public class DatabusPushConsumerTest {
 
 
     @Test
-    public void test7() {
+    public void shouldFailWhenCallPollAndPushAsyncWasAlreadyCalled1() {
 
         // Create a topic with 3 partitions
         final String topicName = createTopic()
@@ -500,7 +496,7 @@ public class DatabusPushConsumerTest {
 
 
     @Test
-    public void test8() {
+    public void shouldFailWhenCallPollAndPushAsyncWasAlreadyCalled2() {
 
         // Create a topic with 3 partitions
         final String topicName = createTopic()

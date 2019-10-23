@@ -17,7 +17,6 @@ import com.opendxl.databus.serialization.ByteArraySerializer;
 import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,13 +42,14 @@ public class BasicPushConsumerExample {
 
     public BasicPushConsumerExample() {
 
-        // Start Kfka cluster
-        startKafkaCluster();
+        // Start Kafka cluster
+        //startKafkaCluster();
 
         // Start producing messages to Databus
         produceMessages();
 
         // Create a Push Consumer
+        DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = null;
         try(DatabusPushConsumer<byte[]> consumer =
                     new DatabusPushConsumer(getConsumerConfig(),
                             new ByteArrayDeserializer(), new MessageProcessor())) {
@@ -57,18 +57,17 @@ public class BasicPushConsumerExample {
             // Subscribe to topic
             consumer.subscribe(Collections.singletonList(CONSUME_TOPIC));
 
-            // Start pushing messages in Async fashion
-            this.databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(1000));
+            // Start pushing messages into MessageProcessor in an async fashion
+            this.databusPushConsumerFuture = consumer.pushAsync();
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = this.databusPushConsumerFuture.get();
-
+            // Wait until the example is stopped
+            databusPushConsumerListenerStatus = this.databusPushConsumerFuture.get();
 
         } catch (Exception e) {
             LOG.error("ERROR" + e.getMessage(), e);
-
+        } finally {
+            LOG.info("Push consumer status:" + databusPushConsumerListenerStatus.getStatus());
         }
-
-
     }
 
     private void startKafkaCluster() {
@@ -114,7 +113,6 @@ public class BasicPushConsumerExample {
                         " PAYLOAD:" + new String(record.getMessagePayload().getPayload()));
             }
 
-            justWait(5000);
             return DatabusPushConsumerListenerResponse.CONTINUE_AND_COMMIT;
         }
     }
@@ -197,12 +195,14 @@ public class BasicPushConsumerExample {
     synchronized private void stopExample() {
         try {
             closed.set(true);
-            ClusterHelper.getInstance().stop();
+            //ClusterHelper.getInstance().stop();
             executor.shutdown();
             executor.awaitTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
         } finally {
             executor.shutdownNow();
+            LOG.info("Example finished");
+
         }
     }
 

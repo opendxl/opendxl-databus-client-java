@@ -1,9 +1,14 @@
+/*---------------------------------------------------------------------------*
+ * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+ *---------------------------------------------------------------------------*/
+
 package com.opendxl.databus.consumer;
 
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.credential.Credential;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.Deserializer;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.log4j.Logger;
 
 import java.io.Closeable;
@@ -13,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -26,16 +30,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Extends a {@link DatabusConsumer} to replace poll model for push message model.
- * {@link DatabusPushConsumer#pushAsync(Duration)} reads messages from an
+ * {@link DatabusPushConsumer#pushAsync()} reads messages from an
  * already-subscribed topic and push them to a {@link DatabusPushConsumerListener} listener
  * instance implemented by the SDK Databus client.
  * The listener receives messages read from Databus and it should implement some logic to process them.
  * The listener returns a {@link DatabusPushConsumerListenerResponse} enum value to let Push Databus Consumer knows
- * which action should take.
+ * which action it should take.
  *
  * @param <P> Message payload type
  */
 public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements Closeable {
+
+    /**
+     * Poll timeout default value
+     */
+    private static final long POLL_TIMEOUT_MS = 1000;
 
     /**
      * The listener implemented by the Databus client to process records
@@ -75,7 +84,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     /**
      * A latch to signal that the main loop has finished.
      */
-    CountDownLatch countDownLatch = new CountDownLatch(1);
+    private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     /**
      * Constructor
@@ -132,12 +141,9 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         this.consumerListener = consumerListener;
     }
 
+
     /**
-     * Not supported by Push Consumer
-     *
-     * @param timeout NA
-     * @return NA
-     * @throws UnsupportedOperationException
+     * {@inheritDoc}
      */
     @Override
     public ConsumerRecords poll(final Duration timeout) {
@@ -153,11 +159,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     }
 
     /**
-     * Not supported by Push Consumer
-     *
-     * @param timeout NA
-     * @return NA
-     * @throws UnsupportedOperationException
+     * {@inheritDoc}
      */
     @Override
     public ConsumerRecords poll(final long timeout) {
@@ -187,6 +189,10 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
             throw new DatabusClientRuntimeException("pushAsync cannot be performed because DatabusPushConsumer is "
                     + "closed.", DatabusPushConsumer.class);
         }
+
+        // If a future was already created and returned (e.g. pushAsync was already called),
+        // it will return the same future to prevent to spawn a new thread and listener.
+        // It allows user to call pushAsync just once
         if (databusPushConsumerFuture != null) {
             return databusPushConsumerFuture;
         }
@@ -201,16 +207,25 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         return databusPushConsumerFuture;
     }
 
+    /**
+     * Reads messages from Databus and push them to {@link DatabusPushConsumerListener} instance which was passed
+     * in the constructor
+     *
+     * @return Future to monitoring the message processing
+     */
+    public DatabusPushConsumerFuture pushAsync() {
+        return pushAsync(Duration.ofMillis(POLL_TIMEOUT_MS));
+    }
 
     /**
-     * It implements the read-push main loop. The loop is controlled by the listener.
+     * It implements the read-push main loop. The loop is controlled by the listener return value.
      * According to {@link DatabusPushConsumerListenerResponse} listener return value, the main loop will continue
      * or stop reading messages. Messages read from Databus are sent to listener in an separated and parallel thread.
      * While the listener is working on messages received from Databus, the Push Consumer pauses topic-partitions
      * assigned to it and sends heartbeats the Kafka broker in background.
      * Once the listener has finished, it should returns a
      * {@link DatabusPushConsumerListenerResponse} value or an Exception in case something was wrong.
-     * Then the maim loop will act accordingly. The main loop keep a {@code databusPushConsumerFuture} future argument
+     * Then the main loop will act accordingly. The main loop keep a {@code databusPushConsumerFuture} future argument
      *
      * @param databusPushConsumerFuture a future instance shared which is updated to let the
      *                                  SDK Databus client know about the process status.
@@ -224,7 +239,6 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         LOG.info("Consumer " + super.getClientId() + " start");
         try {
 
-
             // Main loop. It keeps the reading-pushing mechanism running until either a close() was called or
             // the listener asks to stop or the listener throws an exception.
             while (!stopRequested.get()) {
@@ -233,11 +247,8 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                 // This is the offset position per topicPartition before polling messages from Databus.  Position
                 // will be used to rewind the consumer in case the listener returns RETRY enum value.
                 final Set<TopicPartition> assignment = super.assignment();
-                final Map<TopicPartition, Long> lastKnownPositionPerTopicPartition = new HashMap(assignment.size());
-                for (TopicPartition tp : assignment) {
-                    long position = super.position(tp);
-                    lastKnownPositionPerTopicPartition.put(tp, position);
-                }
+                final Map<TopicPartition, Long> lastKnownPositionPerTopicPartition =
+                        getCurrentConsumerPosition(assignment);
 
                 // poll records from Databus
                 ConsumerRecords records = super.poll(timeout);
@@ -250,24 +261,16 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                     continue;
                 }
 
-                // call the listener
-                final Callable<DatabusPushConsumerListenerResponse> backgroundTask
-                        = () -> consumerListener.onConsume(records);
-                listenerFuture = executor.submit(backgroundTask);
-                databusPushConsumerFuture
-                        .setDatabusPushConsumerListenerStatus(
-                                new DatabusPushConsumerListenerStatus.Builder()
-                                        .withStatus(DatabusPushConsumerListenerStatus.Status.PROCESSING)
-                                        .build());
-                LOG.info("Consumer " + getClientId() + " Listener was called");
+                // It calls the listener in a separated thread.
+                listenerFuture = runListenerAsync(databusPushConsumerFuture, records);
 
-                DatabusPushConsumerListenerResponse onConsumeResponse = null;
+                DatabusPushConsumerListenerResponse onConsumeResponse ;
                 boolean listenerIsFinished = false;
 
                 // This loop wait for listener the resutl or manages exceptions that listener might throws.
                 while (!listenerIsFinished && !stopRequested.get()) {
                     try {
-                        onConsumeResponse = listenerFuture.get(500, TimeUnit.MILLISECONDS);
+                        onConsumeResponse = listenerFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
                         listenerIsFinished = true;
                         switch (onConsumeResponse) {
                             case STOP_AND_COMMIT:
@@ -282,12 +285,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                                         + onConsumeResponse.toString());
                                 break;
                             case RETRY:
-                                for (TopicPartition tp : super.assignment()) {
-                                    if (lastKnownPositionPerTopicPartition.containsKey(tp)) {
-                                        Long position = lastKnownPositionPerTopicPartition.get(tp);
-                                        super.seek(tp, position);
-                                    }
-                                }
+                                seek(lastKnownPositionPerTopicPartition);
                                 LOG.info("Consumer " + getClientId() + " listener returns "
                                         + onConsumeResponse.toString());
                                 break;
@@ -342,28 +340,87 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                     }
                 }
             }
-        } finally {
-            try {
-                close();
-            } catch (IOException e) {
+        } catch (DatabusClientRuntimeException e) {
+            // Prevents to logging  if a WakeupException was thrown because of calling close
+            if ((e.getCause() instanceof WakeupException)  && stopRequested.get()) {
+                LOG.error("Consumer " + super.getClientId() + "Error: " + e.getMessage(), e);
             }
+        } catch (Exception e) {
+            LOG.error("Consumer " + super.getClientId() + "Error: " + e.getMessage(), e);
+        } finally {
             countDownLatch.countDown();
             LOG.info("Consumer " + super.getClientId() + " end");
         }
 
     }
 
+    /**
+     * It sets Consumer position
+     *
+     * @param consumerPosition A Map with the offset position per topic-partition
+     */
+    private void seek(final Map<TopicPartition, Long> consumerPosition) {
+        for (TopicPartition tp : super.assignment()) {
+            if (consumerPosition.containsKey(tp)) {
+                Long position = consumerPosition.get(tp);
+                super.seek(tp, position);
+            }
+        }
+    }
+
+    /**
+     * It spawns a thread to execute the listener
+     *
+     * @param databusPushConsumerFuture The future that track the Pusg COnsumer
+     * @param records records read from Databus
+     * @return a Future instance to
+     */
+    private Future<DatabusPushConsumerListenerResponse> runListenerAsync(
+            final DatabusPushConsumerFuture databusPushConsumerFuture,
+            final ConsumerRecords records) {
+
+        // launch the listener in a separate thread
+        Future<DatabusPushConsumerListenerResponse> listenerTaskFuture = executor.submit(
+                () -> consumerListener.onConsume(records));
+
+        // Update the Push Consumer status
+        databusPushConsumerFuture
+                .setDatabusPushConsumerListenerStatus(
+                        new DatabusPushConsumerListenerStatus.Builder()
+                                .withStatus(DatabusPushConsumerListenerStatus.Status.PROCESSING)
+                                .build());
+
+        LOG.info("Consumer " + getClientId() + " Listener was called");
+        return listenerTaskFuture;
+    }
+
+
+    /**
+     * It stores the current consumer position based on the partitions assigned.
+     * This is the offset position per topicPartition before polling messages from Databus.  Position
+     * will be used to rewind the consumer in case the listener returns RETRY enum value.
+     *
+     * @return The map with the current offset position for each topic partition assigned to consumer
+     */
+    private Map<TopicPartition, Long> getCurrentConsumerPosition(final Set<TopicPartition> assignment) {
+        final Map<TopicPartition, Long> lastKnownPositionPerTopicPartition = new HashMap(assignment.size());
+        for (TopicPartition tp : assignment) {
+            long position = super.position(tp);
+            lastKnownPositionPerTopicPartition.put(tp, position);
+        }
+        return lastKnownPositionPerTopicPartition;
+    }
+
     @Override
     public void close() throws IOException {
 
         try {
-            databusPushConsumerFuture = null;
             stopRequested.set(true);
+            wakeup();
+            databusPushConsumerFuture = null;
             if (listenerFuture != null) {
                 listenerFuture.cancel(true);
             }
-            wakeup();
-            super.close();
             executor.shutdown();
             executor.awaitTermination(5, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -374,9 +431,10 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                 pushAsyncExecutor.shutdownNow();
                 pushAsyncExecutor = null;
             }
+            super.close();
+            LOG.info("Consumer " + super.getClientId() + " is closed");
 
         }
-        LOG.info("Consumer " + getClientId() + " was closed");
     }
 
 

@@ -1,14 +1,16 @@
-package com.opendxl.databus.consumer;
+/*---------------------------------------------------------------------------*
+ * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+ *---------------------------------------------------------------------------*/
 
-import java.time.Duration;
+package com.opendxl.databus.consumer;
 
 /**
  * This is the interface that SDK Databus client has to implement to receive and process records
- * when consume them by using a {@link DatabusPushConsumer} instance. {@link DatabusPushConsumer#pushAsync(Duration)}
- * main loop read messages from a already-subscribed topic and send them
+ * when consume them by using a {@link DatabusPushConsumer} instance. {@link DatabusPushConsumer#pushAsync()}
+ * main loop read messages from an already-subscribed topic and send them
  * to {@link DatabusPushConsumerListener#onConsume(ConsumerRecords)} method.
- * It process messages and returns a {@link DatabusPushConsumerListenerResponse}.
- * According this returned value, DatabusPushConsumer will act will act accordingly.
+ * It will process messages and will return a {@link DatabusPushConsumerListenerResponse}.
+ * According to it, DatabusPushConsumer will act accordingly.
  * <p>
  * {@link DatabusPushConsumerListenerResponse#CONTINUE_AND_COMMIT }
  * </p>
@@ -44,8 +46,9 @@ public interface DatabusPushConsumerListener<P> {
      * </p>
      *
      *
-     * @param records
-     * @return
+     * @param records pushed from Databus
+     * @return A {@link DatabusPushConsumerListenerResponse} enum value response to let {@link DatabusPushConsumer}
+     * know how to proceed.
      */
     DatabusPushConsumerListenerResponse onConsume(ConsumerRecords<P> records);
 
