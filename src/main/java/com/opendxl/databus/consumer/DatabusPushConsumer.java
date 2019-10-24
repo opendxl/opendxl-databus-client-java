@@ -362,7 +362,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     private void seek(final Map<TopicPartition, Long> consumerPosition) {
         for (TopicPartition tp : super.assignment()) {
             if (consumerPosition.containsKey(tp)) {
-                Long position = consumerPosition.get(tp);
+                final Long position = consumerPosition.get(tp);
                 super.seek(tp, position);
             }
         }
@@ -405,8 +405,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     private Map<TopicPartition, Long> getCurrentConsumerPosition(final Set<TopicPartition> assignment) {
         final Map<TopicPartition, Long> lastKnownPositionPerTopicPartition = new HashMap(assignment.size());
         for (TopicPartition tp : assignment) {
-            long position = super.position(tp);
-            lastKnownPositionPerTopicPartition.put(tp, position);
+            lastKnownPositionPerTopicPartition.put(tp, super.position(tp));
         }
         return lastKnownPositionPerTopicPartition;
     }

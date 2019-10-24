@@ -43,7 +43,7 @@ public class BasicPushConsumerExample {
     public BasicPushConsumerExample() {
 
         // Start Kafka cluster
-        //startKafkaCluster();
+        startKafkaCluster();
 
         // Start producing messages to Databus
         produceMessages();
@@ -195,7 +195,7 @@ public class BasicPushConsumerExample {
     synchronized private void stopExample() {
         try {
             closed.set(true);
-            //ClusterHelper.getInstance().stop();
+            ClusterHelper.getInstance().stop();
             executor.shutdown();
             executor.awaitTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
