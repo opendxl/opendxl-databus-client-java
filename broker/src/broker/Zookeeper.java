@@ -6,7 +6,8 @@ package broker;
 
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.zookeeper.server.NIOServerCnxnFactory;
 import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ZooKeeperServer;
@@ -27,7 +28,7 @@ public class Zookeeper {
 
     private ServerCnxnFactory zookeeperConnection;
 
-    private static final Logger LOG = Logger.getLogger(Zookeeper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Zookeeper.class);
 
 
     public Zookeeper(int port) {
