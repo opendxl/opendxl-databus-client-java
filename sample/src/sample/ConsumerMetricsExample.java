@@ -21,7 +21,8 @@ import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.entities.RoutingData;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
@@ -56,7 +57,7 @@ public class ConsumerMetricsExample {
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private static Logger LOG = Logger.getLogger(ConsumerMetricsExample.class);
+    private static Logger LOG = LoggerFactory.getLogger(ConsumerMetricsExample.class);
 
 
     public ConsumerMetricsExample() {

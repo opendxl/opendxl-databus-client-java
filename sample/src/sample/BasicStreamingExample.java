@@ -33,7 +33,8 @@ import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.state.*;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -56,7 +57,7 @@ public class BasicStreamingExample {
     private static final long CONSUMER_TIME_CADENCE_MS = 500L;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private static Logger LOG = Logger.getLogger(BasicStreamingExample.class);
+    private static Logger LOG = LoggerFactory.getLogger(BasicStreamingExample.class);
 
     public BasicStreamingExample() {
 
@@ -119,7 +120,7 @@ public class BasicStreamingExample {
         topology.addStateStore(storeBuilder,"PROCESSOR_NAME");
         topology.addSink("SINK_NAME",outputTopic,new DatabusKeySerializer(), new MessageSerializer(), "PROCESSOR_NAME");
 
-        LOG.info(topology.describe());
+        LOG.info(String.valueOf(topology.describe()));
         return new KafkaStreams(topology, config);
 
     }
