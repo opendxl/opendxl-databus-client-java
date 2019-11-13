@@ -75,12 +75,13 @@ dependencies {
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.0'
     kafkaInMemory 'commons-io:commons-io:2.6'
+    kafkaInMemory 'org.apache.logging.log4j:log4j-slf4j-impl:2.12.1'
 
     // This following section mitigates OWASP vulnerabilities report.
     // It enforces to use specific transitive dependency versions
     // when their previous versions were mentioned by OWASP vulnerability reports.
     // If a vulnerability is false-positive,
-    // libraries should be declarad in /config/dependency-check/owasp-supression.xml
+    // libraries should be declared in /config/dependency-check/owasp-supression.xml
 
     // https://nvd.nist.gov/vuln/detail/CVE-2019-12384
     // https://nvd.nist.gov/vuln/detail/CVE-2019-12814
