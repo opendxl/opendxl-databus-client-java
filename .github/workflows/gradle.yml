@@ -1,4 +1,4 @@
-name: Java CI
+name: opendxl-databus-client-java CI
 
 on: [push]
 
