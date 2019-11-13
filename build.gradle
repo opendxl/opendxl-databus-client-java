@@ -66,10 +66,10 @@ dependencies {
     implementation 'org.slf4j:slf4j-api'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
     testImplementation 'org.apache.kafka:kafka_2.12:2.3.0'
-    testImplementation('org.apache.zookeeper:zookeeper:3.4.14'){
-        exclude group: 'io.netty', module: 'netty'
+    testImplementation 'org.apache.zookeeper:zookeeper:3.4.14'
+    testImplementation('io.netty:netty-all:4.1.43.Final') {
+        force = true
     }
-    testImplementation 'io.netty:netty-all:4.1.43.Final'
     testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
