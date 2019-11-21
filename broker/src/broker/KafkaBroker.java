@@ -15,23 +15,16 @@ import java.util.Properties;
 
 public class KafkaBroker {
 
-
     private Properties brokerConfig;
-
     private Zookeeper zookeeper;
     private KafkaServerStartable broker;
-
     private static final Logger LOG = Logger.getLogger(KafkaBroker.class);
 
-
     public KafkaBroker(final Properties brokerConfig) {
-
-
         this.brokerConfig = brokerConfig;
     }
 
     public void start() {
-
         Runtime.getRuntime().addShutdownHook(
                 new Thread(
                         new Runnable() {
@@ -82,5 +75,4 @@ public class KafkaBroker {
     public Properties getBrokerConfig() {
         return brokerConfig;
     }
-
 }

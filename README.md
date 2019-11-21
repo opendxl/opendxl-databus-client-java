@@ -10,18 +10,13 @@ The OpenDXL Databus Java client library is used to consume and produce records f
 
 ## Documentation
 
-The OpenDXL Databus Java client library is used to consume and produce records
-from/to a
-[Data Exchange Layer](http://www.mcafee.com/us/solutions/data-exchange-layer.aspx)
-(DXL) Streaming Service.
-
 See the
 [OpenDXL Databus Java Client Library Documentation](https://opendxl.github.io/opendxl-databus-client-java/docs/index.html)
 for API documentation and examples.
 
 ## Installation
 
-To start using the OpenDXL Streaming Native Java Client Library:
+To start using the OpenDXL Databus Java client library:
 
 * Download the [Latest Release](https://github.com/opendxl/opendxl-databus-client-java/releases/latest)
 * Extract the release .zip file
@@ -31,7 +26,7 @@ To start using the OpenDXL Streaming Native Java Client Library:
 
 ## Maven Repository
 
-Visit the [OpenDXL Databus Java Client Maven Repository](https://search.maven.org/artifact/com.opendxl/dxldatabus) for
+Visit the [OpenDXL Databus Java Client Maven Repository](https://search.maven.org/artifact/com.opendxl/dxldatabusclient) for
 access to all released versions including the appropriate dependency syntax for a large number of management 
 systems (Maven, Gradle, SBT, Ivy, Grape, etc.).
 
@@ -39,14 +34,14 @@ Maven:
 
 ```xml
 <dependency>
-  <groupId>com.opendxl.databus</groupId>
-  <artifactId>opendxldatabusclient-java-sdk</artifactId>
+  <groupId>com.opendxl</groupId>
+  <artifactId>dxldatabusclient</artifactId>
   <version>0.1.2</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.opendxl.databus:opendxldatabusclient-java-sdk:0.1.2'
+compile 'com.opendxl:dxldatabusclient:0.1.2'
 ```
 
 ## Bugs and Feedback

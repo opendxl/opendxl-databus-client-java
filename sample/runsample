@@ -9,14 +9,14 @@
 #                                                                             #
 # For example:                                                                #
 #                                                                             #
-# ./runsample sample.BasicConsumerProducerExample                             #
+# runsample sample.BasicConsumerProducerExample                               #
 ###############################################################################
 
 if [ -z "$1" ]
   then
     echo "Usage: runsample <sample-to-run>"
     echo ""
-    echo "Example: ./runsample sample.BasicConsumerProducerExample"
+    echo "Example: runsample sample.BasicConsumerProducerExample"
     exit
 fi
 

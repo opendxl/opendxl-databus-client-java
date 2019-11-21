@@ -1,13 +1,13 @@
 CLI (Command Line Interface)
 ----------------------------
 
-OpenDXL Databus client can be invoked from command line interface (CLI)
-for testing or checking purposes. Executing CLI like a standard Java
-library with no arguments, the output shows the help:
+The OpenDXL Databus client can be invoked from command line interface (CLI)
+for testing or checking purposes. Executing the CLI like a standard Java
+library with no arguments displays help information:
 
 ::
 
-    $ java -jar opendxldatabusclient-java-sdk-<VERSION>.jar
+    $ java -jar dxldatabusclient-<VERSION>.jar
 
     ERROR: There are not options
     Option (* = required)                  Description                            
@@ -45,13 +45,13 @@ correct field name.
 Supported Operations
 ~~~~~~~~~~~~~~~~~~~~
 
-In order to get records from Databus client, the user has to invoke a
+In order to get records from the Databus client, the user has to invoke a
 few CLI operations. Operations arguments are placed after
 ``--operation`` option. For instance:
 
 ::
 
-    $ java -jar opendxldatabusclient-java-sdk-<VERSION>.jar --operation <OPERATION_ARGUMENT> ...
+    $ java -jar dxldatabusclient-<VERSION>.jar --operation <OPERATION_ARGUMENT> ...
 
 Operation Arguments
 ^^^^^^^^^^^^^^^^^^^
@@ -66,13 +66,12 @@ Operation Arguments
 
 | The invocation of CLI operations to get records is: ``produce`` ->
   ``consume`` .
-| First of all, a message is needed to be produced to a topic and then
-  start consuming it.
+| A message must be produced to a topic prior to consuming it.
 
 produce
 ^^^^^^^
 
-It is an operation which produces a message to a specific broker with an
+An operation which produces a message to a specific broker with an
 associated topic. Optional arguments can be added to attach partition,
 sharding key, tenant group and headers.
 
@@ -80,10 +79,10 @@ sharding key, tenant group and headers.
 | Mandatory Arguments   | Description                                        |
 | for produce           |                                                    |
 +=======================+====================================================+
-| ``--operation``       | The operation name. In this case, always the       |
+| ``--operation``       | The operation name. In this case, the              |
 |                       | operation name is ``produce``                      |
 +-----------------------+----------------------------------------------------+
-| ``--to-topic``        | The topic name which will send the message.        |
+| ``--to-topic``        | The topic name for the message.                    |
 +-----------------------+----------------------------------------------------+
 | ``--msg``             | The message payload.                               |
 +-----------------------+----------------------------------------------------+
@@ -96,7 +95,7 @@ sharding key, tenant group and headers.
 +=====================+=============================+============+
 | ``--partition``     | The partition number, valid | Blank,     |
 |                     | numbers for partition are   | which      |
-|                     | >= 0.                       | assignes   |
+|                     | >= 0.                       | assigns    |
 |                     |                             | any kafka  |
 |                     |                             | valid      |
 |                     |                             | partition  |
@@ -125,7 +124,7 @@ example
 
 ::
 
-    $ java -jar opendxlstreamingclient-java-sdk-<VERSION>.jar \
+    $ java -jar dxldatabusclient-<VERSION>.jar \
     --operation produce \
     --to-topic <TOPIC_NAME> \
     --brokers <0.0.0.0>:<PORT> \
@@ -159,7 +158,7 @@ example
 consume
 ^^^^^^^
 
-It is an operation which receives messages from specified topics at
+An operation which receives messages from specified topics at
 specified brokers. Optional arguments, like consume-records or
 consume-timeout, are supported to refine the record list contained in
 the consumer operation result.
@@ -170,7 +169,7 @@ the consumer operation result.
 +======================+================+
 | ``--operation``      | The operation  |
 |                      | name. In this  |
-|                      | case, always   |
+|                      | case,          |
 |                      | the operation  |
 |                      | name is        |
 |                      | ``consume``    |
@@ -197,7 +196,7 @@ the consumer operation result.
 |                       | group.                      | empty string  |
 +-----------------------+-----------------------------+---------------+
 | ``--cg``              | The consumer group to be    | Blank with    |
-|                       | member of.                  | empty string  |
+|                       | a member of.                | empty string  |
 +-----------------------+-----------------------------+---------------+
 | ``--config``          | The consumer configuration  | Blank with    |
 |                       | in comma separated          | empty string  |
@@ -210,12 +209,13 @@ the consumer operation result.
 |                       | ommit.interval.ms=0         |               |
 +-----------------------+-----------------------------+---------------+
 | ``--consume-records`` | Maximum number of records   | 1 record      |
-|                       | to read within thespecified |               |
+|                       | to read within the          |               |
+|                       | specified                   |               |
 |                       | ``consume-timeout``. CLI    |               |
 |                       | polls for new records       |               |
-|                       | untilwhichever condition is |               |
-|                       | first met:timeout has       |               |
-|                       | elapsed, ormaximum number   |               |
+|                       | until one of the following  |               |
+|                       | occurs:timeout has          |               |
+|                       | elapsed or maximum number   |               |
 |                       | of records were received.   |               |
 +-----------------------+-----------------------------+---------------+
 | ``--consume-timeout`` | Maximum time to wait for    | 15000         |
@@ -223,10 +223,10 @@ the consumer operation result.
 |                       | specified\ ``consume-record |               |
 |                       | s``                         |               |
 |                       | number. CLI polls for new   |               |
-|                       | records untilwhichever      |               |
-|                       | condition is first          |               |
-|                       | met:timeout has elapsed     |               |
-|                       | ornumber of received        |               |
+|                       | records until one of the    |               |
+|                       | following occurs:timeout    |               |
+|                       | has elapsed                 |               |
+|                       | or number of received       |               |
 |                       | records reached             |               |
 |                       | ``consume-records`` value.  |               |
 +-----------------------+-----------------------------+---------------+
@@ -240,7 +240,7 @@ using \\ consumer group and configuring consumer to enable auto commmit.
 
 ::
 
-    java -jar opendxldatabusclient-java-sdk-<VERSION>.jar \
+    java -jar dxldatabusclient-<VERSION>.jar \
     --operation consume \
     --from-topic <TOPIC_1,TOPIC_2,...,TOPIC_N> \
     --brokers <BROKER_1_IP:BROKER_1_PORT,BROKER_2_PORT:BROKER_2_PORT,...> \
