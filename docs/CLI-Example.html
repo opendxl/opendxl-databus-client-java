@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 0.1.2 documentation</title>
+  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 0.1.2-SNAPSHOT documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Transactions producer consumer example" href="Transactions-producer-consumer-example.html" />
-    <link rel="prev" title="Consumer Metrics Example" href="Consumer-metrics-sample.html" /> 
+    <link rel="next" title="Producer Consumer Example" href="Basic-producer-consumer-example.html" />
+    <link rel="prev" title="Welcome to OpenDXL Databus Java Client Library" href="index.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.2-SNAPSHOT
               </div>
             
           
@@ -83,22 +83,7 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Prerequisites.html">Prerequisites</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
-</ul>
-<ul class="current">
+              <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CLI (Command Line Interface)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#supported-operations">Supported Operations</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#operation-arguments">Operation Arguments</a></li>
@@ -116,6 +101,9 @@
 </li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Transactions-producer-consumer-example.html">Transactions producer consumer example</a></li>
 </ul>
 
@@ -181,10 +169,10 @@
             
   <div class="section" id="cli-command-line-interface">
 <h1>CLI (Command Line Interface)<a class="headerlink" href="#cli-command-line-interface" title="Permalink to this headline">¶</a></h1>
-<p>OpenDXL Databus client can be invoked from command line interface (CLI)
-for testing or checking purposes. Executing CLI like a standard Java
-library with no arguments, the output shows the help:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar opendxldatabusclient-java-sdk-&lt;VERSION&gt;.jar
+<p>The OpenDXL Databus client can be invoked from command line interface (CLI)
+for testing or checking purposes. Executing the CLI like a standard Java
+library with no arguments displays help information:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-&lt;VERSION&gt;.jar
 
 ERROR: There are not options
 Option (* = required)                  Description
@@ -221,10 +209,10 @@ are optional placeholders which you should respectively replace with the
 correct field name.</p>
 <div class="section" id="supported-operations">
 <h2>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h2>
-<p>In order to get records from Databus client, the user has to invoke a
+<p>In order to get records from the Databus client, the user has to invoke a
 few CLI operations. Operations arguments are placed after
 <code class="docutils literal notranslate"><span class="pre">--operation</span></code> option. For instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar opendxldatabusclient-java-sdk-&lt;VERSION&gt;.jar --operation &lt;OPERATION_ARGUMENT&gt; ...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-&lt;VERSION&gt;.jar --operation &lt;OPERATION_ARGUMENT&gt; ...
 </pre></div>
 </div>
 <div class="section" id="operation-arguments">
@@ -251,13 +239,12 @@ few CLI operations. Operations arguments are placed after
 <div class="line-block">
 <div class="line">The invocation of CLI operations to get records is: <code class="docutils literal notranslate"><span class="pre">produce</span></code> -&gt;
 <code class="docutils literal notranslate"><span class="pre">consume</span></code> .</div>
-<div class="line">First of all, a message is needed to be produced to a topic and then
-start consuming it.</div>
+<div class="line">A message must be produced to a topic prior to consuming it.</div>
 </div>
 </div>
 <div class="section" id="produce">
 <h3>produce<a class="headerlink" href="#produce" title="Permalink to this headline">¶</a></h3>
-<p>It is an operation which produces a message to a specific broker with an
+<p>An operation which produces a message to a specific broker with an
 associated topic. Optional arguments can be added to attach partition,
 sharding key, tenant group and headers.</p>
 <table border="1" class="docutils">
@@ -273,11 +260,11 @@ for produce</th>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--operation</span></code></td>
-<td>The operation name. In this case, always the
+<td>The operation name. In this case, the
 operation name is <code class="docutils literal notranslate"><span class="pre">produce</span></code></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--to-topic</span></code></td>
-<td>The topic name which will send the message.</td>
+<td>The topic name for the message.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--msg</span></code></td>
 <td>The message payload.</td>
@@ -308,7 +295,7 @@ numbers for partition are
 &gt;= 0.</td>
 <td>Blank,
 which
-assignes
+assigns
 any kafka
 valid
 partition
@@ -348,7 +335,7 @@ string</td>
 </table>
 <div class="section" id="example">
 <h4>example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar opendxlstreamingclient-java-sdk-&lt;VERSION&gt;.jar \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-&lt;VERSION&gt;.jar \
 --operation produce \
 --to-topic &lt;TOPIC_NAME&gt; \
 --brokers &lt;0.0.0.0&gt;:&lt;PORT&gt; \
@@ -383,7 +370,7 @@ string</td>
 </div>
 <div class="section" id="consume">
 <h3>consume<a class="headerlink" href="#consume" title="Permalink to this headline">¶</a></h3>
-<p>It is an operation which receives messages from specified topics at
+<p>An operation which receives messages from specified topics at
 specified brokers. Optional arguments, like consume-records or
 consume-timeout, are supported to refine the record list contained in
 the consumer operation result.</p>
@@ -402,7 +389,7 @@ for consume</th>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--operation</span></code></td>
 <td>The operation
 name. In this
-case, always
+case,
 the operation
 name is
 <code class="docutils literal notranslate"><span class="pre">consume</span></code></td>
@@ -446,7 +433,7 @@ empty string</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--cg</span></code></td>
 <td>The consumer group to be
-member of.</td>
+a member of.</td>
 <td>Blank with
 empty string</td>
 </tr>
@@ -465,12 +452,13 @@ empty string</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--consume-records</span></code></td>
 <td>Maximum number of records
-to read within thespecified
+to read within the
+specified
 <code class="docutils literal notranslate"><span class="pre">consume-timeout</span></code>. CLI
 polls for new records
-untilwhichever condition is
-first met:timeout has
-elapsed, ormaximum number
+until one of the following
+occurs:timeout has
+elapsed or maximum number
 of records were received.</td>
 <td>1 record</td>
 </tr>
@@ -480,10 +468,10 @@ receiving the
 specified<code class="docutils literal notranslate"><span class="pre">consume-record</span>
 <span class="pre">s</span></code>
 number. CLI polls for new
-records untilwhichever
-condition is first
-met:timeout has elapsed
-ornumber of received
+records until one of the
+following occurs:timeout
+has elapsed
+or number of received
 records reached
 <code class="docutils literal notranslate"><span class="pre">consume-records</span></code> value.</td>
 <td>15000
@@ -496,7 +484,7 @@ milliseconds</td>
 <p>This example waits up to \ to receive up to \ records in total for \
 tenant group from \ or \ or \ topics from \ or \ kafka brokers
 using \ consumer group and configuring consumer to enable auto commmit.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">opendxldatabusclient</span><span class="o">-</span><span class="n">java</span><span class="o">-</span><span class="n">sdk</span><span class="o">-&lt;</span><span class="n">VERSION</span><span class="o">&gt;.</span><span class="n">jar</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">dxldatabusclient</span><span class="o">-&lt;</span><span class="n">VERSION</span><span class="o">&gt;.</span><span class="n">jar</span> \
 <span class="o">--</span><span class="n">operation</span> <span class="n">consume</span> \
 <span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">topic</span> <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="p">,</span><span class="n">TOPIC_2</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">TOPIC_N</span><span class="o">&gt;</span> \
 <span class="o">--</span><span class="n">brokers</span> <span class="o">&lt;</span><span class="n">BROKER_1_IP</span><span class="p">:</span><span class="n">BROKER_1_PORT</span><span class="p">,</span><span class="n">BROKER_2_PORT</span><span class="p">:</span><span class="n">BROKER_2_PORT</span><span class="p">,</span><span class="o">...&gt;</span> \
@@ -585,10 +573,10 @@ using \ consumer group and configuring consumer to enable auto commmit.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="Transactions-producer-consumer-example.html" class="btn btn-neutral float-right" title="Transactions producer consumer example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Basic-producer-consumer-example.html" class="btn btn-neutral float-right" title="Producer Consumer Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Consumer-metrics-sample.html" class="btn btn-neutral" title="Consumer Metrics Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Welcome to OpenDXL Databus Java Client Library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
