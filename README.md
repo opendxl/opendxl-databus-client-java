@@ -1,6 +1,7 @@
 # OpenDXL Databus Java Client Library
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://github.com/opendxl/opendxl-databus-client-java/workflows/build/badge.svg?branch=master)](https://github.com/opendxl/opendxl-databus-client-java/actions)
 
 ## Overview
 
@@ -9,18 +10,13 @@ The OpenDXL Databus Java client library is used to consume and produce records f
 
 ## Documentation
 
-The OpenDXL Databus Java client library is used to consume and produce records
-from/to a
-[Data Exchange Layer](http://www.mcafee.com/us/solutions/data-exchange-layer.aspx)
-(DXL) Streaming Service.
-
 See the
 [OpenDXL Databus Java Client Library Documentation](https://opendxl.github.io/opendxl-databus-client-java/docs/index.html)
 for API documentation and examples.
 
 ## Installation
 
-To start using the OpenDXL Streaming Native Java Client Library:
+To start using the OpenDXL Databus Java client library:
 
 * Download the [Latest Release](https://github.com/opendxl/opendxl-databus-client-java/releases/latest)
 * Extract the release .zip file
@@ -30,7 +26,7 @@ To start using the OpenDXL Streaming Native Java Client Library:
 
 ## Maven Repository
 
-Visit the [OpenDXL Databus Java Client Maven Repository](https://search.maven.org/artifact/com.opendxl/dxldatabus) for
+Visit the [OpenDXL Databus Java Client Maven Repository](https://search.maven.org/artifact/com.opendxl/dxldatabusclient) for
 access to all released versions including the appropriate dependency syntax for a large number of management 
 systems (Maven, Gradle, SBT, Ivy, Grape, etc.).
 
@@ -38,14 +34,16 @@ Maven:
 
 ```xml
 <dependency>
-  <groupId>com.opendxl.databus</groupId>
-  <artifactId>opendxldatabusclient-java-sdk</artifactId>
-  <version>0.1.3</version>
+
+  <groupId>com.opendxl</groupId>
+  <artifactId>dxldatabusclient</artifactId>
+  <version>0.1.2</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.opendxl.databus:opendxldatabusclient-java-sdk:0.1.3'
+
+compile 'com.opendxl:dxldatabusclient:0.1.2'
 ```
 
 ## Bugs and Feedback
@@ -62,3 +60,4 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+

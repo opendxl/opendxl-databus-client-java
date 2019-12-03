@@ -22,8 +22,7 @@ plugins {
     id "org.owasp.dependencycheck" version "5.2.1"
 }
 
-
-group 'com.opendxl.databus'
+group 'com.opendxl'
 
 sourceCompatibility = 1.8
 
@@ -147,7 +146,7 @@ artifacts {
 // Set up the distribution zip
 distributions {
     main {
-        baseName = 'opendxldatabusclient-java-sdk'
+        baseName = 'dxldatabusclient-java-sdk'
         contents {
             from(jar) {
                 into('lib')
@@ -165,16 +164,13 @@ distributions {
                 into 'sample'
             }
             from('broker/src/broker') {
-                into 'sample/src/sample'
+                into 'sample/src/broker'
             }
             from(shadowJar) {
                 into("sample/lib")
             }
             from(configurations.kafkaInMemory) {
                 into("sample/lib/kafka")
-            }
-            from(jacocoTestReport) {
-                into("coverage")
             }
             from('distribution')
         }
@@ -185,7 +181,6 @@ sourceSets {
     main {
         java {
             srcDir 'src/main/java'
-            srcDir 'broker/src'
         }
         resources {
             srcDir 'src/main/java'
@@ -196,16 +191,18 @@ sourceSets {
     sample {
         java {
             srcDir 'sample/src'
+            srcDir 'broker/src'
         }
         resources {
             srcDir 'sample/src'
         }
-        compileClasspath += main.output + configurations.compileClasspath + configurations.kafkaInMemory
-        runtimeClasspath += main.output + configurations.runtimeClasspath + configurations.kafkaInMemory
+        compileClasspath += main.output + test.output + configurations.compileClasspath + configurations.kafkaInMemory
+        runtimeClasspath += main.output + test.output + configurations.runtimeClasspath + configurations.kafkaInMemory
     }
     test {
         java {
             srcDir 'src/test/java'
+            srcDir 'broker/src'
         }
         resources {
             srcDir 'src/test/resources'
@@ -276,8 +273,6 @@ publishing {
             artifact(shadowJar) {
                 classifier = 'all'
             }
-
-
         }
     }
     repositories {
@@ -305,10 +300,10 @@ task replaceVersionInREADME() {
             fileset(dir: 'docs', includes: 'index.rst')
         }
         // Gradle
-        ant.replaceregexp(match: "com\\.opendxl\\.databus\\:opendxldatabusclient-java-sdk\\:(.+)", replace: "com.opendxl.databus:opendxldatabusclient-java-sdk:${version}'", flags: 'g', byline: true) {
+        ant.replaceregexp(match: "com\\.opendxl\\:dxldatabusclient\\:(.+)", replace: "com.opendxl:dxldatabusclient:${version}'", flags: 'g', byline: true) {
             fileset(dir: '.', includes: 'README.md')
         }
-        ant.replaceregexp(match: "com\\.opendxl\\.databus\\:opendxldatabusclient-java-sdk\\:(.+)", replace: "com.opendxl.databus:opendxldatabusclient-java-sdk:${version}'", flags: 'g', byline: true) {
+        ant.replaceregexp(match: "com\\.opendxl\\:dxldatabusclient\\:(.+)", replace: "com.opendxl:dxldatabusclient:${version}'", flags: 'g', byline: true) {
             fileset(dir: 'docs', includes: 'index.rst')
         }
     }
