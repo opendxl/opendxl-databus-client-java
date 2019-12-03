@@ -53,6 +53,7 @@ jacocoTestReport {
 
 configurations {
     kafkaInMemory
+    sampleJars.extendsFrom testImplementation
 }
 
 dependencies {
@@ -74,7 +75,6 @@ dependencies {
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.0'
     kafkaInMemory 'commons-io:commons-io:2.6'
-    kafkaInMemory 'org.apache.logging.log4j:log4j-slf4j-impl:2.12.1'
 
     // This following section mitigates OWASP vulnerabilities report.
     // It enforces to use specific transitive dependency versions
@@ -153,6 +153,9 @@ distributions {
             }
             from(shadowJar) {
                 into("lib")
+            }
+            from(configurations.sampleJars) {
+                into("sample/lib")
             }
             from(configurations.compileClasspath) {
                 into("lib/3rdparty")
