@@ -40,7 +40,6 @@ public class ClusterHelper {
     private static final String METRIC_GROUP = "kafka.server";
     private static final String METRIC_TYPE = "SessionExpireListener";
 
-
     public static ClusterHelper getInstance() {
         if (clusterHelper == null) {
             clusterHelper = new ClusterHelper();
