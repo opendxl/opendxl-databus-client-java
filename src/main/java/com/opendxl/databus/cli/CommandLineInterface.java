@@ -31,10 +31,7 @@ public class CommandLineInterface {
 
     /**
      * Operation is a CommandLineOperation instance suitable to {@link Channel} API method that will be executed.
-     * Each API method is associated to an specific Operation, e.g.:
-     * {@link Channel#create()} is associated to {@link com.opendxl.streaming.cli.operation.CreateOperation},
-     * {@link Channel#subscribe(List)} is associated to {@link com.opendxl.streaming.cli.operation.SubscribeOperation},
-     * etc. Goal of each Operation class is to call its associated API method from the command line.
+     * Each API method is associated to an specific Operation
      */
     private CommandLineOperation operation;
 
