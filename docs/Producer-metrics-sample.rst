@@ -5,8 +5,8 @@ This sample demonstrates how to get producer metrics from the DXL
 Databus client by using a producer in a running Kafka cluster. The type
 of metrics that can be obtained are the following:
 
--  Producer metrics associated to a clientId.
--  Producer metrics associated to a clientId and a topic.
+-  Producer metrics associated with a clientId.
+-  Producer metrics associated with a clientId and a topic.
 
 Code highlights are shown below:
 
@@ -125,33 +125,28 @@ Sample Code
             LOG.info("");
         }
 
-| The first step is to instance the Kafka cluster to run the example.
-| The constructor method ``ProducerMetricsExample()`` is in charge of
-  doing that.
-| After this, the ``startExample()`` method starts running the producer
-  to send messages calling the method ``getProducerTask()`` and start
-  the metrics collecting thread.
+The first step is to instance the Kafka cluster to run the example.
 
-The metrics thread has two parameters which are needed to be configured:
+The constructor method ``ProducerMetricsExample()`` is responsible for accomplishing that.
 
--  The metrics sampling period before to get metrics, setted with
-   ``REPORT_METRICS_INITIAL_DELAY`` value, which is time before start
+After that, the ``startExample()`` method starts running the producer to send messages,
+invoking the method ``getProducerTask()`` which initiates the metrics collecting thread.
+
+The metrics thread has two parameters which must be configured:
+
+-  ``REPORT_METRICS_INITIAL_DELAY`` which is the time to wait prior
    collecting metrics.
--  The the period of time to get the metrics from Kafka, setted with
-   ``REPORT_METRICS_PERIOD``.
+-  ``REPORT_METRICS_PERIOD`` which is the interval at which to
+   collect metrics from Kafka.
 
-| After the producer and the metrics thread starts, the sample shows the
-| metrics with values.
+Once the producer and metrics threads have started, metrics are displayed.
 
-The ``reportMetrics()`` method is responsible to get the producer
-metrics from the Kafka cluster. ``reportMetrics()`` calls
-``getProducerByClientIdMetrics()`` to get the producer metrics for an
-associated clientId and also calls
-``getProducerByClientIdAndTopicMetrics()`` to get the producer metrics
-for an associated clientId with an specific topic.
+The ``reportMetrics()`` method is responsible for collecting producer metrics from the Kafka cluster.
+``reportMetrics()`` calls ``getProducerByClientIdMetrics()`` to collect producer metrics for an
+associated clientId and also calls ``getProducerByClientIdAndTopicMetrics()`` to get the
+producer metrics for an associated clientId with a specific topic.
 
-The producer metrics associated to a clientId obtained are the
-following:
+The producer metrics associated to a clientId obtained are as follows:
 
 +----------------------+-----------------------------------------+
 | Metric Name          | Description                             |
@@ -189,12 +184,12 @@ The producer metrics associated to a clientId and a topicId are:
 | record-send-rate     | The average number of records sent per  |
 |                      | second for a topic.                     |
 +----------------------+-----------------------------------------+
-| record-error-total   | The total number of record sent that    |
+| record-error-total   | The total number of records sent that   |
 |                      | resulted in errors for a topic.         |
 +----------------------+-----------------------------------------+
-| record-error-rate    | The average per-second number of record |
-|                      | sent that resulted in errors for a      |
-|                      | topic.                                  |
+| record-error-rate    | The average per-second number of        |
+|                      | records sent that resulted in errors    |
+|                      | for a topic.                            |
 +----------------------+-----------------------------------------+
 | byte-total           | The total number of bytes sent for a    |
 |                      | topic.                                  |

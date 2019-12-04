@@ -112,7 +112,7 @@ public class CommandLineInterface {
 
         // topic option spec represented as --from-topic command line
         final ArgumentAcceptingOptionSpec<String> fromTopicOpt =
-                parser.accepts("from-topic", "Coma-separated topic name list to consume. "
+                parser.accepts("from-topic", "Comma-separated topic name list to consume. "
                         + "Example: topic1,topic2,...,topicN")
                         .withRequiredArg()
                         .describedAs("from-topic")
@@ -122,7 +122,7 @@ public class CommandLineInterface {
         final ArgumentAcceptingOptionSpec<Integer> consumeTimeoutOpt =
                 parser.accepts("consume-timeout", "Consume Poll Timeout. Time in ms that the consumer"
                         + " waits for new records during a consume operation. "
-                        + " Optional parameter, if absent, it defaults to 5000 ms.")
+                        + " Optional parameter, if absent, it defaults to 15000 ms.")
                         .withRequiredArg()
                         .ofType(Integer.class)
                         .describedAs("consume-timeout")
