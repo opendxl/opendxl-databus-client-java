@@ -7,7 +7,8 @@ package broker;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +19,7 @@ public class KafkaBroker {
     private Properties brokerConfig;
     private Zookeeper zookeeper;
     private KafkaServerStartable broker;
-    private static final Logger LOG = Logger.getLogger(KafkaBroker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaBroker.class);
 
     public KafkaBroker(final Properties brokerConfig) {
         this.brokerConfig = brokerConfig;

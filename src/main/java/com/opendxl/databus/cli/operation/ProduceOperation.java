@@ -21,7 +21,8 @@ import com.opendxl.databus.producer.ProducerRecord;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionSet;
 import joptsimple.internal.Strings;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class ProduceOperation implements CommandLineOperation {
     /**
      * Logger
      */
-    private static final Logger LOG = Logger.getLogger(ProduceOperation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProduceOperation.class);
 
     /**
      * The operation name

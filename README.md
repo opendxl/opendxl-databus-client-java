@@ -34,6 +34,7 @@ Maven:
 
 ```xml
 <dependency>
+
   <groupId>com.opendxl</groupId>
   <artifactId>dxldatabusclient</artifactId>
   <version>0.1.2</version>
@@ -41,6 +42,7 @@ Maven:
 ```
 or Gradle:
 ```groovy
+
 compile 'com.opendxl:dxldatabusclient:0.1.2'
 ```
 

@@ -8,7 +8,8 @@ package com.opendxl.databus.cli;
 import com.opendxl.databus.cli.operation.CommandLineOperation;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -21,7 +22,7 @@ public class CliUtils {
     /**
      * Logger
      */
-    private static final Logger LOG = Logger.getLogger(CliUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CliUtils.class);
 
     /**
      * A static field which represents an invalid partition, used as a default value

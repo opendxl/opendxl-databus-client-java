@@ -16,7 +16,8 @@ import com.opendxl.databus.consumer.DatabusConsumer;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class ConsumeOperation implements CommandLineOperation {
     /**
      * Logger
      */
-    private static final Logger LOG = Logger.getLogger(ConsumeOperation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConsumeOperation.class);
 
     /**
      * The operation name
@@ -225,7 +226,7 @@ public class ConsumeOperation implements CommandLineOperation {
         do {
             // Consume records and commit
             records = consumer.poll(100);
-            LOG.warn(records.count());
+            LOG.warn(String.valueOf(records.count()));
             if (records.count() > 0 && Boolean.parseBoolean(enableAutoCommit) == Boolean.FALSE) {
                 consumer.commitSync();
             }

@@ -22,7 +22,8 @@ import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
 import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import org.apache.commons.lang.NullArgumentException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,7 +69,7 @@ public abstract class Consumer<P> {
     /**
      * The logger object.
      */
-    private static final Logger LOG = Logger.getLogger(Consumer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
 
     /**
      * The Kafka associated consumer.

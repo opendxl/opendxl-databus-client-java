@@ -21,7 +21,8 @@ import com.opendxl.databus.producer.metric.ProducerMetricBuilder;
 import com.opendxl.databus.producer.metric.ProducerMetricEnum;
 import com.opendxl.databus.serialization.internal.DatabusKeySerializer;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.List;
@@ -64,7 +65,7 @@ public abstract class Producer<P> {
      */
     private String clientId;
 
-    private static final Logger LOG = Logger.getLogger(Producer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
 
     /**
      * Gets the configuration to a producer instance

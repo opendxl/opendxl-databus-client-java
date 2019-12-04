@@ -22,7 +22,8 @@ import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
 import broker.ClusterHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ public class BasicConsumerProducerExample {
     private static final long CONSUMER_TIME_CADENCE_MS = 1000L;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private static Logger LOG = Logger.getLogger(BasicConsumerProducerExample.class);
+    private static Logger LOG = LoggerFactory.getLogger(BasicConsumerProducerExample.class);
 
 
     public BasicConsumerProducerExample() {

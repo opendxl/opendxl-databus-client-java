@@ -53,6 +53,7 @@ jacocoTestReport {
 
 configurations {
     kafkaInMemory
+    sampleJars.extendsFrom testImplementation
 }
 
 dependencies {
@@ -62,10 +63,13 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.commons:commons-configuration2:2.5'
     implementation 'commons-lang:commons-lang:2.6'
-    implementation 'log4j:log4j:1.2.17'
+    implementation 'org.slf4j:slf4j-api'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
     testImplementation 'org.apache.kafka:kafka_2.12:2.3.0'
     testImplementation 'org.apache.zookeeper:zookeeper:3.4.14'
+    testImplementation('io.netty:netty-all:4.1.43.Final') {
+        force = true
+    }
     testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
@@ -76,7 +80,7 @@ dependencies {
     // It enforces to use specific transitive dependency versions
     // when their previous versions were mentioned by OWASP vulnerability reports.
     // If a vulnerability is false-positive,
-    // libraries should be declarad in /config/dependency-check/owasp-supression.xml
+    // libraries should be declared in /config/dependency-check/owasp-supression.xml
 
     // https://nvd.nist.gov/vuln/detail/CVE-2019-12384
     // https://nvd.nist.gov/vuln/detail/CVE-2019-12814
@@ -149,6 +153,9 @@ distributions {
             }
             from(shadowJar) {
                 into("lib")
+            }
+            from(configurations.sampleJars) {
+                into("sample/lib")
             }
             from(configurations.compileClasspath) {
                 into("lib/3rdparty")

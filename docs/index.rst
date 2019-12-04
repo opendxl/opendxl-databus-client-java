@@ -81,4 +81,3 @@ Bugs and Feedback
 
 For bugs, questions and discussions please use the `GitHub
 Issues <https://github.com/opendxl/opendxl-databus-client-java/issues>`__.
-
