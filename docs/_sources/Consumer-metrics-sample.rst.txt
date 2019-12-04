@@ -1,17 +1,17 @@
 Consumer Metrics Example
 ------------------------
 
-This sample demonstrates how to get consumer metrics from the DXL
+This sample demonstrates collecting consumer metrics from the DXL
 Databus client by using a consumer in a running Kafka cluster. The type
-of metrics that can be obtained are the following:
+of metrics that can be obtained are as follows:
 
 -  Consumer metrics associated to a clientId.
 -  Consumer metrics associated to a clientId and a topic.
 
-The example goal is to show ``Consumer`` metric values varying across
+The purpose of this example is to show ``Consumer`` metric values varying across
 time, so a ``Consumer`` instance is created and it must continuously
 consume records from Kafka. In order to provide these records, the
-example instantiates a ``Producer`` to keep on producing records to
+example instantiates a ``Producer`` to continue producing records to
 specific topics for the ``Consumer`` to consume from. The ``Producer``
 instance has only a helper role in this example so it is not covered in
 detail.
@@ -199,37 +199,36 @@ Sample Code
         };
     }
 
-The first step is to instance the Kafka cluster, the ``Consumer`` and
-the helper ``Producer`` to run the example. The constructor method
-``ConsumerMetricsExample()`` is in charge of doing that. It also
-subscribes ``Consumer`` to the selected topic ``CONSUMER_TOPIC``.
+The first step is to create the Kafka cluster and the ``Consumer`` and
+the helper ``Producer`` with which to run the example. The constructor method
+``ConsumerMetricsExample()`` is responsible for accomplishing that. It also
+subscribes the ``Consumer`` to the selected topic ``CONSUMER_TOPIC``.
 
-At second step, ``startExample()`` method creates a consumer thread by
-calling ``getConsumerTask()`` and it starts the thread for the
-``Consumer`` instance to continuously receive records.
+Second, the ``startExample()`` method creates a consumer thread by
+invoking ``getConsumerTask()``. This starts the thread for the
+``Consumer`` instance which continuously receives records.
 
-At third step, ``startExample()`` method also creates a producer thread
-by calling ``getProducerTask()`` and it starts the thread for the
-``Producer`` to send records to the topic where the ``Consumer`` is
+Third, the ``startExample()`` method creates a producer thread
+by calling ``getProducerTask()``. This starts the thread for the
+``Producer`` which sends records to the topic that the ``Consumer`` is
 subscribed to.
 
-Finally, ``startExample()`` method starts the metrics collecting thread
+Finally, the ``startExample()`` method starts the metrics collecting thread
 which will periodically call ``reportMetrics()``. The metrics thread has
-two parameters which are needed to be configured:
+two parameters which must be configured:
 
--  the waiting period before to get metrics, set with
-   REPORT\_METRICS\_INITIAL\_DELAY value, which is time before start
+-  ``REPORT_METRICS_INITIAL_DELAY`` which is the time to wait prior
    collecting metrics.
--  the period of time to periodically get the metrics from Kafka, set
-   with REPORT\_METRICS\_PERIOD.
+-  ``REPORT_METRICS_PERIOD`` which is the interval at which to
+   collect metrics from Kafka.
 
 After the consumer, producer and metrics threads have started, the
-sample shows the consumer metrics with values periodically.
+sample periodically displays the consumer metrics.
 
-The ``reportMetrics()`` method is responsible to get the consumer
+The ``reportMetrics()`` method is responsible for collecting consumer
 metrics from the Kafka cluster.
 
-The ``Consumer`` metrics obtained by the sample are the following:
+The ``Consumer`` metrics obtained by the sample are as follows:
 
 +-------------------------+-----------------------------------------+
 | Metric Name             | Description                             |
@@ -256,10 +255,10 @@ The ``Consumer`` metrics obtained by the sample are the following:
 Further information about Kafka monitoring and metrics can be found
 `here <https://kafka.apache.org/documentation/#monitoring>`__.
 
-Finally, the sample shuts down gracefully by pressing ``CTRL+C``. The
-shut down steps involve:
+Finally, pressing ``CTRL+C`` shuts down the example.
+The shut down steps involve:
 
--  stop produce thread and close ``Producer`` instance
+-  stop producer thread and close ``Producer`` instance
 -  stop consumer thread, unsubscribe ``Consumer`` instance from topics
    and close it
 -  stop Kafka cluster

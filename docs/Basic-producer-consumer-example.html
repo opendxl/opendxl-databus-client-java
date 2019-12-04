@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Producer Consumer Example &mdash; OpenDXL Databus Java Client Library 0.1.2-SNAPSHOT documentation</title>
+  <title>Producer Consumer Example &mdash; OpenDXL Databus Java Client Library 2.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.1.2-SNAPSHOT
+                2.3.0
               </div>
             
           
@@ -292,15 +292,10 @@ synchronized private void stopExample(final ExecutorService executor) {
 }
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">The first step is to create the instance of the Kafka cluster to run
-the example.</div>
-<div class="line">The constructor method <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> is in charge of
-doing that.</div>
-<div class="line">This method also creates a DatabusConsumer instance calling to
-<code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same approach, calling
-to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of DatabusProducer.</div>
-</div>
+<p>The first step is to create the instance of the Kafka cluster to run the example.</p>
+<p>The constructor <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> is responsible for accomplishing that.</p>
+<p>This method also creates a DatabusConsumer instance by invoking the <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code>
+method. The <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method is invoked to create an instance of a DatabusProducer.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">Consumer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getConsumer</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">final</span> <span class="n">Properties</span> <span class="n">consumerProps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Properties</span><span class="p">();</span>
     <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">BOOTSTRAP_SERVERS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="p">);</span>
@@ -377,7 +372,7 @@ additional messages before sending the
 current batch.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">BATCH_SIZE_CONFIG</span></code></td>
-<td>the amount of memory in bytes (not
+<td>The amount of memory in bytes (not
 messages!) that will be used for each
 batch.</td>
 </tr>
@@ -387,15 +382,11 @@ batch.</td>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Collections</span><span class="o">.</span><span class="n">singletonList</span><span class="p">(</span><span class="n">consumerTopic</span><span class="p">));</span>
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">Then the <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> constructor is executed,
-the</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two internal
-methods for the producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and
-<code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to
-produce and consume messages respectively.</div>
-</div>
-<p>Here in detail both methods will be explained:</p>
+<p>After the <code class="docutils literal notranslate"><span class="pre">BasicConsumerProducerExample()</span></code> constructor is executed, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code>
+method is called. This method calls two internal methods for the
+producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>.
+Both methods execute threads, in order to produce and consume messages respectively.</p>
+<p>Both methods are in explained in more detail below:</p>
 </div>
 <div class="section" id="getconsumertask">
 <h2><code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code><a class="headerlink" href="#getconsumertask" title="Permalink to this headline">¶</a></h2>
@@ -439,7 +430,7 @@ produce and consume messages respectively.</div>
     }
 </pre></div>
 </div>
-<p>Consumer thread runs until sample stops or an exception is triggered.
+<p>Consumer thread runs until the sample stops or an exception is triggered.
 When this happens the while loop breaks. Until that, the consumer polls
 the produced records.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">final</span> <span class="n">ConsumerRecords</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">consumer</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">CONSUMER_TIME_CADENCE_MS</span><span class="p">);</span>
@@ -498,12 +489,8 @@ sockets.</li>
 <p>Producer thread runs until sample stops or an exception is triggered.
 When this happens the while loop breaks. Until that, the producer sends
 the produced records.</p>
-<div class="line-block">
-<div class="line">First the producer creates a message and make it into an array of
-bytes.</div>
-<div class="line">After this, a producer record is created calling to the
-<code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code> method.</div>
-</div>
+<p>First the producer creates a message and makes it into an array of bytes.</p>
+<p>After this, a producer record is created calling to the <code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code> method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">ProducerRecord</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getProducerRecord</span><span class="p">(</span><span class="n">final</span> <span class="n">String</span> <span class="n">topic</span><span class="p">,</span> <span class="n">final</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">payload</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">currentTimeMillis</span><span class="p">());</span>
     <span class="n">RoutingData</span> <span class="n">routingData</span> <span class="o">=</span> <span class="n">new</span> <span class="n">RoutingData</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">null</span><span class="p">);</span>
@@ -513,33 +500,31 @@ bytes.</div>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In this method the a <code class="docutils literal notranslate"><span class="pre">ProducerRecord</span></code> instance is created, adding to
-his constructor a <code class="docutils literal notranslate"><span class="pre">RoutingData</span></code> object with topic and key, <code class="docutils literal notranslate"><span class="pre">Headers</span></code>
+<p>In this method the a <code class="docutils literal notranslate"><span class="pre">ProducerRecord</span></code> instance is created,
+specifying a <code class="docutils literal notranslate"><span class="pre">RoutingData</span></code> object with topic and key, <code class="docutils literal notranslate"><span class="pre">Headers</span></code>
 object and a <code class="docutils literal notranslate"><span class="pre">MessagePayload</span></code> object with the message content.</p>
-<p>Now, at this point the next step is send the message. To do that the
+<p>At this point the next step is send the message. To do that the
 producer calls the send method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">producerRecord</span><span class="p">,</span> <span class="n">new</span> <span class="n">MyCallback</span><span class="p">(</span><span class="n">producerRecord</span><span class="o">.</span><span class="n">getRoutingData</span><span class="p">()</span><span class="o">.</span><span class="n">getShardingKey</span><span class="p">()));</span>
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">This method sends a producer record and associates a callback for each
+<p>This method sends a producer record and associates a callback for each
 sent execution. The callback is used because send is asynchronous and
 this method will return immediately once the record has been stored in
 the buffer of records waiting to be sent. This allows sending many
 records in parallel without blocking to wait for the response after
-each one.</div>
-<div class="line">Fully non-blocking usage can make use of the callback parameter to
-provide a callback that will be invoked when the request is complete.</div>
-</div>
-<p>After send method executes the <code class="docutils literal notranslate"><span class="pre">justWait()</span></code> method is called to wait
+each one.</p>
+<p>Fully non-blocking usage can make use of the callback parameter to
+provide a callback that will be invoked when the request is complete.</p>
+<p>After the send method executes, the <code class="docutils literal notranslate"><span class="pre">justWait()</span></code> method is called to wait
 and produce a new record. <code class="docutils literal notranslate"><span class="pre">PRODUCER_TIME_CADENCE_MS</span></code> is the time in ms
 that the producer waits to send a new message.</p>
-<p>Finally when sample stops flush and close method are called.</p>
+<p>Finally, once the sample stops, the flush and close methods are invoked.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">flush</span><span class="p">();</span>
 <span class="n">producer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>Flush method method makes all buffered records immediately available to
+<p>The flush method method makes all buffered records immediately available to
 send and blocks on the completion of the requests associated with these
 records. Flush gives a convenient way to ensure all previously sent
 messages have actually completed.</p>

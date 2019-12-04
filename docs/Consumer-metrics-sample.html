@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Consumer Metrics Example &mdash; OpenDXL Databus Java Client Library 0.1.2-SNAPSHOT documentation</title>
+  <title>Consumer Metrics Example &mdash; OpenDXL Databus Java Client Library 2.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.1.2-SNAPSHOT
+                2.3.0
               </div>
             
           
@@ -163,17 +163,17 @@
             
   <div class="section" id="consumer-metrics-example">
 <h1>Consumer Metrics Example<a class="headerlink" href="#consumer-metrics-example" title="Permalink to this headline">¶</a></h1>
-<p>This sample demonstrates how to get consumer metrics from the DXL
+<p>This sample demonstrates collecting consumer metrics from the DXL
 Databus client by using a consumer in a running Kafka cluster. The type
-of metrics that can be obtained are the following:</p>
+of metrics that can be obtained are as follows:</p>
 <ul class="simple">
 <li>Consumer metrics associated to a clientId.</li>
 <li>Consumer metrics associated to a clientId and a topic.</li>
 </ul>
-<p>The example goal is to show <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> metric values varying across
+<p>The purpose of this example is to show <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> metric values varying across
 time, so a <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance is created and it must continuously
 consume records from Kafka. In order to provide these records, the
-example instantiates a <code class="docutils literal notranslate"><span class="pre">Producer</span></code> to keep on producing records to
+example instantiates a <code class="docutils literal notranslate"><span class="pre">Producer</span></code> to continue producing records to
 specific topics for the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> to consume from. The <code class="docutils literal notranslate"><span class="pre">Producer</span></code>
 instance has only a helper role in this example so it is not covered in
 detail.</p>
@@ -357,32 +357,31 @@ private Runnable getProducerTask() {
 }
 </pre></div>
 </div>
-<p>The first step is to instance the Kafka cluster, the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> and
-the helper <code class="docutils literal notranslate"><span class="pre">Producer</span></code> to run the example. The constructor method
-<code class="docutils literal notranslate"><span class="pre">ConsumerMetricsExample()</span></code> is in charge of doing that. It also
-subscribes <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> to the selected topic <code class="docutils literal notranslate"><span class="pre">CONSUMER_TOPIC</span></code>.</p>
-<p>At second step, <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method creates a consumer thread by
-calling <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code> and it starts the thread for the
-<code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance to continuously receive records.</p>
-<p>At third step, <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method also creates a producer thread
-by calling <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> and it starts the thread for the
-<code class="docutils literal notranslate"><span class="pre">Producer</span></code> to send records to the topic where the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> is
+<p>The first step is to create the Kafka cluster and the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> and
+the helper <code class="docutils literal notranslate"><span class="pre">Producer</span></code> with which to run the example. The constructor method
+<code class="docutils literal notranslate"><span class="pre">ConsumerMetricsExample()</span></code> is responsible for accomplishing that. It also
+subscribes the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> to the selected topic <code class="docutils literal notranslate"><span class="pre">CONSUMER_TOPIC</span></code>.</p>
+<p>Second, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method creates a consumer thread by
+invoking <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code>. This starts the thread for the
+<code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance which continuously receives records.</p>
+<p>Third, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method creates a producer thread
+by calling <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. This starts the thread for the
+<code class="docutils literal notranslate"><span class="pre">Producer</span></code> which sends records to the topic that the <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> is
 subscribed to.</p>
-<p>Finally, <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts the metrics collecting thread
+<p>Finally, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts the metrics collecting thread
 which will periodically call <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code>. The metrics thread has
-two parameters which are needed to be configured:</p>
+two parameters which must be configured:</p>
 <ul class="simple">
-<li>the waiting period before to get metrics, set with
-REPORT_METRICS_INITIAL_DELAY value, which is time before start
+<li><code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_INITIAL_DELAY</span></code> which is the time to wait prior
 collecting metrics.</li>
-<li>the period of time to periodically get the metrics from Kafka, set
-with REPORT_METRICS_PERIOD.</li>
+<li><code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_PERIOD</span></code> which is the interval at which to
+collect metrics from Kafka.</li>
 </ul>
 <p>After the consumer, producer and metrics threads have started, the
-sample shows the consumer metrics with values periodically.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible to get the consumer
+sample periodically displays the consumer metrics.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible for collecting consumer
 metrics from the Kafka cluster.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> metrics obtained by the sample are the following:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> metrics obtained by the sample are as follows:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="38%" />
@@ -422,10 +421,10 @@ records for any partition.</td>
 </table>
 <p>Further information about Kafka monitoring and metrics can be found
 <a class="reference external" href="https://kafka.apache.org/documentation/#monitoring">here</a>.</p>
-<p>Finally, the sample shuts down gracefully by pressing <code class="docutils literal notranslate"><span class="pre">CTRL+C</span></code>. The
-shut down steps involve:</p>
+<p>Finally, pressing <code class="docutils literal notranslate"><span class="pre">CTRL+C</span></code> shuts down the example.
+The shut down steps involve:</p>
 <ul class="simple">
-<li>stop produce thread and close <code class="docutils literal notranslate"><span class="pre">Producer</span></code> instance</li>
+<li>stop producer thread and close <code class="docutils literal notranslate"><span class="pre">Producer</span></code> instance</li>
 <li>stop consumer thread, unsubscribe <code class="docutils literal notranslate"><span class="pre">Consumer</span></code> instance from topics
 and close it</li>
 <li>stop Kafka cluster</li>

@@ -132,13 +132,12 @@ Sample Code
             }
         }
 
-| The first step is to create the instance of the Kafka cluster to run
-  the example.
-| The constructor method ``BasicConsumerProducerExample()`` is in charge of
-  doing that.
-| This method also creates a DatabusConsumer instance calling to
-  ``getConsumer()`` method. For producer is the same approach, calling
-  to ``getProducer()`` method, to create an instance of DatabusProducer.
+The first step is to create the instance of the Kafka cluster to run the example.
+
+The constructor ``BasicConsumerProducerExample()`` is responsible for accomplishing that.
+
+This method also creates a DatabusConsumer instance by invoking the ``getConsumer()``
+method. The ``getProducer()`` method is invoked to create an instance of a DatabusProducer.
 
 .. code:: java
 
@@ -194,7 +193,7 @@ DatabusProducer receives the following configuration:
 |                              | additional messages before sending the  |
 |                              | current batch.                          |
 +------------------------------+-----------------------------------------+
-| ``BATCH_SIZE_CONFIG``        | the amount of memory in bytes (not      |
+| ``BATCH_SIZE_CONFIG``        | The amount of memory in bytes (not      |
 |                              | messages!) that will be used for each   |
 |                              | batch.                                  |
 +------------------------------+-----------------------------------------+
@@ -205,14 +204,12 @@ After this, the consumer subscribes to a topic in the following line:
 
         this.consumer.subscribe(Collections.singletonList(consumerTopic));
 
-| Then the ``BasicConsumerProducerExample()`` constructor is executed,
-  the
-| ``startExample()`` method is called. This method calls two internal
-  methods for the producer and consumer: ``getConsumerTask()`` and
-  ``getProducerTask()``. Both methods execute threads, in order to
-  produce and consume messages respectively.
+After the ``BasicConsumerProducerExample()`` constructor is executed, the ``startExample()``
+method is called. This method calls two internal methods for the
+producer and consumer: ``getConsumerTask()`` and ``getProducerTask()``.
+Both methods execute threads, in order to produce and consume messages respectively.
 
-Here in detail both methods will be explained:
+Both methods are in explained in more detail below:
 
 ``getConsumerTask()``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -258,7 +255,7 @@ Here in detail both methods will be explained:
             };
         }
 
-Consumer thread runs until sample stops or an exception is triggered.
+Consumer thread runs until the sample stops or an exception is triggered.
 When this happens the while loop breaks. Until that, the consumer polls
 the produced records.
 
@@ -326,10 +323,9 @@ Producer thread runs until sample stops or an exception is triggered.
 When this happens the while loop breaks. Until that, the producer sends
 the produced records.
 
-| First the producer creates a message and make it into an array of
-  bytes.
-| After this, a producer record is created calling to the
-  ``getProducerRecord()`` method.
+First the producer creates a message and makes it into an array of bytes.
+
+After this, a producer record is created calling to the ``getProducerRecord()`` method.
 
 .. code:: java
 
@@ -341,38 +337,39 @@ the produced records.
             return new ProducerRecord<>(routingData, headers, messagePayload);
         }
 
-In this method the a ``ProducerRecord`` instance is created, adding to
-his constructor a ``RoutingData`` object with topic and key, ``Headers``
+In this method the a ``ProducerRecord`` instance is created,
+specifying a ``RoutingData`` object with topic and key, ``Headers``
 object and a ``MessagePayload`` object with the message content.
 
-Now, at this point the next step is send the message. To do that the
+At this point the next step is send the message. To do that the
 producer calls the send method.
 
 .. code:: java
 
         producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
 
-| This method sends a producer record and associates a callback for each
-  sent execution. The callback is used because send is asynchronous and
-  this method will return immediately once the record has been stored in
-  the buffer of records waiting to be sent. This allows sending many
-  records in parallel without blocking to wait for the response after
-  each one.
-| Fully non-blocking usage can make use of the callback parameter to
-  provide a callback that will be invoked when the request is complete.
+This method sends a producer record and associates a callback for each
+sent execution. The callback is used because send is asynchronous and
+this method will return immediately once the record has been stored in
+the buffer of records waiting to be sent. This allows sending many
+records in parallel without blocking to wait for the response after
+each one.
 
-After send method executes the ``justWait()`` method is called to wait
+Fully non-blocking usage can make use of the callback parameter to
+provide a callback that will be invoked when the request is complete.
+
+After the send method executes, the ``justWait()`` method is called to wait
 and produce a new record. ``PRODUCER_TIME_CADENCE_MS`` is the time in ms
 that the producer waits to send a new message.
 
-Finally when sample stops flush and close method are called.
+Finally, once the sample stops, the flush and close methods are invoked.
 
 .. code:: java
 
         producer.flush();
         producer.close();
 
-Flush method method makes all buffered records immediately available to
+The flush method method makes all buffered records immediately available to
 send and blocks on the completion of the requests associated with these
 records. Flush gives a convenient way to ensure all previously sent
 messages have actually completed.

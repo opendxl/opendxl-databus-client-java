@@ -7,7 +7,7 @@ library with no arguments displays help information:
 
 ::
 
-    $ java -jar dxldatabusclient-<VERSION>.jar
+    $ java -jar dxldatabusclient-2.3.0.jar
 
     ERROR: There are not options
     Option (* = required)                  Description                            
@@ -25,13 +25,13 @@ library with no arguments displays help information:
       timeout>                               the consumer waits for new records   
                                              during a consume operation.          
                                              Optional parameter, if absent, it    
-                                             defaults to 5000 ms. (default: 15000)
-    --from-topic <String: from-topic>      Coma-separated topic name list to      
+                                             defaults to 15000 ms. (default: 15000)
+    --from-topic <String: from-topic>      Comma-separated topic name list to
                                              consume. Example: topic1,topic2,..., 
                                              topicN                               
     --headers [String: headers]            The producer headers:  (default: )     
     --msg <String: message>                message to be produced                 
-    --operation <String: operation>      Operations: produce | consume          
+    --operation <String: operation>        Operations: produce | consume
     --partition [String: partition]        The partition number:  (default: )     
     --sharding-key [String: sharding-key]  Sharding key (default: )               
     --tenant-group [String: tenant-group]  Tenant Group (default: )               
@@ -51,7 +51,7 @@ few CLI operations. Operations arguments are placed after
 
 ::
 
-    $ java -jar dxldatabusclient-<VERSION>.jar --operation <OPERATION_ARGUMENT> ...
+    $ java -jar dxldatabusclient-2.3.0.jar --operation <OPERATION_ARGUMENT> ...
 
 Operation Arguments
 ^^^^^^^^^^^^^^^^^^^
@@ -64,9 +64,9 @@ Operation Arguments
 | ``--consume``         | consume a message from a Kafka topic.   |
 +-----------------------+-----------------------------------------+
 
-| The invocation of CLI operations to get records is: ``produce`` ->
-  ``consume`` .
-| A message must be produced to a topic prior to consuming it.
+The invocation of CLI operations to get records is: ``produce`` -> ``consume`` .
+
+A message must be produced to a topic prior to consuming it.
 
 produce
 ^^^^^^^
@@ -124,7 +124,7 @@ example
 
 ::
 
-    $ java -jar dxldatabusclient-<VERSION>.jar \
+    $ java -jar dxldatabusclient-2.3.0.jar \
     --operation produce \
     --to-topic <TOPIC_NAME> \
     --brokers <0.0.0.0>:<PORT> \
@@ -200,32 +200,30 @@ the consumer operation result.
 +-----------------------+-----------------------------+---------------+
 | ``--config``          | The consumer configuration  | Blank with    |
 |                       | in comma separated          | empty string  |
-|                       | property-value pairs.For    |               |
-|                       | example:                    |               |
-|                       | enable.auto.commit=false,re |               |
-|                       | quest.timeout.ms=61000,sess |               |
-|                       | ion.timeout.ms=60000,auto.o |               |
-|                       | ffset.reset=earliest,auto.c |               |
-|                       | ommit.interval.ms=0         |               |
+|                       | property-value pairs.       |               |
+|                       | For example:                |               |
+|                       | enable.auto.commit=false,   |               |
+|                       | request.timeout.ms=61000,   |               |
+|                       | session.timeout.ms=60000,   |               |
+|                       | auto.offset.reset=earliest, |               |
+|                       | auto.commit.interval.ms=0   |               |
 +-----------------------+-----------------------------+---------------+
 | ``--consume-records`` | Maximum number of records   | 1 record      |
 |                       | to read within the          |               |
 |                       | specified                   |               |
-|                       | ``consume-timeout``. CLI    |               |
-|                       | polls for new records       |               |
+|                       | ``consume-timeout``.        |               |
+|                       | CLI polls for new records   |               |
 |                       | until one of the following  |               |
 |                       | occurs:timeout has          |               |
 |                       | elapsed or maximum number   |               |
 |                       | of records were received.   |               |
 +-----------------------+-----------------------------+---------------+
 | ``--consume-timeout`` | Maximum time to wait for    | 15000         |
-|                       | receiving the               | milliseconds  |
-|                       | specified\ ``consume-record |               |
-|                       | s``                         |               |
-|                       | number. CLI polls for new   |               |
-|                       | records until one of the    |               |
-|                       | following occurs:timeout    |               |
-|                       | has elapsed                 |               |
+|                       | receiving the specified     | milliseconds  |
+|                       | ``consume-records`` number. |               |
+|                       | CLI polls for new records   |               |
+|                       | until one of the following  |               |
+|                       | occurs:timeout has elapsed  |               |
 |                       | or number of received       |               |
 |                       | records reached             |               |
 |                       | ``consume-records`` value.  |               |
@@ -234,13 +232,9 @@ the consumer operation result.
 example
 '''''''
 
-This example waits up to \\ to receive up to \\ records in total for \\
-tenant group from \\ or \\ or \\ topics from \\ or \\ kafka brokers
-using \\ consumer group and configuring consumer to enable auto commmit.
-
 ::
 
-    java -jar dxldatabusclient-<VERSION>.jar \
+    java -jar dxldatabusclient-2.3.0.jar \
     --operation consume \
     --from-topic <TOPIC_1,TOPIC_2,...,TOPIC_N> \
     --brokers <BROKER_1_IP:BROKER_1_PORT,BROKER_2_PORT:BROKER_2_PORT,...> \

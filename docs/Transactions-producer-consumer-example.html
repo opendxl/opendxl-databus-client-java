@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Transactions producer consumer example &mdash; OpenDXL Databus Java Client Library 0.1.2-SNAPSHOT documentation</title>
+  <title>Transactions producer consumer example &mdash; OpenDXL Databus Java Client Library 2.3.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.1.2-SNAPSHOT
+                2.3.0
               </div>
             
           
@@ -319,17 +319,16 @@ synchronized private void stopExample(final ExecutorService executor) {
 }
 </pre></div>
 </div>
-<p>The first step is to create the instance of the Kafka cluster to run the
-example. The constructor method <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code>
-is in charge of doing that. This method also creates a DatabusConsumer
-instance calling to <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> method. For producer is the same
-approach, calling to <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method, to create an instance of
-DatabusProducer. Also calls the method
-<code class="docutils literal notranslate"><span class="pre">ClusterHelper.getInstance().addNewKafkaTopic()</span></code> to create a
-transactional topic. A transactional topic is a Kafka topic with 3
-partitions at least and replication factor of 3 at least, so it’s
-necessary to create this topic a minimum of 3 running brokers. Thats why
-in the constructor we have to add 3 brokers instances.</p>
+<p>The first step is to create the Kafka cluster instance with which to run the example.
+The constructor method <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code> is responsible for
+accomplishing that. This method also creates a DatabusConsumer instance by
+invoking the``getConsumer()`` method. The <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> method is also invoked,
+which creates an instance of a DatabusProducer. Finally, the
+<code class="docutils literal notranslate"><span class="pre">ClusterHelper.getInstance().addNewKafkaTopic()</span></code> method is invoked which
+creates a transactional topic. A transactional topic is a Kafka topic with at least
+3 partitions and a replication factor of at least 3. It is
+necessary to create this topic in a minimum of 3 running brokers. Thus, in the
+constructor we have to add 3 brokers instances.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ClusterHelper</span>
         <span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
         <span class="o">.</span><span class="n">addBroker</span><span class="p">(</span><span class="mi">9092</span><span class="p">)</span>
@@ -339,8 +338,7 @@ in the constructor we have to add 3 brokers instances.</p>
         <span class="o">.</span><span class="n">start</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>Also <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> and <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> methods has custom
-configurations to enable transactions:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> and <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> methods has custom configurations to enable transactions:</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">Consumer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getConsumer</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">final</span> <span class="n">Properties</span> <span class="n">consumerProps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Properties</span><span class="p">();</span>
     <span class="n">consumerProps</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ConsumerConfiguration</span><span class="o">.</span><span class="n">BOOTSTRAP_SERVERS_CONFIG</span><span class="p">,</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="p">);</span>
@@ -370,8 +368,8 @@ configurations to enable transactions:</p>
 <p>DatabusConsumer receives the following basic configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="42%" />
-<col width="58%" />
+<col width="44%" />
+<col width="56%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -379,19 +377,16 @@ configurations to enable transactions:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><a href="#id1"><span class="problematic" id="id2">``</span></a>BOOTSTRAP_SERVERS_CONFIG`
-`</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_CONFIG</span></code></td>
 <td>The Kafka broker and port to listen.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">GROUP_ID_CONFIG</span></code></td>
 <td>The consumer group associated.</td>
 </tr>
-<tr class="row-even"><td><a href="#id3"><span class="problematic" id="id4">``</span></a>ENABLE_AUTO_COMMIT_CONFIG
-``</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ENABLE_AUTO_COMMIT_CONFIG</span></code></td>
 <td>If auto-commit will be enabled or not.</td>
 </tr>
-<tr class="row-odd"><td><a href="#id5"><span class="problematic" id="id6">``</span></a>SESSION_TIMEOUT_MS_CONFIG
-``</td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">SESSION_TIMEOUT_MS_CONFIG</span></code></td>
 <td>The heartbeat interval in ms to check
 if the Kafka broker is alive.</td>
 </tr>
@@ -425,8 +420,8 @@ committed.</td>
 <p>DatabusProducer receives the following basic configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="41%" />
-<col width="59%" />
+<col width="42%" />
+<col width="58%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -434,8 +429,7 @@ committed.</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><a href="#id7"><span class="problematic" id="id8">``</span></a>BOOTSTRAP_SERVERS_CONFIG
-``</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">BOOTSTRAP_SERVERS_CONFIG</span></code></td>
 <td>The Kafka broker and port to listen.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">CLIENT_ID_CONFIG</span></code></td>
@@ -456,8 +450,8 @@ batch.</td>
 <p>Then add the configurations parameter to produce transactions messages:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="42%" />
-<col width="58%" />
+<col width="44%" />
+<col width="56%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Config Parameter Name</th>
@@ -474,8 +468,7 @@ same TransactionalId have been
 completed prior to starting any new
 transactions.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">TRANSACTION_TIMEOUT_CONFI</span>
-<span class="pre">G</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">TRANSACTION_TIMEOUT_CONFIG</span></code></td>
 <td>The maximum amount of time in ms that
 the transaction coordinator will wait
 for a transaction status update from
@@ -484,17 +477,17 @@ aborting the ongoing transaction.</td>
 </tr>
 </tbody>
 </table>
-<p>After call <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> and <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> methods, the consumer
+<p>After invoking the <code class="docutils literal notranslate"><span class="pre">getProducer()</span></code> and <code class="docutils literal notranslate"><span class="pre">getConsumer()</span></code> methods, the consumer
 subscribes to a topic in the following line:</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Collections</span><span class="o">.</span><span class="n">singletonList</span><span class="p">(</span><span class="n">consumerTopic</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>Then the <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code> constructor is
-executed, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two
-internal methods for the producer and consumer: <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code>
+<p>Then, the <code class="docutils literal notranslate"><span class="pre">TransactionConsumerProducerExample()</span></code> constructor is
+executed and the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method is called. This method calls two
+internal methods for the producer and consumer, <code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code>
 and <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code>. Both methods execute threads, in order to
 produce and consume messages respectively.</p>
-<p>Here in detail both methods will be explained:</p>
+<p>Both methods are explained in detail below:</p>
 </div>
 <div class="section" id="getconsumertask">
 <h2><code class="docutils literal notranslate"><span class="pre">getConsumerTask()</span></code><a class="headerlink" href="#getconsumertask" title="Permalink to this headline">¶</a></h2>
@@ -538,24 +531,26 @@ produce and consume messages respectively.</p>
     }
 </pre></div>
 </div>
-<p>Consumer thread runs until sample stops or an exception is triggered.
-When this happens the while loop breaks. Until that, the consumer polls
-the produced records.</p>
+<p>The consumer thread runs, polling for produced records, until the sample
+stops or an exception is triggered.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">final</span> <span class="n">ConsumerRecords</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">records</span> <span class="o">=</span> <span class="n">consumer</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">CONSUMER_TIME_CADENCE_MS</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">CONSUMER_TIME_CADENCE_MS</span></code> is the time, in ms, spent waiting in
-poll if data is not available.</p>
-<p>When the poll finished the consumer logs the data of the received
+<p>The <code class="docutils literal notranslate"><span class="pre">CONSUMER_TIME_CADENCE_MS</span></code> is the time, in ms, spent waiting to
+poll for data.</p>
+<p>When the poll completes, the consumer logs the data of received
 messages and calls the commit method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">commitAsync</span><span class="p">();</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">commitAsync()</span></code>, commits the last offset and carry on.</p>
-<p>When the sample stops, unsubscribe and close method of the consumer are
-called. These methods do the following: - Unsubscribe from topics
-currently subscribed. - Close the consumer. This will close the network
-connections and sockets.</p>
+<p>When the sample stops, the unsubscribe and close method of the consumer are
+invoked.</p>
+<p>These methods do the following:</p>
+<ul class="simple">
+<li>Unsubscribe from topics currently subscribed.</li>
+<li>Close the consumer. This will close the network connections and sockets.</li>
+</ul>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">();</span>
 <span class="n">consumer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
 </pre></div>
@@ -611,21 +606,18 @@ connections and sockets.</p>
     }
 </pre></div>
 </div>
-<p>Producer thread runs until sample stops or an exception is triggered.
-When this happens the while loop breaks. Until that, the producer sends
-the produced records in a transaction.</p>
-<p>First the producer calls the <code class="docutils literal notranslate"><span class="pre">initTransactions()</span></code> method to enable
+<dl class="docutils">
+<dt>The Producer thread runs, producing records in a transaction,</dt>
+<dd>until the sample stops or an exception occurs.</dd>
+</dl>
+<p>First, the producer invokes the <code class="docutils literal notranslate"><span class="pre">initTransactions()</span></code> method to enable
 transactions in the producer.</p>
-<p>Then executes in the loop the <code class="docutils literal notranslate"><span class="pre">beginTransactionsMethod()</span></code> to start a
+<p>Next, in the loop, it invokes the <code class="docutils literal notranslate"><span class="pre">beginTransactionsMethod()</span></code> to start a
 new Transaction.</p>
-<div class="line-block">
-<div class="line">After this the producer creates batch of messages (with an associated
-producer record) to send in the transaction. The number of messages
-created for the transaction is determined by the value of the
-<code class="docutils literal notranslate"><span class="pre">TRANSACTION_MESSAGES_NUMBER</span></code>.</div>
-<div class="line">Each producer record is created calling to the <code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code>
-method.</div>
-</div>
+<p>After this, the producer creates a batch of messages (with an associated producer record)
+to send in the transaction. The number of messages created for the transaction is
+determined by the value of the <code class="docutils literal notranslate"><span class="pre">TRANSACTION_MESSAGES_NUMBER</span></code>. Each producer record
+is created by invoking the <code class="docutils literal notranslate"><span class="pre">getProducerRecord()</span></code> method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">ProducerRecord</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">getProducerRecord</span><span class="p">(</span><span class="n">final</span> <span class="n">String</span> <span class="n">topic</span><span class="p">,</span> <span class="n">final</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">payload</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">currentTimeMillis</span><span class="p">());</span>
     <span class="n">RoutingData</span> <span class="n">routingData</span> <span class="o">=</span> <span class="n">new</span> <span class="n">RoutingData</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">null</span><span class="p">);</span>
@@ -635,41 +627,39 @@ method.</div>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In this method the a <code class="docutils literal notranslate"><span class="pre">ProducerRecord</span></code> instance is created, adding to
-his constructor a <code class="docutils literal notranslate"><span class="pre">RoutingData</span></code> object with topic and key, <code class="docutils literal notranslate"><span class="pre">Headers</span></code>
-object and a <code class="docutils literal notranslate"><span class="pre">MessagePayload</span></code> object with the message content.</p>
-<p>Now, at this point the next step is send the message. To do that the
-producer calls the send method.</p>
+<p>In this method a <code class="docutils literal notranslate"><span class="pre">ProducerRecord</span></code> instance is created, specifying
+a <code class="docutils literal notranslate"><span class="pre">RoutingData</span></code> object with topic and key, a <code class="docutils literal notranslate"><span class="pre">Headers</span></code>
+object, and a <code class="docutils literal notranslate"><span class="pre">MessagePayload</span></code> object with the message content.</p>
+<p>At this point, the message is sent by invoking the following method.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">producerRecord</span><span class="p">,</span> <span class="n">new</span> <span class="n">MyCallback</span><span class="p">(</span><span class="n">producerRecord</span><span class="o">.</span><span class="n">getRoutingData</span><span class="p">()</span><span class="o">.</span><span class="n">getShardingKey</span><span class="p">()));</span>
 </pre></div>
 </div>
 <p>This method sends a producer record and associates a callback for each
-sent execution. The callback is used because send is asynchronous and
+sent record. The callback is used because send is asynchronous and
 this method will return immediately once the record has been stored in
 the buffer of records waiting to be sent. This allows sending many
 records in parallel without blocking to wait for the response after each
 one. Fully non-blocking usage can make use of the callback parameter to
-provide a callback that will be invoked when the request is complete.</p>
+provide a callback that will be invoked once the request is complete.</p>
 <p>When all messages are sent the <code class="docutils literal notranslate"><span class="pre">commitTransaction()</span></code> method is called.
 This commits the ongoing transaction and will flush any unsent records
 before actually committing the transaction.</p>
-<p>After send method executes the <code class="docutils literal notranslate"><span class="pre">justWait()</span></code> method is called to wait
-and produce a new record. <code class="docutils literal notranslate"><span class="pre">PRODUCER_TIME_CADENCE_MS</span></code> is the time in ms
-that the producer waits to send a new message.</p>
-<p>Finally when sample stops flush and close method are called.</p>
+<p>After each send, the <code class="docutils literal notranslate"><span class="pre">justWait()</span></code> method is invoked to wait prior to
+producing a new record. <code class="docutils literal notranslate"><span class="pre">PRODUCER_TIME_CADENCE_MS</span></code> is the time in ms
+that the producer waits prior to sending a new message.</p>
+<p>Finally, when the sample stops, the flush and close methods are invoked.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="n">flush</span><span class="p">();</span>
 <span class="n">producer</span><span class="o">.</span><span class="n">close</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>Flush method method makes all buffered records immediately available to
+<p>The flush method method makes all buffered records immediately available to
 send and blocks on the completion of the requests associated with these
 records. Flush gives a convenient way to ensure all previously sent
 messages have actually completed.</p>
-<p>Close method closes producer and frees resources such as connections,
+<p>The close method closes the producer and frees resources such as connections,
 threads, and buffers associated with the producer.</p>
-<p>If for any reason transaction fails, the <code class="docutils literal notranslate"><span class="pre">abortTransaction()</span></code> method
-is called. Any unflushed produced messages will be aborted when this
-call is made.</p>
+<p>If for any reason a transaction fails, the <code class="docutils literal notranslate"><span class="pre">abortTransaction()</span></code> method
+is invoked. At this point, any unflushed messages will be aborted.</p>
 </div>
 <div class="section" id="run-the-sample">
 <h2>Run the sample<a class="headerlink" href="#run-the-sample" title="Permalink to this headline">¶</a></h2>

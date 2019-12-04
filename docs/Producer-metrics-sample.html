@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Producer Metrics Example &mdash; OpenDXL Databus Java Client Library 0.1.2-SNAPSHOT documentation</title>
+  <title>Producer Metrics Example &mdash; OpenDXL Databus Java Client Library 2.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.1.2-SNAPSHOT
+                2.3.0
               </div>
             
           
@@ -167,8 +167,8 @@
 Databus client by using a producer in a running Kafka cluster. The type
 of metrics that can be obtained are the following:</p>
 <ul class="simple">
-<li>Producer metrics associated to a clientId.</li>
-<li>Producer metrics associated to a clientId and a topic.</li>
+<li>Producer metrics associated with a clientId.</li>
+<li>Producer metrics associated with a clientId and a topic.</li>
 </ul>
 <p>Code highlights are shown below:</p>
 <div class="section" id="sample-code">
@@ -284,34 +284,23 @@ of metrics that can be obtained are the following:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">The first step is to instance the Kafka cluster to run the example.</div>
-<div class="line">The constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is in charge of
-doing that.</div>
-<div class="line">After this, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts running the producer
-to send messages calling the method <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> and start
-the metrics collecting thread.</div>
-</div>
-<p>The metrics thread has two parameters which are needed to be configured:</p>
+<p>The first step is to instance the Kafka cluster to run the example.</p>
+<p>The constructor method <code class="docutils literal notranslate"><span class="pre">ProducerMetricsExample()</span></code> is responsible for accomplishing that.</p>
+<p>After that, the <code class="docutils literal notranslate"><span class="pre">startExample()</span></code> method starts running the producer to send messages,
+invoking the method <code class="docutils literal notranslate"><span class="pre">getProducerTask()</span></code> which initiates the metrics collecting thread.</p>
+<p>The metrics thread has two parameters which must be configured:</p>
 <ul class="simple">
-<li>The metrics sampling period before to get metrics, setted with
-<code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_INITIAL_DELAY</span></code> value, which is time before start
+<li><code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_INITIAL_DELAY</span></code> which is the time to wait prior
 collecting metrics.</li>
-<li>The the period of time to get the metrics from Kafka, setted with
-<code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_PERIOD</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">REPORT_METRICS_PERIOD</span></code> which is the interval at which to
+collect metrics from Kafka.</li>
 </ul>
-<div class="line-block">
-<div class="line">After the producer and the metrics thread starts, the sample shows the</div>
-<div class="line">metrics with values.</div>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible to get the producer
-metrics from the Kafka cluster. <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> calls
-<code class="docutils literal notranslate"><span class="pre">getProducerByClientIdMetrics()</span></code> to get the producer metrics for an
-associated clientId and also calls
-<code class="docutils literal notranslate"><span class="pre">getProducerByClientIdAndTopicMetrics()</span></code> to get the producer metrics
-for an associated clientId with an specific topic.</p>
-<p>The producer metrics associated to a clientId obtained are the
-following:</p>
+<p>Once the producer and metrics threads have started, metrics are displayed.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> method is responsible for collecting producer metrics from the Kafka cluster.
+<code class="docutils literal notranslate"><span class="pre">reportMetrics()</span></code> calls <code class="docutils literal notranslate"><span class="pre">getProducerByClientIdMetrics()</span></code> to collect producer metrics for an
+associated clientId and also calls <code class="docutils literal notranslate"><span class="pre">getProducerByClientIdAndTopicMetrics()</span></code> to get the
+producer metrics for an associated clientId with a specific topic.</p>
+<p>The producer metrics associated to a clientId obtained are as follows:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="35%" />
@@ -375,13 +364,13 @@ topic.</td>
 second for a topic.</td>
 </tr>
 <tr class="row-even"><td>record-error-total</td>
-<td>The total number of record sent that
+<td>The total number of records sent that
 resulted in errors for a topic.</td>
 </tr>
 <tr class="row-odd"><td>record-error-rate</td>
-<td>The average per-second number of record
-sent that resulted in errors for a
-topic.</td>
+<td>The average per-second number of
+records sent that resulted in errors
+for a topic.</td>
 </tr>
 <tr class="row-even"><td>byte-total</td>
 <td>The total number of bytes sent for a

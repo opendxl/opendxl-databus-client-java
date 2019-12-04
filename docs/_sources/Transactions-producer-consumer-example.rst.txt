@@ -160,17 +160,16 @@ Sample Code
            }
        }
 
-The first step is to create the instance of the Kafka cluster to run the
-example. The constructor method ``TransactionConsumerProducerExample()``
-is in charge of doing that. This method also creates a DatabusConsumer
-instance calling to ``getConsumer()`` method. For producer is the same
-approach, calling to ``getProducer()`` method, to create an instance of
-DatabusProducer. Also calls the method
-``ClusterHelper.getInstance().addNewKafkaTopic()`` to create a
-transactional topic. A transactional topic is a Kafka topic with 3
-partitions at least and replication factor of 3 at least, so it’s
-necessary to create this topic a minimum of 3 running brokers. Thats why
-in the constructor we have to add 3 brokers instances.
+The first step is to create the Kafka cluster instance with which to run the example.
+The constructor method ``TransactionConsumerProducerExample()`` is responsible for
+accomplishing that. This method also creates a DatabusConsumer instance by
+invoking the``getConsumer()`` method. The ``getProducer()`` method is also invoked,
+which creates an instance of a DatabusProducer. Finally, the
+``ClusterHelper.getInstance().addNewKafkaTopic()`` method is invoked which
+creates a transactional topic. A transactional topic is a Kafka topic with at least
+3 partitions and a replication factor of at least 3. It is
+necessary to create this topic in a minimum of 3 running brokers. Thus, in the
+constructor we have to add 3 brokers instances.
 
 .. code:: java
 
@@ -182,8 +181,7 @@ in the constructor we have to add 3 brokers instances.
                    .zookeeperPort(2181)
                    .start();
 
-Also ``getConsumer()`` and ``getProducer()`` methods has custom
-configurations to enable transactions:
+The ``getConsumer()`` and ``getProducer()`` methods has custom configurations to enable transactions:
 
 .. code:: java
 
@@ -214,22 +212,21 @@ configurations to enable transactions:
 
 DatabusConsumer receives the following basic configuration:
 
-+-----------------------------+----------------------------------------+
-| Config Parameter Name       | Description                            |
-+=============================+========================================+
-| ``BOOTSTRAP_SERVERS_CONFIG` | The Kafka broker and port to listen.   |
-| `                           |                                        |
-+-----------------------------+----------------------------------------+
-| ``GROUP_ID_CONFIG``         | The consumer group associated.         |
-+-----------------------------+----------------------------------------+
-| ``ENABLE_AUTO_COMMIT_CONFIG | If auto-commit will be enabled or not. |
-| ``                          |                                        |
-+-----------------------------+----------------------------------------+
-| ``SESSION_TIMEOUT_MS_CONFIG | The heartbeat interval in ms to check  |
-| ``                          | if the Kafka broker is alive.          |
-+-----------------------------+----------------------------------------+
-| ``CLIENT_ID_CONFIG``        | The related clientId.                  |
-+-----------------------------+----------------------------------------+
++-------------------------------+----------------------------------------+
+| Config Parameter Name         | Description                            |
++===============================+========================================+
+| ``BOOTSTRAP_SERVERS_CONFIG``  | The Kafka broker and port to listen.   |
++-------------------------------+----------------------------------------+
+| ``GROUP_ID_CONFIG``           | The consumer group associated.         |
++-------------------------------+----------------------------------------+
+| ``ENABLE_AUTO_COMMIT_CONFIG`` | If auto-commit will be enabled or not. |
+|                               |                                        |
++-------------------------------+----------------------------------------+
+| ``SESSION_TIMEOUT_MS_CONFIG`` | The heartbeat interval in ms to check  |
+|                               | if the Kafka broker is alive.          |
++-------------------------------+----------------------------------------+
+| ``CLIENT_ID_CONFIG``          | The related clientId.                  |
++-------------------------------+----------------------------------------+
 
 And this configuration parameter to consume transactions messages:
 
@@ -246,57 +243,56 @@ And this configuration parameter to consume transactions messages:
 
 DatabusProducer receives the following basic configuration:
 
-+----------------------------+-----------------------------------------+
-| Config Parameter Name      | Description                             |
-+============================+=========================================+
-| ``BOOTSTRAP_SERVERS_CONFIG | The Kafka broker and port to listen.    |
-| ``                         |                                         |
-+----------------------------+-----------------------------------------+
-| ``CLIENT_ID_CONFIG``       | The related clientId.                   |
-+----------------------------+-----------------------------------------+
-| ``LINGER_MS_CONFIG``       | The amount of time in ms to wait for    |
-|                            | additional messages before sending the  |
-|                            | current batch.                          |
-+----------------------------+-----------------------------------------+
-| ``BATCH_SIZE_CONFIG``      | the amount of memory in bytes (not      |
-|                            | messages!) that will be used for each   |
-|                            | batch.                                  |
-+----------------------------+-----------------------------------------+
++------------------------------+-----------------------------------------+
+| Config Parameter Name        | Description                             |
++==============================+=========================================+
+| ``BOOTSTRAP_SERVERS_CONFIG`` | The Kafka broker and port to listen.    |
++------------------------------+-----------------------------------------+
+| ``CLIENT_ID_CONFIG``         | The related clientId.                   |
++------------------------------+-----------------------------------------+
+| ``LINGER_MS_CONFIG``         | The amount of time in ms to wait for    |
+|                              | additional messages before sending the  |
+|                              | current batch.                          |
++------------------------------+-----------------------------------------+
+| ``BATCH_SIZE_CONFIG``        | the amount of memory in bytes (not      |
+|                              | messages!) that will be used for each   |
+|                              | batch.                                  |
++------------------------------+-----------------------------------------+
 
 Then add the configurations parameter to produce transactions messages:
 
-+-----------------------------+----------------------------------------+
-| Config Parameter Name       | Description                            |
-+=============================+========================================+
-| ``TRANSACTIONAL_ID_CONFIG`` | This enables reliability semantics     |
-|                             | which span multiple producer sessions  |
-|                             | since it allows the client to          |
-|                             | guarantee that transactions using the  |
-|                             | same TransactionalId have been         |
-|                             | completed prior to starting any new    |
-|                             | transactions.                          |
-+-----------------------------+----------------------------------------+
-| ``TRANSACTION_TIMEOUT_CONFI | The maximum amount of time in ms that  |
-| G``                         | the transaction coordinator will wait  |
-|                             | for a transaction status update from   |
-|                             | the producer before proactively        |
-|                             | aborting the ongoing transaction.      |
-+-----------------------------+----------------------------------------+
++--------------------------------+----------------------------------------+
+| Config Parameter Name          | Description                            |
++================================+========================================+
+| ``TRANSACTIONAL_ID_CONFIG``    | This enables reliability semantics     |
+|                                | which span multiple producer sessions  |
+|                                | since it allows the client to          |
+|                                | guarantee that transactions using the  |
+|                                | same TransactionalId have been         |
+|                                | completed prior to starting any new    |
+|                                | transactions.                          |
++--------------------------------+----------------------------------------+
+| ``TRANSACTION_TIMEOUT_CONFIG`` | The maximum amount of time in ms that  |
+|                                | the transaction coordinator will wait  |
+|                                | for a transaction status update from   |
+|                                | the producer before proactively        |
+|                                | aborting the ongoing transaction.      |
++--------------------------------+----------------------------------------+
 
-After call ``getProducer()`` and ``getConsumer()`` methods, the consumer
+After invoking the ``getProducer()`` and ``getConsumer()`` methods, the consumer
 subscribes to a topic in the following line:
 
 .. code:: java
 
        this.consumer.subscribe(Collections.singletonList(consumerTopic));
 
-Then the ``TransactionConsumerProducerExample()`` constructor is
-executed, the ``startExample()`` method is called. This method calls two
-internal methods for the producer and consumer: ``getConsumerTask()``
+Then, the ``TransactionConsumerProducerExample()`` constructor is
+executed and the ``startExample()`` method is called. This method calls two
+internal methods for the producer and consumer, ``getConsumerTask()``
 and ``getProducerTask()``. Both methods execute threads, in order to
 produce and consume messages respectively.
 
-Here in detail both methods will be explained:
+Both methods are explained in detail below:
 
 ``getConsumerTask()``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -342,18 +338,17 @@ Here in detail both methods will be explained:
            };
        }
 
-Consumer thread runs until sample stops or an exception is triggered.
-When this happens the while loop breaks. Until that, the consumer polls
-the produced records.
+The consumer thread runs, polling for produced records, until the sample
+stops or an exception is triggered.
 
 .. code:: java
 
        final ConsumerRecords<byte[]> records = consumer.poll(CONSUMER_TIME_CADENCE_MS);
 
-The ``CONSUMER_TIME_CADENCE_MS`` is the time, in ms, spent waiting in
-poll if data is not available.
+The ``CONSUMER_TIME_CADENCE_MS`` is the time, in ms, spent waiting to
+poll for data.
 
-When the poll finished the consumer logs the data of the received
+When the poll completes, the consumer logs the data of received
 messages and calls the commit method.
 
 .. code:: java
@@ -362,10 +357,13 @@ messages and calls the commit method.
 
 ``commitAsync()``, commits the last offset and carry on.
 
-When the sample stops, unsubscribe and close method of the consumer are
-called. These methods do the following: - Unsubscribe from topics
-currently subscribed. - Close the consumer. This will close the network
-connections and sockets.
+When the sample stops, the unsubscribe and close method of the consumer are
+invoked.
+
+These methods do the following:
+
+- Unsubscribe from topics currently subscribed.
+- Close the consumer. This will close the network connections and sockets.
 
 .. code:: java
 
@@ -424,22 +422,19 @@ connections and sockets.
            };
        }
 
-Producer thread runs until sample stops or an exception is triggered.
-When this happens the while loop breaks. Until that, the producer sends
-the produced records in a transaction.
+The Producer thread runs, producing records in a transaction,
+ until the sample stops or an exception occurs.
 
-First the producer calls the ``initTransactions()`` method to enable
+First, the producer invokes the ``initTransactions()`` method to enable
 transactions in the producer.
 
-Then executes in the loop the ``beginTransactionsMethod()`` to start a
+Next, in the loop, it invokes the ``beginTransactionsMethod()`` to start a
 new Transaction.
 
-| After this the producer creates batch of messages (with an associated
-  producer record) to send in the transaction. The number of messages
-  created for the transaction is determined by the value of the
-  ``TRANSACTION_MESSAGES_NUMBER``.
-| Each producer record is created calling to the ``getProducerRecord()``
-  method.
+After this, the producer creates a batch of messages (with an associated producer record)
+to send in the transaction. The number of messages created for the transaction is
+determined by the value of the ``TRANSACTION_MESSAGES_NUMBER``. Each producer record
+is created by invoking the ``getProducerRecord()`` method.
 
 .. code:: java
 
@@ -451,51 +446,49 @@ new Transaction.
            return new ProducerRecord<>(routingData, headers, messagePayload);
        }
 
-In this method the a ``ProducerRecord`` instance is created, adding to
-his constructor a ``RoutingData`` object with topic and key, ``Headers``
-object and a ``MessagePayload`` object with the message content.
+In this method a ``ProducerRecord`` instance is created, specifying
+a ``RoutingData`` object with topic and key, a ``Headers``
+object, and a ``MessagePayload`` object with the message content.
 
-Now, at this point the next step is send the message. To do that the
-producer calls the send method.
+At this point, the message is sent by invoking the following method.
 
 .. code:: java
 
        producer.send(producerRecord, new MyCallback(producerRecord.getRoutingData().getShardingKey()));
 
 This method sends a producer record and associates a callback for each
-sent execution. The callback is used because send is asynchronous and
+sent record. The callback is used because send is asynchronous and
 this method will return immediately once the record has been stored in
 the buffer of records waiting to be sent. This allows sending many
 records in parallel without blocking to wait for the response after each
 one. Fully non-blocking usage can make use of the callback parameter to
-provide a callback that will be invoked when the request is complete.
+provide a callback that will be invoked once the request is complete.
 
 When all messages are sent the ``commitTransaction()`` method is called.
 This commits the ongoing transaction and will flush any unsent records
 before actually committing the transaction.
 
-After send method executes the ``justWait()`` method is called to wait
-and produce a new record. ``PRODUCER_TIME_CADENCE_MS`` is the time in ms
-that the producer waits to send a new message.
+After each send, the ``justWait()`` method is invoked to wait prior to
+producing a new record. ``PRODUCER_TIME_CADENCE_MS`` is the time in ms
+that the producer waits prior to sending a new message.
 
-Finally when sample stops flush and close method are called.
+Finally, when the sample stops, the flush and close methods are invoked.
 
 .. code:: java
 
        producer.flush();
        producer.close();
 
-Flush method method makes all buffered records immediately available to
+The flush method method makes all buffered records immediately available to
 send and blocks on the completion of the requests associated with these
 records. Flush gives a convenient way to ensure all previously sent
 messages have actually completed.
 
-Close method closes producer and frees resources such as connections,
+The close method closes the producer and frees resources such as connections,
 threads, and buffers associated with the producer.
 
-If for any reason transaction fails, the ``abortTransaction()`` method
-is called. Any unflushed produced messages will be aborted when this
-call is made.
+If for any reason a transaction fails, the ``abortTransaction()`` method
+is invoked. At this point, any unflushed messages will be aborted.
 
 Run the sample
 ~~~~~~~~~~~~~~
