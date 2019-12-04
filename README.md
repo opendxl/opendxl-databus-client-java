@@ -22,7 +22,7 @@ To start using the OpenDXL Databus Java client library:
 * Extract the release .zip file
 * View the `README.html` file located at the root of the extracted files.
   * The `README` links to the documentation which includes installation instructions, API details, and samples.
-  * The SDK documentation is also available on-line [here](https://opendxl.github.io/opendxl-databus-client-java/docs/javadoc/index.html).
+  * The SDK documentation is also available on-line [here](https://opendxl.github.io/opendxl-databus-client-java/docs/index.html).
 
 ## Maven Repository
 

@@ -309,6 +309,10 @@ task replaceVersionInREADME() {
         ant.replaceregexp(match: "com\\.opendxl\\:dxldatabusclient\\:(.+)", replace: "com.opendxl:dxldatabusclient:${version}'", flags: 'g', byline: true) {
             fileset(dir: 'docs', includes: 'index.rst')
         }
+        // Command Line (Docs)
+        ant.replaceregexp(match: "dxldatabusclient-(.*).jar", replace: "dxldatabusclient-${version}.jar", flags: 'g', byline: true) {
+            fileset(dir: 'docs', includes: 'CLI-Example.rst')
+        }
     }
 }
 
