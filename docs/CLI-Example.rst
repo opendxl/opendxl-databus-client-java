@@ -19,12 +19,11 @@ library with no arguments displays help information:
     --config [String: config]              The producer/consumer configuration    
                                              list: Example: linger.ms=1000,batch. 
                                              size=100000,compression.type=lz4     
-    --consume-records <Integer: consume-   Consume Poll expected records. Number  
-      records>                               of expected records.  (default: 1)   
-    --consume-timeout <Integer: consume-   Consume Poll Timeout. Time in ms that  
-      timeout>                               the consumer waits for new records   
-                                             during a consume operation.          
-                                             Optional parameter, if absent, it    
+    --consume-records <Integer: consume-   Number of expected records to finish
+      records>                               the command line.  (default: 1)
+    --consume-timeout <Integer: consume-   Max time the command line waits for
+      timeout>                               finishing a consumer operation.
+                                             Optional parameter, if absent, it
                                              defaults to 15000 ms. (default: 15000)
     --from-topic <String: from-topic>      Comma-separated topic name list to
                                              consume. Example: topic1,topic2,..., 
