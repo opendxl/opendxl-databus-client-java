@@ -209,7 +209,7 @@ specified brokers.
 |                       | to finish command line.     |               |
 |                       | CLI polls for new records   |               |
 |                       | until one of the following  |               |
-|                       | occurs:timeout has          |               |
+|                       | occurs: timeout has         |               |
 |                       | elapsed or number of records|               |
 |                       | received were greater than  |               |
 |                       | this value.                 |               |
