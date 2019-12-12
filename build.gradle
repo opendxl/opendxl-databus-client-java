@@ -63,7 +63,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.commons:commons-configuration2:2.5'
     implementation 'commons-lang:commons-lang:2.6'
-    implementation 'org.slf4j:slf4j-api'
+    implementation 'org.slf4j:slf4j-api:1.7.29'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
     testImplementation 'org.apache.kafka:kafka_2.12:2.3.0'
     testImplementation 'org.apache.zookeeper:zookeeper:3.4.14'
