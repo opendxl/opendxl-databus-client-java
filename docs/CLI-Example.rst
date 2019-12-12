@@ -214,12 +214,12 @@ specified brokers.
 |                       | received were greater than  |               |
 |                       | this value.                 |               |
 +-----------------------+-----------------------------+---------------+
-| ``--consume-timeout`` | Maximum time to wait for    | 15000         |
-|                       | receiving the specified     | milliseconds  |
-|                       | ``consume-records`` number. |               |
+| ``--consume-timeout`` | Maximum time the command    | 15000         |
+|                       | line waits for finishing    | milliseconds  |
+|                       | a consume operation.        |               |
 |                       | CLI polls for new records   |               |
 |                       | until one of the following  |               |
-|                       | occurs:timeout has elapsed  |               |
+|                       | occurs: timeout has elapsed |               |
 |                       | or number of received       |               |
 |                       | records were greater than   |               |
 |                       | ``consume-records`` value.  |               |
