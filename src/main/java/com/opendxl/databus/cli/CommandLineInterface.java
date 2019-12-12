@@ -120,8 +120,8 @@ public class CommandLineInterface {
 
         // Consumer config option spec represented as --consume-timeout command line
         final ArgumentAcceptingOptionSpec<Integer> consumeTimeoutOpt =
-                parser.accepts("consume-timeout", "Consume Poll Timeout. Time in ms that the consumer"
-                        + " waits for new records during a consume operation. "
+                parser.accepts("consume-timeout", "Max time the command line"
+                        + " waits for finishing a consume operation. "
                         + " Optional parameter, if absent, it defaults to 15000 ms.")
                         .withRequiredArg()
                         .ofType(Integer.class)
@@ -130,8 +130,8 @@ public class CommandLineInterface {
 
         // Consumer config option spec represented as --consume-records command line
         final ArgumentAcceptingOptionSpec<Integer> consumeRecordsOpt =
-                parser.accepts("consume-records", "Consume Poll expected records. "
-                        + "Number of expected records. ")
+                parser.accepts("consume-records", "Number of expected records to finish the"
+                        + " command line. ")
                         .withRequiredArg()
                         .ofType(Integer.class)
                         .describedAs("consume-records")
