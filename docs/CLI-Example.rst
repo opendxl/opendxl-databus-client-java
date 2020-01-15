@@ -1,13 +1,13 @@
 CLI (Command Line Interface)
 ----------------------------
 
-OpenDXL Databus client can be invoked from command line interface (CLI)
-for testing or checking purposes. Executing CLI like a standard Java
-library with no arguments, the output shows the help:
+The OpenDXL Databus client can be invoked from command line interface (CLI)
+for testing or checking purposes. Executing the CLI like a standard Java
+library with no arguments displays help information:
 
 ::
 
-    $ java -jar opendxldatabusclient-java-sdk-<VERSION>.jar
+    $ java -jar dxldatabusclient-2.3.0.jar
 
     ERROR: There are not options
     Option (* = required)                  Description                            
@@ -19,19 +19,18 @@ library with no arguments, the output shows the help:
     --config [String: config]              The producer/consumer configuration    
                                              list: Example: linger.ms=1000,batch. 
                                              size=100000,compression.type=lz4     
-    --consume-records <Integer: consume-   Consume Poll expected records. Number  
-      records>                               of expected records.  (default: 1)   
-    --consume-timeout <Integer: consume-   Consume Poll Timeout. Time in ms that  
-      timeout>                               the consumer waits for new records   
-                                             during a consume operation.          
-                                             Optional parameter, if absent, it    
-                                             defaults to 5000 ms. (default: 15000)
-    --from-topic <String: from-topic>      Coma-separated topic name list to      
+    --consume-records <Integer: consume-   Number of expected records to finish
+      records>                               the command line.  (default: 1)
+    --consume-timeout <Integer: consume-   Max time the command line waits for
+      timeout>                               finishing a consumer operation.
+                                             Optional parameter, if absent, it
+                                             defaults to 15000 ms. (default: 15000)
+    --from-topic <String: from-topic>      Comma-separated topic name list to
                                              consume. Example: topic1,topic2,..., 
                                              topicN                               
     --headers [String: headers]            The producer headers:  (default: )     
     --msg <String: message>                message to be produced                 
-    --operation <String: operation>      Operations: produce | consume          
+    --operation <String: operation>        Operations: produce | consume
     --partition [String: partition]        The partition number:  (default: )     
     --sharding-key [String: sharding-key]  Sharding key (default: )               
     --tenant-group [String: tenant-group]  Tenant Group (default: )               
@@ -45,13 +44,13 @@ correct field name.
 Supported Operations
 ~~~~~~~~~~~~~~~~~~~~
 
-In order to get records from Databus client, the user has to invoke a
+In order to get records from the Databus client, the user has to invoke a
 few CLI operations. Operations arguments are placed after
 ``--operation`` option. For instance:
 
 ::
 
-    $ java -jar opendxldatabusclient-java-sdk-<VERSION>.jar --operation <OPERATION_ARGUMENT> ...
+    $ java -jar dxldatabusclient-2.3.0.jar --operation <OPERATION_ARGUMENT> ...
 
 Operation Arguments
 ^^^^^^^^^^^^^^^^^^^
@@ -64,15 +63,14 @@ Operation Arguments
 | ``--consume``         | consume a message from a Kafka topic.   |
 +-----------------------+-----------------------------------------+
 
-| The invocation of CLI operations to get records is: ``produce`` ->
-  ``consume`` .
-| First of all, a message is needed to be produced to a topic and then
-  start consuming it.
+The invocation of CLI operations to get records is: ``produce`` -> ``consume`` .
+
+A message must be produced to a topic prior to consuming it.
 
 produce
 ^^^^^^^
 
-It is an operation which produces a message to a specific broker with an
+An operation which produces a message to a specific broker with an
 associated topic. Optional arguments can be added to attach partition,
 sharding key, tenant group and headers.
 
@@ -80,10 +78,10 @@ sharding key, tenant group and headers.
 | Mandatory Arguments   | Description                                        |
 | for produce           |                                                    |
 +=======================+====================================================+
-| ``--operation``       | The operation name. In this case, always the       |
+| ``--operation``       | The operation name. In this case, the              |
 |                       | operation name is ``produce``                      |
 +-----------------------+----------------------------------------------------+
-| ``--to-topic``        | The topic name which will send the message.        |
+| ``--to-topic``        | The topic name for the message.                    |
 +-----------------------+----------------------------------------------------+
 | ``--msg``             | The message payload.                               |
 +-----------------------+----------------------------------------------------+
@@ -96,7 +94,7 @@ sharding key, tenant group and headers.
 +=====================+=============================+============+
 | ``--partition``     | The partition number, valid | Blank,     |
 |                     | numbers for partition are   | which      |
-|                     | >= 0.                       | assignes   |
+|                     | >= 0.                       | assigns    |
 |                     |                             | any kafka  |
 |                     |                             | valid      |
 |                     |                             | partition  |
@@ -125,7 +123,7 @@ example
 
 ::
 
-    $ java -jar opendxlstreamingclient-java-sdk-<VERSION>.jar \
+    $ java -jar dxldatabusclient-2.3.0.jar \
     --operation produce \
     --to-topic <TOPIC_NAME> \
     --brokers <0.0.0.0>:<PORT> \
@@ -159,10 +157,8 @@ example
 consume
 ^^^^^^^
 
-It is an operation which receives messages from specified topics at
-specified brokers. Optional arguments, like consume-records or
-consume-timeout, are supported to refine the record list contained in
-the consumer operation result.
+An operation which receives messages from specified topics at
+specified brokers.
 
 +----------------------+----------------+
 | Mandatory Arguments  | Description    |
@@ -170,7 +166,7 @@ the consumer operation result.
 +======================+================+
 | ``--operation``      | The operation  |
 |                      | name. In this  |
-|                      | case, always   |
+|                      | case,          |
 |                      | the operation  |
 |                      | name is        |
 |                      | ``consume``    |
@@ -197,55 +193,49 @@ the consumer operation result.
 |                       | group.                      | empty string  |
 +-----------------------+-----------------------------+---------------+
 | ``--cg``              | The consumer group to be    | Blank with    |
-|                       | member of.                  | empty string  |
+|                       | a member of.                | empty string  |
 +-----------------------+-----------------------------+---------------+
 | ``--config``          | The consumer configuration  | Blank with    |
 |                       | in comma separated          | empty string  |
-|                       | property-value pairs.For    |               |
-|                       | example:                    |               |
-|                       | enable.auto.commit=false,re |               |
-|                       | quest.timeout.ms=61000,sess |               |
-|                       | ion.timeout.ms=60000,auto.o |               |
-|                       | ffset.reset=earliest,auto.c |               |
-|                       | ommit.interval.ms=0         |               |
+|                       | property-value pairs.       |               |
+|                       | For example:                |               |
+|                       | enable.auto.commit=false,   |               |
+|                       | request.timeout.ms=61000,   |               |
+|                       | session.timeout.ms=60000,   |               |
+|                       | auto.offset.reset=earliest, |               |
+|                       | auto.commit.interval.ms=0   |               |
 +-----------------------+-----------------------------+---------------+
-| ``--consume-records`` | Maximum number of records   | 1 record      |
-|                       | to read within thespecified |               |
-|                       | ``consume-timeout``. CLI    |               |
-|                       | polls for new records       |               |
-|                       | untilwhichever condition is |               |
-|                       | first met:timeout has       |               |
-|                       | elapsed, ormaximum number   |               |
-|                       | of records were received.   |               |
+| ``--consume-records`` | Number of expected records  | 1 record      |
+|                       | to finish command line.     |               |
+|                       | CLI polls for new records   |               |
+|                       | until one of the following  |               |
+|                       | occurs: timeout has         |               |
+|                       | elapsed or number of records|               |
+|                       | received were greater than  |               |
+|                       | this value.                 |               |
 +-----------------------+-----------------------------+---------------+
-| ``--consume-timeout`` | Maximum time to wait for    | 15000         |
-|                       | receiving the               | milliseconds  |
-|                       | specified\ ``consume-record |               |
-|                       | s``                         |               |
-|                       | number. CLI polls for new   |               |
-|                       | records untilwhichever      |               |
-|                       | condition is first          |               |
-|                       | met:timeout has elapsed     |               |
-|                       | ornumber of received        |               |
-|                       | records reached             |               |
+| ``--consume-timeout`` | Maximum time the command    | 15000         |
+|                       | line waits for finishing    | milliseconds  |
+|                       | a consume operation.        |               |
+|                       | CLI polls for new records   |               |
+|                       | until one of the following  |               |
+|                       | occurs: timeout has elapsed |               |
+|                       | or number of received       |               |
+|                       | records were greater than   |               |
 |                       | ``consume-records`` value.  |               |
 +-----------------------+-----------------------------+---------------+
 
 example
 '''''''
 
-This example waits up to \\ to receive up to \\ records in total for \\
-tenant group from \\ or \\ or \\ topics from \\ or \\ kafka brokers
-using \\ consumer group and configuring consumer to enable auto commmit.
-
 ::
 
-    java -jar opendxldatabusclient-java-sdk-<VERSION>.jar \
+    java -jar dxldatabusclient-2.3.0.jar \
     --operation consume \
     --from-topic <TOPIC_1,TOPIC_2,...,TOPIC_N> \
     --brokers <BROKER_1_IP:BROKER_1_PORT,BROKER_2_PORT:BROKER_2_PORT,...> \
-    --consume-timeout <CONSUME-TIMEOUT> \
-    --consume-records <CONSUME-RECORDS-NUMBER> \
+    --consume-timeout <CONSUME-TIMEOUT-TO-FINISH-CLI> \
+    --consume-records <CONSUME-RECORDS-NUMBER-TO-FINISH-CLI> \
     --tenant-group <TENANT-GROUP-NAME> \
     --cg <CONSUMER-GROUP>
     --config enable.auto.commit=true 

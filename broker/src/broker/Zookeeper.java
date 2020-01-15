@@ -4,9 +4,9 @@
 
 package broker;
 
-
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.zookeeper.server.NIOServerCnxnFactory;
 import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ZooKeeperServer;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Zookeeper {
+
     private static final String ZOOKEEPER_HOST = "localhost";
     private static final String ZOOKEEPER_SNAPSHOT_PREFIX_FILE_NAME = "zookeeper-snapshot";
     private static final String ZOOKEEPER_LOGS_PREFIX_FILE_NAME = "zookeeper-logs";
@@ -24,11 +25,9 @@ public class Zookeeper {
 
     private int port;
     private int maxConnections;
-
     private ServerCnxnFactory zookeeperConnection;
 
-    private static final Logger LOG = Logger.getLogger(Zookeeper.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(Zookeeper.class);
 
     public Zookeeper(int port) {
         this.port = port;

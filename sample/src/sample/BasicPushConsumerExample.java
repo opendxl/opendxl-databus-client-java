@@ -14,7 +14,8 @@ import com.opendxl.databus.entities.RoutingData;
 import com.opendxl.databus.producer.*;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -37,7 +38,7 @@ public class BasicPushConsumerExample {
     private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private static Logger LOG = Logger.getLogger(BasicPushConsumerExample.class);
+    private static Logger LOG = LoggerFactory.getLogger(BasicPushConsumerExample.class);
     private ExecutorService executor;
 
     public BasicPushConsumerExample() {

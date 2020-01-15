@@ -14,7 +14,8 @@ import com.opendxl.databus.producer.ProducerConfig;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.producer.metric.ProducerMetric;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
@@ -63,7 +64,7 @@ public class ProducerMetricsExample {
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private static Logger LOG = Logger.getLogger(ProducerMetricsExample.class);
+    private static Logger LOG = LoggerFactory.getLogger(ProducerMetricsExample.class);
 
     public ProducerMetricsExample() {
         // Start Kafka cluster

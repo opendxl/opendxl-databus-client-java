@@ -9,7 +9,8 @@ import com.opendxl.databus.credential.Credential;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.Deserializer;
 import org.apache.kafka.common.errors.WakeupException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     /**
      * Logger instance
      */
-    private static final Logger LOG = Logger.getLogger(DatabusPushConsumer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabusPushConsumer.class);
 
     /**
      * An executor to spawn the listener thread in async way

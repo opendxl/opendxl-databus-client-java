@@ -14,7 +14,6 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,10 +30,7 @@ public class CommandLineInterface {
 
     /**
      * Operation is a CommandLineOperation instance suitable to {@link Channel} API method that will be executed.
-     * Each API method is associated to an specific Operation, e.g.:
-     * {@link Channel#create()} is associated to {@link com.opendxl.streaming.cli.operation.CreateOperation},
-     * {@link Channel#subscribe(List)} is associated to {@link com.opendxl.streaming.cli.operation.SubscribeOperation},
-     * etc. Goal of each Operation class is to call its associated API method from the command line.
+     * Each API method is associated to an specific Operation
      */
     private CommandLineOperation operation;
 
@@ -116,7 +112,7 @@ public class CommandLineInterface {
 
         // topic option spec represented as --from-topic command line
         final ArgumentAcceptingOptionSpec<String> fromTopicOpt =
-                parser.accepts("from-topic", "Coma-separated topic name list to consume. "
+                parser.accepts("from-topic", "Comma-separated topic name list to consume. "
                         + "Example: topic1,topic2,...,topicN")
                         .withRequiredArg()
                         .describedAs("from-topic")
@@ -124,9 +120,9 @@ public class CommandLineInterface {
 
         // Consumer config option spec represented as --consume-timeout command line
         final ArgumentAcceptingOptionSpec<Integer> consumeTimeoutOpt =
-                parser.accepts("consume-timeout", "Consume Poll Timeout. Time in ms that the consumer"
-                        + " waits for new records during a consume operation. "
-                        + " Optional parameter, if absent, it defaults to 5000 ms.")
+                parser.accepts("consume-timeout", "Max time the command line"
+                        + " waits for finishing a consume operation. "
+                        + " Optional parameter, if absent, it defaults to 15000 ms.")
                         .withRequiredArg()
                         .ofType(Integer.class)
                         .describedAs("consume-timeout")
@@ -134,8 +130,8 @@ public class CommandLineInterface {
 
         // Consumer config option spec represented as --consume-records command line
         final ArgumentAcceptingOptionSpec<Integer> consumeRecordsOpt =
-                parser.accepts("consume-records", "Consume Poll expected records. "
-                        + "Number of expected records. ")
+                parser.accepts("consume-records", "Number of expected records to finish the"
+                        + " command line. ")
                         .withRequiredArg()
                         .ofType(Integer.class)
                         .describedAs("consume-records")

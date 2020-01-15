@@ -143,8 +143,7 @@ public class CommandLineInterfaceTest {
                 + " --topics topic1"
                 + " --msg Hello_World!";
         CommandLineInterface.main(args.split(" "));
-    }
-
+    }                                             
 
     @Test
     public void shouldFailWhenTopicIsMissing() {

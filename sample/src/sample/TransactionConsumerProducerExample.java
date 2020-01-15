@@ -13,7 +13,8 @@ import com.opendxl.databus.entities.RoutingData;
 import com.opendxl.databus.producer.*;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -42,7 +43,7 @@ public class TransactionConsumerProducerExample {
     private static final int TRANSACTION_MESSAGES_NUMBER = 5;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private static Logger LOG = Logger.getLogger(BasicConsumerProducerExample.class);
+    private static Logger LOG = LoggerFactory.getLogger(BasicConsumerProducerExample.class);
 
 
     public TransactionConsumerProducerExample() throws Exception {
