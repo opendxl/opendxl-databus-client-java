@@ -198,9 +198,9 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
             return databusPushConsumerFuture;
         }
 
-        final DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus
-                = new DatabusPushConsumerListenerStatus.Builder().build();
-        databusPushConsumerFuture = new DatabusPushConsumerFuture(databusPushConsumerListenerStatus, countDownLatch);
+        final DatabusPushConsumerStatus databusPushConsumerStatus
+                = new DatabusPushConsumerStatus.Builder().build();
+        databusPushConsumerFuture = new DatabusPushConsumerFuture(databusPushConsumerStatus, countDownLatch);
 
         pushAsyncExecutor = Executors.newFixedThreadPool(1);
         Runnable pushRecordTask = () -> push(databusPushConsumerFuture, timeout);
@@ -300,7 +300,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                         resume(assignment());
                         databusPushConsumerFuture
                                 .setDatabusPushConsumerListenerStatus(
-                                        new DatabusPushConsumerListenerStatus.Builder()
+                                        new DatabusPushConsumerStatus.Builder()
                                                 .withListenerResult(onConsumeResponse)
                                                 .build());
 
@@ -316,7 +316,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                                 + " listener throws an Exception while it was working: " + e.getMessage(), e);
                         databusPushConsumerFuture
                                 .setDatabusPushConsumerListenerStatus(
-                                        new DatabusPushConsumerListenerStatus.Builder()
+                                        new DatabusPushConsumerStatus.Builder()
                                                 .withException(e)
                                                 .build());
                         stopRequested.set(true);
@@ -325,14 +325,14 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                         LOG.warn("Consumer " + super.getClientId() + " was cancelled: " + e.getMessage(), e);
                         databusPushConsumerFuture
                                 .setDatabusPushConsumerListenerStatus(
-                                        new DatabusPushConsumerListenerStatus.Builder().build());
+                                        new DatabusPushConsumerStatus.Builder().build());
                         stopRequested.set(true);
                         break;
                     } catch (Exception e) {
                         LOG.warn("Consumer " + super.getClientId() + " exception: " + e.getMessage(), e);
                         databusPushConsumerFuture
                                 .setDatabusPushConsumerListenerStatus(
-                                        new DatabusPushConsumerListenerStatus.Builder()
+                                        new DatabusPushConsumerStatus.Builder()
                                                 .withException(e)
                                                 .build());
                         stopRequested.set(true);
@@ -387,8 +387,8 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         // Update the Push Consumer status
         databusPushConsumerFuture
                 .setDatabusPushConsumerListenerStatus(
-                        new DatabusPushConsumerListenerStatus.Builder()
-                                .withStatus(DatabusPushConsumerListenerStatus.Status.PROCESSING)
+                        new DatabusPushConsumerStatus.Builder()
+                                .withStatus(DatabusPushConsumerStatus.Status.PROCESSING)
                                 .build());
 
         LOG.info("Consumer " + getClientId() + " Listener was called");

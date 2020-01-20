@@ -83,12 +83,12 @@ public class DatabusPushConsumerTest {
             // Set max.poll.interval.ms timeout
             Assert.assertEquals(numOfRecordsToProduce, recordsProduced.size());
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
-            Assert.assertTrue(databusPushConsumerListenerStatus.getException() == null);
-            Assert.assertTrue(databusPushConsumerListenerStatus.getListenerResult()
+            DatabusPushConsumerStatus databusPushConsumerStatus = databusPushConsumerFuture.get();
+            Assert.assertTrue(databusPushConsumerStatus.getException() == null);
+            Assert.assertTrue(databusPushConsumerStatus.getListenerResult()
                     == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT);
-            Assert.assertTrue(databusPushConsumerListenerStatus.getStatus()
-                    == DatabusPushConsumerListenerStatus.Status.STOPPED);
+            Assert.assertTrue(databusPushConsumerStatus.getStatus()
+                    == DatabusPushConsumerStatus.Status.STOPPED);
 
             Assert.assertTrue(databusPushConsumerFuture.isDone());
         } catch (IOException | InterruptedException | ExecutionException e) {
@@ -143,13 +143,13 @@ public class DatabusPushConsumerTest {
             // Set max.poll.interval.ms timeout
             Assert.assertEquals(numOfRecordsToProduce, recordsProduced.size());
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+            DatabusPushConsumerStatus databusPushConsumerStatus = databusPushConsumerFuture.get();
             Assert.assertTrue(databusPushConsumerFuture.isDone());
-            Assert.assertTrue(  databusPushConsumerListenerStatus.getException() != null);
-            Assert.assertTrue( databusPushConsumerListenerStatus.getException() instanceof ExecutionException );
-            Assert.assertTrue( databusPushConsumerListenerStatus.getException().getCause() instanceof ArithmeticException );
-            Assert.assertTrue( databusPushConsumerListenerStatus.getListenerResult() == null );
-            Assert.assertTrue( databusPushConsumerListenerStatus.getStatus() == DatabusPushConsumerListenerStatus.Status.STOPPED );
+            Assert.assertTrue(  databusPushConsumerStatus.getException() != null);
+            Assert.assertTrue( databusPushConsumerStatus.getException() instanceof ExecutionException );
+            Assert.assertTrue( databusPushConsumerStatus.getException().getCause() instanceof ArithmeticException );
+            Assert.assertTrue( databusPushConsumerStatus.getListenerResult() == null );
+            Assert.assertTrue( databusPushConsumerStatus.getStatus() == DatabusPushConsumerStatus.Status.STOPPED );
 
 
         } catch (IOException | InterruptedException | ExecutionException e) {
@@ -218,7 +218,7 @@ public class DatabusPushConsumerTest {
 
             DatabusPushConsumerFuture databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(1000));
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+            DatabusPushConsumerStatus databusPushConsumerStatus = databusPushConsumerFuture.get();
             Assert.assertTrue(databusPushConsumerFuture.isDone());
 
 
@@ -228,9 +228,9 @@ public class DatabusPushConsumerTest {
             Assert.assertTrue(actualPosition.get(tp2) == offsetToSeekForPartition2);
 
 
-            Assert.assertTrue( databusPushConsumerListenerStatus.getException() == null);
-            Assert.assertTrue( databusPushConsumerListenerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
-            Assert.assertTrue( databusPushConsumerListenerStatus.getStatus() == DatabusPushConsumerListenerStatus.Status.STOPPED );
+            Assert.assertTrue( databusPushConsumerStatus.getException() == null);
+            Assert.assertTrue( databusPushConsumerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
+            Assert.assertTrue( databusPushConsumerStatus.getStatus() == DatabusPushConsumerStatus.Status.STOPPED );
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             Assert.fail();
@@ -324,7 +324,7 @@ public class DatabusPushConsumerTest {
 
             DatabusPushConsumerFuture databusPushConsumerFuture = consumer.pushAsync(Duration.ofMillis(1000));
 
-            DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = databusPushConsumerFuture.get();
+            DatabusPushConsumerStatus databusPushConsumerStatus = databusPushConsumerFuture.get();
             Assert.assertTrue(databusPushConsumerFuture.isDone());
 
 
@@ -336,9 +336,9 @@ public class DatabusPushConsumerTest {
             Assert.assertTrue(actualPosition.get(t2p1) == offsetToSeekForT2Partition1);
             Assert.assertTrue(actualPosition.get(t2p2) == offsetToSeekForT2Partition2);
 
-            Assert.assertTrue( databusPushConsumerListenerStatus.getException() == null);
-            Assert.assertTrue( databusPushConsumerListenerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
-            Assert.assertTrue( databusPushConsumerListenerStatus.getStatus() == DatabusPushConsumerListenerStatus.Status.STOPPED );
+            Assert.assertTrue( databusPushConsumerStatus.getException() == null);
+            Assert.assertTrue( databusPushConsumerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
+            Assert.assertTrue( databusPushConsumerStatus.getStatus() == DatabusPushConsumerStatus.Status.STOPPED );
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();

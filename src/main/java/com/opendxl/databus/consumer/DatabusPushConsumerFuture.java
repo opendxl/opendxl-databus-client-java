@@ -15,12 +15,12 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * This class allows SDK Databus client to know the status of a {@link DatabusPushConsumer} instance
  */
-public class DatabusPushConsumerFuture implements Future<DatabusPushConsumerListenerStatus> {
+public class DatabusPushConsumerFuture implements Future<DatabusPushConsumerStatus> {
 
     /**
      * A Listener Status instance
      */
-    private final AtomicReference<DatabusPushConsumerListenerStatus> databusPushConsumerListenerStatus
+    private final AtomicReference<DatabusPushConsumerStatus> databusPushConsumerListenerStatus
             = new AtomicReference<>();
 
     /**
@@ -32,24 +32,24 @@ public class DatabusPushConsumerFuture implements Future<DatabusPushConsumerList
     /**
      * Constructor
      *
-     * @param databusPushConsumerListenerStatus Listener Status instance
+     * @param databusPushConsumerStatus Listener Status instance
      * @param countDownLatch A latch to signal that the DatabusPushConsumer has finished
      */
-    public DatabusPushConsumerFuture(final DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus,
+    public DatabusPushConsumerFuture(final DatabusPushConsumerStatus databusPushConsumerStatus,
                                      final CountDownLatch countDownLatch) {
         this.countDownLatch = countDownLatch;
-        this.databusPushConsumerListenerStatus.set(databusPushConsumerListenerStatus);
+        this.databusPushConsumerListenerStatus.set(databusPushConsumerStatus);
     }
 
 
     /**
      *  Set the listener status
-     * @param databusPushConsumerListenerStatus listener status
+     * @param databusPushConsumerStatus listener status
      */
-    public void setDatabusPushConsumerListenerStatus(final DatabusPushConsumerListenerStatus
-                                                             databusPushConsumerListenerStatus) {
+    public void setDatabusPushConsumerListenerStatus(final DatabusPushConsumerStatus
+                                                             databusPushConsumerStatus) {
 
-        this.databusPushConsumerListenerStatus.set(databusPushConsumerListenerStatus);
+        this.databusPushConsumerListenerStatus.set(databusPushConsumerStatus);
     }
 
 
@@ -70,14 +70,14 @@ public class DatabusPushConsumerFuture implements Future<DatabusPushConsumerList
     }
 
     @Override
-    public DatabusPushConsumerListenerStatus get() throws InterruptedException, ExecutionException,
+    public DatabusPushConsumerStatus get() throws InterruptedException, ExecutionException,
             CancellationException {
         countDownLatch.await();
         return databusPushConsumerListenerStatus.get();
     }
 
     @Override
-    public DatabusPushConsumerListenerStatus get(final long timeout, final TimeUnit unit) throws InterruptedException,
+    public DatabusPushConsumerStatus get(final long timeout, final TimeUnit unit) throws InterruptedException,
             ExecutionException, TimeoutException {
         try {
             countDownLatch.await(timeout, unit);

@@ -7,11 +7,22 @@ package sample;
 import broker.ClusterHelper;
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.*;
+import com.opendxl.databus.consumer.ConsumerConfiguration;
+import com.opendxl.databus.consumer.ConsumerRecord;
+import com.opendxl.databus.consumer.ConsumerRecords;
+import com.opendxl.databus.consumer.DatabusPushConsumer;
+import com.opendxl.databus.consumer.DatabusPushConsumerFuture;
+import com.opendxl.databus.consumer.DatabusPushConsumerListener;
+import com.opendxl.databus.consumer.DatabusPushConsumerListenerResponse;
+import com.opendxl.databus.consumer.DatabusPushConsumerStatus;
 import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.entities.RoutingData;
-import com.opendxl.databus.producer.*;
+import com.opendxl.databus.producer.Callback;
+import com.opendxl.databus.producer.DatabusProducer;
+import com.opendxl.databus.producer.Producer;
+import com.opendxl.databus.producer.ProducerConfig;
+import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
@@ -50,7 +61,7 @@ public class BasicPushConsumerExample {
         produceMessages();
 
         // Create a Push Consumer
-        DatabusPushConsumerListenerStatus databusPushConsumerListenerStatus = null;
+        DatabusPushConsumerStatus databusPushConsumerStatus = null;
         try(DatabusPushConsumer<byte[]> consumer =
                     new DatabusPushConsumer(getConsumerConfig(),
                             new ByteArrayDeserializer(), new MessageProcessor())) {
@@ -62,12 +73,12 @@ public class BasicPushConsumerExample {
             this.databusPushConsumerFuture = consumer.pushAsync();
 
             // Wait until the example is stopped
-            databusPushConsumerListenerStatus = this.databusPushConsumerFuture.get();
+            databusPushConsumerStatus = this.databusPushConsumerFuture.get();
 
         } catch (Exception e) {
             LOG.error("ERROR" + e.getMessage(), e);
         } finally {
-            LOG.info("Push consumer status:" + databusPushConsumerListenerStatus.getStatus());
+            LOG.info("Push consumer status:" + databusPushConsumerStatus.getStatus());
         }
     }
 
