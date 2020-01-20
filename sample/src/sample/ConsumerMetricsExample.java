@@ -151,6 +151,7 @@ public class ConsumerMetricsExample {
                 try {
                     consumer.close();
                 } catch (IOException e) {
+                    LOG.error(e.getMessage());
                 }
                 LOG.info("Consumer closed");
 

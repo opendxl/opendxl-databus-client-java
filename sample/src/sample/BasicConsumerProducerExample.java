@@ -156,6 +156,7 @@ public class BasicConsumerProducerExample {
                 try {
                     consumer.close();
                 } catch (IOException e) {
+                    LOG.error(e.getMessage());
                 }
                 LOG.info("Consumer closed");
 

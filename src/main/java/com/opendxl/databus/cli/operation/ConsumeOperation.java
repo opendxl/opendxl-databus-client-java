@@ -135,7 +135,7 @@ public class ConsumeOperation implements CommandLineOperation {
                 try {
                     consumer.close();
                 } catch (IOException e) {
-
+                    LOG.error(e.getMessage());
                 }
             }
         }
