@@ -1521,9 +1521,8 @@ public abstract class Consumer<P> {
     }
 
     /**
-     * Sets the clientId
+     * Get the clientId
      *
-     * @param clientId - The clientId to set.
      */
     protected String getClientId() {
         return this.clientId;

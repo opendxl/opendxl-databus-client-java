@@ -6,7 +6,7 @@ package com.opendxl.databus.consumer;
 
 public enum DatabusPushConsumerListenerResponse {
 
-    // returned by listsner when it wants to continue pushing more messages
+    // returned by listener when it wants to continue pushing more messages
     CONTINUE_AND_COMMIT,
 
     // returned by listener when it wants to receive the same records

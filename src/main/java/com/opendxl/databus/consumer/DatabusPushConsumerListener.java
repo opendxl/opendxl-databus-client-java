@@ -13,6 +13,9 @@ package com.opendxl.databus.consumer;
  * According to it, DatabusPushConsumer will act accordingly.
  * <p>
  * {@link DatabusPushConsumerListenerResponse#CONTINUE_AND_COMMIT }
+ * {@link DatabusPushConsumerListenerResponse#RETRY }
+ * {@link DatabusPushConsumerListenerResponse#STOP_AND_COMMIT }
+ * {@link DatabusPushConsumerListenerResponse#STOP_NO_COMMIT }
  * </p>
  *
  *

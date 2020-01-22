@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * already-subscribed topic and push them to a {@link DatabusPushConsumerListener} listener
  * instance implemented by the SDK Databus client.
  * The listener receives messages read from Databus and it should implement some logic to process them.
- * The listener returns a {@link DatabusPushConsumerListenerResponse} enum value to let Push Databus Consumer knows
+ * The listener returns a {@link DatabusPushConsumerListenerResponse} enum value to let Push Databus Consumer known
  * which action it should take.
  *
  * @param <P> Message payload type
@@ -63,7 +63,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
     /**
-     * An future instance to control the listener thread
+     * A future instance to control the listener thread
      */
     private Future<DatabusPushConsumerListenerResponse> listenerFuture;
 
@@ -73,7 +73,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     private AtomicBoolean stopRequested = new AtomicBoolean(false);
 
     /**
-     * An executor to spawn the mail loop thread in async way.
+     * An executor to spawn the main loop thread in async way.
      */
     private ExecutorService pushAsyncExecutor = null;
 
@@ -268,7 +268,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                 DatabusPushConsumerListenerResponse onConsumeResponse ;
                 boolean listenerIsFinished = false;
 
-                // This loop wait for listener the resutl or manages exceptions that listener might throws.
+                // This loop waits for the listener the result and it also manages exceptions that listener might throw.
                 while (!listenerIsFinished && !stopRequested.get()) {
                     try {
                         onConsumeResponse = listenerFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -411,6 +411,9 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         return lastKnownPositionPerTopicPartition;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws IOException {
 
