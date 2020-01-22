@@ -13,6 +13,7 @@ import com.opendxl.databus.consumer.ConsumerRecords;
 import com.opendxl.databus.consumer.DatabusConsumer;
 import com.opendxl.databus.consumer.OffsetAndMetadata;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -120,7 +121,10 @@ public class ConsumerHelper {
     }
 
     public ConsumerHelper close() {
-        consumer.close();
+        try {
+            consumer.close();
+        } catch (IOException e) {
+        }
         return this;
     }
 
@@ -158,11 +162,11 @@ public class ConsumerHelper {
         consumer.pause(getConsumerAssignment());
     }
 
-    private TopicPartition[] getConsumerAssignment() {
-        TopicPartition tp[] = new TopicPartition[consumer.assignment().size()];
+    private List<TopicPartition> getConsumerAssignment() {
+        List<TopicPartition>  tp = new ArrayList(consumer.assignment().size());
         int i = 0;
-        for (TopicPartition x : consumer.assignment()) {
-            tp[i++] = x;
+        for (TopicPartition element : consumer.assignment()) {
+            tp.add(element);
         }
         return tp;
     }

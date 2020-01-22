@@ -24,6 +24,7 @@ import com.opendxl.databus.serialization.ByteArraySerializer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -147,7 +148,11 @@ public class ConsumerMetricsExample {
                 LOG.error(e.getMessage());
             } finally {
                 consumer.unsubscribe();
-                consumer.close();
+                try {
+                    consumer.close();
+                } catch (IOException e) {
+                    LOG.error(e.getMessage());
+                }
                 LOG.info("Consumer closed");
 
             }

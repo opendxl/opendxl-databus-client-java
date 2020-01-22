@@ -25,6 +25,7 @@ import broker.ClusterHelper;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -152,7 +153,11 @@ public class BasicConsumerProducerExample {
                 LOG.error(e.getMessage());
             } finally {
                 consumer.unsubscribe();
-                consumer.close();
+                try {
+                    consumer.close();
+                } catch (IOException e) {
+                    LOG.error(e.getMessage());
+                }
                 LOG.info("Consumer closed");
 
             }

@@ -6,28 +6,22 @@ package com.opendxl.databus.consumer;
 
 import broker.ClusterHelper;
 import com.opendxl.databus.common.TopicPartition;
+import com.opendxl.databus.exception.DatabusClientRuntimeException;
+import com.opendxl.databus.producer.ProducerRecord;
+import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.util.Constants;
 import com.opendxl.databus.util.ConsumerHelper;
 import com.opendxl.databus.util.ProducerHelper;
 import com.opendxl.databus.util.Topic;
-import com.opendxl.databus.exception.DatabusClientRuntimeException;
-import com.opendxl.databus.producer.ProducerRecord;
-import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -271,7 +265,7 @@ public class ConsumerTest {
 
 
     @Test
-    public void ShouldRebalanceBecauseMaxPollIntervalTimeout() {
+    public void shouldRebalanceBecauseMaxPollIntervalTimeout() {
         try {
 
             final int numOfRecordsToProduce = 10;
@@ -316,6 +310,100 @@ public class ConsumerTest {
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void rebelancingPausedTopicPartitionTest() {
+
+        try {
+            final int numOfRecordsToProduce = 10;
+
+            // Create a topic with 3 partitions
+            final String topicName = createTopic()
+                    .partitions(1)
+                    .go();
+
+            TopicPartition topicPartition = new TopicPartition(topicName, 0);
+
+            // produceWithStreamingSDK records
+            Map<String, ProducerRecord<byte[]>> recordsProduced = produceTo(topicName)
+                    .numberOfRecords(numOfRecordsToProduce)
+                    .produce()
+                    .asMap();
+
+            // Check that all records were produced successfully
+            // Set max.poll.interval.ms timeout
+            Assert.assertEquals(numOfRecordsToProduce, recordsProduced.size());
+
+
+            // Common config for consumers
+            Properties config = new Properties();
+            config.put(ConsumerConfiguration.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+            config.put(ConsumerConfiguration.GROUP_ID_CONFIG, topicName);
+            config.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, "false");
+            config.put(ConsumerConfiguration.SESSION_TIMEOUT_MS_CONFIG, "30000");
+            config.put(ConsumerConfiguration.CLIENT_ID_CONFIG, topicName);
+            config.put(ConsumerConfiguration.MAX_POLL_RECORDS_CONFIG, 1);
+            config.put(ConsumerConfiguration.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+            // Create consumer1 and consume 1 record
+            Consumer<byte[]> consumer1 = new DatabusConsumer<>(config, new ByteArrayDeserializer());
+            consumer1.subscribe(Arrays.asList(topicName));
+            ConsumerRecords records1 = consumer1.poll(Duration.ofMillis(6000));
+
+            // Assert that consumer1 reads 1 record and topicPartition was assigned
+            Assert.assertTrue(records1.count() == 1);
+            Assert.assertTrue(consumer1.assignment().contains(topicPartition));
+
+            // Create consumer2 and consume 1 record
+            Consumer<byte[]> consumer2 = new DatabusConsumer<>(config, new ByteArrayDeserializer());
+            consumer2.subscribe(Arrays.asList(topicName));
+            ConsumerRecords records2 = consumer2.poll(Duration.ofMillis(6000));
+
+            // Assert that consumer2 did not read anything and topicPartiion was not assigned
+            Assert.assertTrue(records2.count() == 0);
+            Assert.assertTrue(!consumer2.assignment().contains(topicPartition));
+
+            // Pause topicPartition and assrt that
+            Assert.assertTrue(!consumer1.paused().contains(topicPartition));
+            consumer1.pause(Arrays.asList(topicPartition));
+            Assert.assertTrue(consumer1.paused().contains(topicPartition));
+
+            // Outprint consumer1 and consumer2 subscription and partitions assigned
+            System.out.println("Consumer1 subscription:" + consumer1.subscription());
+            System.out.println("Consumer2 subscription:" + consumer2.subscription());
+            System.out.println("Consumer1 assigmanent:" + consumer1.assignment());
+            System.out.println("Consumer2 assigmanent:" + consumer2.assignment());
+
+            // Close consumer1 to cause rebalancing
+
+            consumer1.close();
+            // Consumer2 poll to join the group
+            consumer2.poll(0);
+            System.out.println("Consumer1 closed");
+
+            // Wait till coordinator assignes topicPartition to consumer2
+            while (!consumer2.assignment().contains(topicPartition)) {
+                System.out.println(consumer2.assignment());
+                Thread.sleep(1000);
+            }
+
+            // printout that comnsumer2 assignament and  a list of topicPartition paused
+            System.out.println("Consumer2 assigmanent:" + consumer2.assignment());
+            System.out.println("Consumer2 paused:" + consumer2.paused());
+
+
+            Assert.assertTrue(consumer2.assignment().contains(topicPartition));
+
+            records2 = consumer2.poll(Duration.ofMillis(6000));
+            System.out.println("Consumer2 records:" + records2.count());
+            Assert.assertTrue(records2.count() == 1);
+            Assert.assertTrue(consumer2.paused().isEmpty());
+
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+
     }
 
 
@@ -373,6 +461,7 @@ public class ConsumerTest {
             Assert.fail(e.getMessage());
         }
     }
+
 
 
 
