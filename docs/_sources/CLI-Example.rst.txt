@@ -19,12 +19,11 @@ library with no arguments displays help information:
     --config [String: config]              The producer/consumer configuration    
                                              list: Example: linger.ms=1000,batch. 
                                              size=100000,compression.type=lz4     
-    --consume-records <Integer: consume-   Consume Poll expected records. Number  
-      records>                               of expected records.  (default: 1)   
-    --consume-timeout <Integer: consume-   Consume Poll Timeout. Time in ms that  
-      timeout>                               the consumer waits for new records   
-                                             during a consume operation.          
-                                             Optional parameter, if absent, it    
+    --consume-records <Integer: consume-   Number of expected records to finish
+      records>                               the command line.  (default: 1)
+    --consume-timeout <Integer: consume-   Max time the command line waits for
+      timeout>                               finishing a consumer operation.
+                                             Optional parameter, if absent, it
                                              defaults to 15000 ms. (default: 15000)
     --from-topic <String: from-topic>      Comma-separated topic name list to
                                              consume. Example: topic1,topic2,..., 
@@ -159,9 +158,7 @@ consume
 ^^^^^^^
 
 An operation which receives messages from specified topics at
-specified brokers. Optional arguments, like consume-records or
-consume-timeout, are supported to refine the record list contained in
-the consumer operation result.
+specified brokers.
 
 +----------------------+----------------+
 | Mandatory Arguments  | Description    |
@@ -208,24 +205,23 @@ the consumer operation result.
 |                       | auto.offset.reset=earliest, |               |
 |                       | auto.commit.interval.ms=0   |               |
 +-----------------------+-----------------------------+---------------+
-| ``--consume-records`` | Maximum number of records   | 1 record      |
-|                       | to read within the          |               |
-|                       | specified                   |               |
-|                       | ``consume-timeout``.        |               |
+| ``--consume-records`` | Number of expected records  | 1 record      |
+|                       | to finish command line.     |               |
 |                       | CLI polls for new records   |               |
 |                       | until one of the following  |               |
-|                       | occurs:timeout has          |               |
-|                       | elapsed or maximum number   |               |
-|                       | of records were received.   |               |
+|                       | occurs: timeout has         |               |
+|                       | elapsed or number of records|               |
+|                       | received were greater than  |               |
+|                       | this value.                 |               |
 +-----------------------+-----------------------------+---------------+
-| ``--consume-timeout`` | Maximum time to wait for    | 15000         |
-|                       | receiving the specified     | milliseconds  |
-|                       | ``consume-records`` number. |               |
+| ``--consume-timeout`` | Maximum time the command    | 15000         |
+|                       | line waits for finishing    | milliseconds  |
+|                       | a consume operation.        |               |
 |                       | CLI polls for new records   |               |
 |                       | until one of the following  |               |
-|                       | occurs:timeout has elapsed  |               |
+|                       | occurs: timeout has elapsed |               |
 |                       | or number of received       |               |
-|                       | records reached             |               |
+|                       | records were greater than   |               |
 |                       | ``consume-records`` value.  |               |
 +-----------------------+-----------------------------+---------------+
 
@@ -238,8 +234,8 @@ example
     --operation consume \
     --from-topic <TOPIC_1,TOPIC_2,...,TOPIC_N> \
     --brokers <BROKER_1_IP:BROKER_1_PORT,BROKER_2_PORT:BROKER_2_PORT,...> \
-    --consume-timeout <CONSUME-TIMEOUT> \
-    --consume-records <CONSUME-RECORDS-NUMBER> \
+    --consume-timeout <CONSUME-TIMEOUT-TO-FINISH-CLI> \
+    --consume-records <CONSUME-RECORDS-NUMBER-TO-FINISH-CLI> \
     --tenant-group <TENANT-GROUP-NAME> \
     --cg <CONSUMER-GROUP>
     --config enable.auto.commit=true 

@@ -75,6 +75,7 @@ Basic
         Producer-metrics-sample.rst
         Consumer-metrics-sample.rst
         Transactions-producer-consumer-example.rst
+        Basic-push-consumer-example.rst
 
 Bugs and Feedback
 -----------------

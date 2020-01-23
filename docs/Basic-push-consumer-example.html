@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Push Consumer Example &mdash; OpenDXL Databus Java Client Library 2.4.0-SNAPSHOT documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Transactions producer consumer example" href="Transactions-producer-consumer-example.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenDXL Databus Java Client Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.4.0-SNAPSHOT
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="CLI-Example.html">CLI (Command Line Interface)</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Basic-producer-consumer-example.html">Producer Consumer Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Transactions-producer-consumer-example.html">Transactions producer consumer example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Push Consumer Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-code">Sample Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#steps-to-create-a-push-consumer">Steps to create a Push Consumer</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenDXL Databus Java Client Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Push Consumer Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="push-consumer-example">
+<h1>Push Consumer Example<a class="headerlink" href="#push-consumer-example" title="Permalink to this headline">¶</a></h1>
+<p>This sample demonstrates how to consume messages from the
+DXL Databus client by using a DatabusPushConsumer consumer in a
+running Kafka cluster.</p>
+<p>A DatabusPushConsumer allows clients focus on manipulate messages received from Databus and free them to
+to deal with the transport mechanism like commit and retry.</p>
+<p>Main advantage</p>
+<ul class="simple">
+<li>It eliminates rebalancing because it takes advantage of consumer pause and resume behind scene while records are being processed.</li>
+<li>It offers Retry operation to reprocess the same set of records automatically when they fail.</li>
+<li>Push model instead of Polling model. Records are read from Kafka and pushed into client’s logic implementation. Continuous polling is eliminated.</li>
+<li>Hide consumer complexity operation like poll, commit, pause, resume, and seek. Let the user focus on processing records logic.</li>
+</ul>
+<p>Code highlights are shown below:</p>
+<div class="section" id="sample-code">
+<h2>Sample Code<a class="headerlink" href="#sample-code" title="Permalink to this headline">¶</a></h2>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span>package sample;
+
+import broker.ClusterHelper;
+import com.opendxl.databus.common.RecordMetadata;
+import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
+import com.opendxl.databus.consumer.*;
+import com.opendxl.databus.entities.Headers;
+import com.opendxl.databus.entities.MessagePayload;
+import com.opendxl.databus.entities.RoutingData;
+import com.opendxl.databus.producer.*;
+import com.opendxl.databus.serialization.ByteArrayDeserializer;
+import com.opendxl.databus.serialization.ByteArraySerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+
+public class BasicPushConsumerExample {
+
+    private static final String PRODUCE_TOPIC = &quot;topic1&quot;;
+    private static final String CONSUME_TOPIC = &quot;topic1&quot;;
+    private DatabusPushConsumerFuture databusPushConsumerFuture;
+
+    private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+
+    private static Logger LOG = LoggerFactory.getLogger(BasicPushConsumerExample.class);
+    private ExecutorService executor;
+
+    public BasicPushConsumerExample() {
+
+        // Start Kafka cluster
+        startKafkaCluster();
+
+        // Start producing messages to Databus
+        produceMessages();
+
+        // Create a Push Consumer
+        DatabusPushConsumerListenerStatus databusPushConsumerStatus = null;
+        try(DatabusPushConsumer&lt;byte[]&gt; consumer =
+                    new DatabusPushConsumer(getConsumerConfig(),
+                            new ByteArrayDeserializer(), new MessageProcessor())) {
+
+            // Subscribe to topic
+            consumer.subscribe(Collections.singletonList(CONSUME_TOPIC));
+
+            // Start pushing messages into MessageProcessor in an async fashion
+            this.databusPushConsumerFuture = consumer.pushAsync();
+
+            // Wait until the example is stopped
+            databusPushConsumerStatus = this.databusPushConsumerFuture.get();
+
+        } catch (Exception e) {
+            LOG.error(&quot;ERROR&quot; + e.getMessage(), e);
+        } finally {
+            LOG.info(&quot;Push consumer status:&quot; + databusPushConsumerStatus.getStatus());
+        }
+    }
+
+    private void startKafkaCluster() {
+        ClusterHelper
+                .getInstance()
+                .addBroker(9092)
+                .zookeeperPort(2181)
+                .start();
+    }
+
+    private Properties getConsumerConfig() {
+        // Start pushing messages coming from Databus
+        final Properties config = new Properties();
+        config.put(ConsumerConfiguration.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+        config.put(ConsumerConfiguration.GROUP_ID_CONFIG, &quot;consumer-group-1&quot;);
+        config.put(ConsumerConfiguration.ENABLE_AUTO_COMMIT_CONFIG, &quot;false&quot;);
+        config.put(ConsumerConfiguration.CLIENT_ID_CONFIG, &quot;consumer-id&quot;);
+        return config;
+    }
+
+    /**
+     * This is the implementation performed by the Databus SDK client to process messages
+     */
+    class MessageProcessor implements DatabusPushConsumerListener&lt;byte[]&gt; {
+
+        @Override
+        public DatabusPushConsumerListenerResponse onConsume(ConsumerRecords&lt;byte[]&gt; records) {
+            // Iterate records
+            for (ConsumerRecord&lt;byte[]&gt; record : records) {
+
+                // Get headers as String
+                final StringBuilder headers = new StringBuilder().append(&quot;[&quot;);
+                record.getHeaders().getAll().forEach((k, v) -&gt; headers.append(&quot;[&quot; + k + &quot;:&quot; + v + &quot;]&quot;));
+                headers.append(&quot;]&quot;);
+
+                LOG.info(&quot;[CONSUMER &lt;- KAFKA][MSG RCEIVED] ID &quot; + record.getKey() +
+                        &quot; TOPIC:&quot; + record.getComposedTopic() +
+                        &quot; KEY:&quot; + record.getKey() +
+                        &quot; PARTITION:&quot; + record.getPartition() +
+                        &quot; OFFSET:&quot; + record.getOffset() +
+                        &quot; TIMESTAMP:&quot; + record.getTimestamp() +
+                        &quot; HEADERS:&quot; + headers +
+                        &quot; PAYLOAD:&quot; + new String(record.getMessagePayload().getPayload()));
+            }
+
+            return DatabusPushConsumerListenerResponse.CONTINUE_AND_COMMIT;
+        }
+    }
+
+    private void produceMessages() {
+
+        final Map config = new HashMap&lt;String, Object&gt;();
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+        config.put(ProducerConfig.CLIENT_ID_CONFIG, &quot;producer-id-sample&quot;);
+        config.put(ProducerConfig.LINGER_MS_CONFIG, &quot;100&quot;);
+        config.put(ProducerConfig.BATCH_SIZE_CONFIG, &quot;150000&quot;);
+        Producer&lt;byte[]&gt; producer =  new DatabusProducer&lt;&gt;(config, new ByteArraySerializer());
+
+        Runnable produceMessagesTask = () -&gt; {
+            LOG.info(&quot;Producer started&quot;);
+            while (!closed.get()) {
+
+                // Prepare a record
+                final String message = &quot;Hello World at:&quot; + LocalDateTime.now();
+
+                // user should provide the encoding
+                final byte[] payload = message.getBytes(Charset.defaultCharset());
+
+                String key = String.valueOf(System.currentTimeMillis());
+                RoutingData routingData = new RoutingData(PRODUCE_TOPIC, key, null);
+                Headers headers = null;
+                MessagePayload&lt;byte[]&gt; messagePayload = new MessagePayload&lt;&gt;(payload);
+                ProducerRecord&lt;byte[]&gt; producerRecord = new ProducerRecord&lt;&gt;(routingData, headers, messagePayload);
+
+
+                // Send the record
+                producer.send(producerRecord, new ProducerCallback(producerRecord.getRoutingData().getShardingKey()));
+                LOG.info(&quot;[PRODUCER -&gt; KAFKA][SENDING MSG] ID &quot; + producerRecord.getRoutingData().getShardingKey() +
+                        &quot; TOPIC:&quot; + TopicNameBuilder.getTopicName(PRODUCE_TOPIC, null) +
+                        &quot; PAYLOAD:&quot; + message);
+
+                justWait(PRODUCER_TIME_CADENCE_MS);
+            }
+            producer.flush();
+            producer.close();
+            LOG.info(&quot;Producer closed&quot;);
+
+        };
+
+        executor = Executors.newFixedThreadPool(1);
+        executor.submit(produceMessagesTask);
+    }
+
+
+
+    private void justWait(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static class ProducerCallback implements Callback {
+
+        private String shardingKey;
+
+        public ProducerCallback(String shardingKey) {
+
+            this.shardingKey = shardingKey;
+        }
+
+        public void onCompletion(RecordMetadata metadata, Exception exception) {
+            if (exception != null) {
+                LOG.warn(&quot;Error sending a record &quot; + exception.getMessage());
+                return;
+            }
+            LOG.info(&quot;[PRODUCER &lt;- KAFKA][OK MSG SENT] ID &quot; + shardingKey +
+                    &quot; TOPIC:&quot; + metadata.topic() +
+                    &quot; PARTITION:&quot; + metadata.partition() +
+                    &quot; OFFSET:&quot; + metadata.offset());
+        }
+    }
+
+    synchronized private void stopExample() {
+        try {
+            closed.set(true);
+            ClusterHelper.getInstance().stop();
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+        } finally {
+            executor.shutdownNow();
+            LOG.info(&quot;Example finished&quot;);
+
+        }
+    }
+
+    public void startExample() throws InterruptedException {
+
+        Runtime.getRuntime().addShutdownHook(
+                new Thread(
+                        new Runnable() {
+                            public void run() {
+                                stopExample();
+                                LOG.info(&quot;Example finished&quot;);
+                            }
+                        }));
+
+    }
+
+
+    public static void main(String[] args) throws InterruptedException {
+        LOG.info(&quot;Ctrl-C to finish&quot;);
+        new BasicPushConsumerExample().startExample();
+    }
+
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="steps-to-create-a-push-consumer">
+<h2>Steps to create a Push Consumer<a class="headerlink" href="#steps-to-create-a-push-consumer" title="Permalink to this headline">¶</a></h2>
+<p>1. Create a DatabusPushConsumer by using a specific consumer configuration and a DatabusPushConsumerListener instance
+that contains the logic to manage the received records. In this case MessageProcessor class implements
+DatabusPushConsumerListener interface to listen to messages coming from Databus.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">DatabusPushConsumer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">consumer</span> <span class="o">=</span>
+            <span class="n">new</span> <span class="n">DatabusPushConsumer</span><span class="p">(</span><span class="n">getConsumerConfig</span><span class="p">(),</span>
+                    <span class="n">new</span> <span class="n">ByteArrayDeserializer</span><span class="p">(),</span> <span class="n">new</span> <span class="n">MessageProcessor</span><span class="p">());</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li>Subscribe to a topic</li>
+</ol>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Collections</span><span class="o">.</span><span class="n">singletonList</span><span class="p">(</span><span class="n">CONSUME_TOPIC</span><span class="p">));</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li>Start pushing messages into MessageProcessor in an async fashion.</li>
+</ol>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">databusPushConsumerFuture</span> <span class="o">=</span> <span class="n">consumer</span><span class="o">.</span><span class="n">pushAsync</span><span class="p">();</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li>Monitor Push Consumer</li>
+</ol>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="o">//</span> <span class="n">Wait</span> <span class="n">indefinitely</span>
+<span class="n">databusPushConsumerFuture</span><span class="o">.</span><span class="n">get</span><span class="p">();</span>
+
+<span class="o">...</span>
+<span class="o">//</span> <span class="n">Wait</span> <span class="k">for</span> <span class="n">a</span> <span class="k">while</span> <span class="n">then</span> <span class="n">check</span> <span class="n">the</span> <span class="n">listener</span> <span class="n">status</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">true</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="n">DatabusPushConsumerStatus</span> <span class="n">status</span> <span class="o">=</span>
+                <span class="n">this</span><span class="o">.</span><span class="n">databusPushConsumerFuture</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="n">MILLISECONDS</span><span class="p">);</span>
+        <span class="o">//</span> <span class="k">if</span> <span class="n">this</span> <span class="n">line</span> <span class="ow">is</span> <span class="n">reached</span><span class="p">,</span> <span class="n">means</span> <span class="n">the</span> <span class="n">listener</span> <span class="n">has</span> <span class="n">finished</span><span class="o">.</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">TimeoutException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">//</span> <span class="n">TimeoutException</span> <span class="n">means</span> <span class="n">that</span> <span class="n">listener</span> <span class="ow">is</span> <span class="n">still</span> <span class="n">working</span><span class="p">,</span> <span class="n">so</span> <span class="n">it</span> <span class="k">continue</span> <span class="n">the</span> <span class="n">loop</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Push consumer status:&quot;</span> <span class="o">+</span> <span class="n">databusPushConsumerStatus</span><span class="o">.</span><span class="n">getStatus</span><span class="p">());</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Push consumer status:&quot;</span> <span class="o">+</span> <span class="n">databusPushConsumerStatus</span><span class="o">.</span><span class="n">getListenerResult</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="Transactions-producer-consumer-example.html" class="btn btn-neutral" title="Transactions producer consumer example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McAfee LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

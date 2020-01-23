@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 2.3.0 documentation</title>
+  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 2.4.0-SNAPSHOT documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                2.3.0
+                2.4.0-SNAPSHOT
               </div>
             
           
@@ -105,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Producer-metrics-sample.html">Producer Metrics Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Consumer-metrics-sample.html">Consumer Metrics Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Transactions-producer-consumer-example.html">Transactions producer consumer example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic-push-consumer-example.html">Push Consumer Example</a></li>
 </ul>
 
             
@@ -184,11 +185,10 @@ Option (* = required)                  Description
 --config [String: config]              The producer/consumer configuration
                                          list: Example: linger.ms=1000,batch.
                                          size=100000,compression.type=lz4
---consume-records &lt;Integer: consume-   Consume Poll expected records. Number
-  records&gt;                               of expected records.  (default: 1)
---consume-timeout &lt;Integer: consume-   Consume Poll Timeout. Time in ms that
-  timeout&gt;                               the consumer waits for new records
-                                         during a consume operation.
+--consume-records &lt;Integer: consume-   Number of expected records to finish
+  records&gt;                               the command line.  (default: 1)
+--consume-timeout &lt;Integer: consume-   Max time the command line waits for
+  timeout&gt;                               finishing a consumer operation.
                                          Optional parameter, if absent, it
                                          defaults to 15000 ms. (default: 15000)
 --from-topic &lt;String: from-topic&gt;      Comma-separated topic name list to
@@ -368,9 +368,7 @@ string</td>
 <div class="section" id="consume">
 <h3>consume<a class="headerlink" href="#consume" title="Permalink to this headline">¶</a></h3>
 <p>An operation which receives messages from specified topics at
-specified brokers. Optional arguments, like consume-records or
-consume-timeout, are supported to refine the record list contained in
-the consumer operation result.</p>
+specified brokers.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="58%" />
@@ -448,26 +446,25 @@ auto.commit.interval.ms=0</td>
 empty string</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">--consume-records</span></code></td>
-<td>Maximum number of records
-to read within the
-specified
-<code class="docutils literal notranslate"><span class="pre">consume-timeout</span></code>.
+<td>Number of expected records
+to finish command line.
 CLI polls for new records
 until one of the following
-occurs:timeout has
-elapsed or maximum number
-of records were received.</td>
+occurs: timeout has
+elapsed or number of records
+received were greater than
+this value.</td>
 <td>1 record</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">--consume-timeout</span></code></td>
-<td>Maximum time to wait for
-receiving the specified
-<code class="docutils literal notranslate"><span class="pre">consume-records</span></code> number.
+<td>Maximum time the command
+line waits for finishing
+a consume operation.
 CLI polls for new records
 until one of the following
-occurs:timeout has elapsed
+occurs: timeout has elapsed
 or number of received
-records reached
+records were greater than
 <code class="docutils literal notranslate"><span class="pre">consume-records</span></code> value.</td>
 <td>15000
 milliseconds</td>
@@ -480,8 +477,8 @@ milliseconds</td>
 <span class="o">--</span><span class="n">operation</span> <span class="n">consume</span> \
 <span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">topic</span> <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="p">,</span><span class="n">TOPIC_2</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">TOPIC_N</span><span class="o">&gt;</span> \
 <span class="o">--</span><span class="n">brokers</span> <span class="o">&lt;</span><span class="n">BROKER_1_IP</span><span class="p">:</span><span class="n">BROKER_1_PORT</span><span class="p">,</span><span class="n">BROKER_2_PORT</span><span class="p">:</span><span class="n">BROKER_2_PORT</span><span class="p">,</span><span class="o">...&gt;</span> \
-<span class="o">--</span><span class="n">consume</span><span class="o">-</span><span class="n">timeout</span> <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">TIMEOUT</span><span class="o">&gt;</span> \
-<span class="o">--</span><span class="n">consume</span><span class="o">-</span><span class="n">records</span> <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">RECORDS</span><span class="o">-</span><span class="n">NUMBER</span><span class="o">&gt;</span> \
+<span class="o">--</span><span class="n">consume</span><span class="o">-</span><span class="n">timeout</span> <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">TIMEOUT</span><span class="o">-</span><span class="n">TO</span><span class="o">-</span><span class="n">FINISH</span><span class="o">-</span><span class="n">CLI</span><span class="o">&gt;</span> \
+<span class="o">--</span><span class="n">consume</span><span class="o">-</span><span class="n">records</span> <span class="o">&lt;</span><span class="n">CONSUME</span><span class="o">-</span><span class="n">RECORDS</span><span class="o">-</span><span class="n">NUMBER</span><span class="o">-</span><span class="n">TO</span><span class="o">-</span><span class="n">FINISH</span><span class="o">-</span><span class="n">CLI</span><span class="o">&gt;</span> \
 <span class="o">--</span><span class="n">tenant</span><span class="o">-</span><span class="n">group</span> <span class="o">&lt;</span><span class="n">TENANT</span><span class="o">-</span><span class="n">GROUP</span><span class="o">-</span><span class="n">NAME</span><span class="o">&gt;</span> \
 <span class="o">--</span><span class="n">cg</span> <span class="o">&lt;</span><span class="n">CONSUMER</span><span class="o">-</span><span class="n">GROUP</span><span class="o">&gt;</span>
 <span class="o">--</span><span class="n">config</span> <span class="n">enable</span><span class="o">.</span><span class="n">auto</span><span class="o">.</span><span class="n">commit</span><span class="o">=</span><span class="n">true</span>
