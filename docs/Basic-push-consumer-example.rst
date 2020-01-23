@@ -286,11 +286,21 @@ DatabusPushConsumerListener interface to listen to messages coming from Databus.
     databusPushConsumerFuture.get();
 
     ...
-    // Wait for a while and then check the status
-    while(true) {
-        databusPushConsumerStatus = this.databusPushConsumerFuture.get(1000, TimeUnit.MILLISECONDS);
-        LOG.info("Push consumer status:" + databusPushConsumerStatus.getStatus());
-        LOG.info("Push consumer status:" + databusPushConsumerStatus.getListenerResult();
+    // Wait for a while then check the listener status
+    while (true)  {
+        try {
+            DatabusPushConsumerStatus status =
+                    this.databusPushConsumerFuture.get(100, TimeUnit.MILLISECONDS);
+            // if this line is reached, means the listener has finished.
+            return;
+        } catch (TimeoutException e) {
+            // TimeoutException means that listener is still working, so it continue the loop
+            continue;
+        } finally {
+            LOG.info("Push consumer status:" + databusPushConsumerStatus.getStatus());
+            LOG.info("Push consumer status:" + databusPushConsumerStatus.getListenerResult());
+        }
     }
+    ...
 
 
