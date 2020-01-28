@@ -5,15 +5,15 @@ This sample demonstrates how to consume messages from the
 DXL Databus client by using a DatabusPushConsumer consumer in a
 running Kafka cluster.
 
-A DatabusPushConsumer allows clients focus on manipulate messages received from Databus and free them to
-to deal with the transport mechanism like commit and retry.
+The DatabusPushConsumer allows clients to focus on receiving message from the databus and not focusing
+on transport-level mechanism details such as commit and retry.
 
-Main advantage
+Benefits
 
-- It eliminates rebalancing because it takes advantage of consumer pause and resume behind scene while records are being processed.
-- It offers Retry operation to reprocess the same set of records automatically when they fail.
-- Push model instead of Polling model. Records are read from Kafka and pushed into client's logic implementation. Continuous polling is eliminated.
-- Hide consumer complexity operation like poll, commit, pause, resume, and seek. Let the user focus on processing records logic.
+- Eliminates rebalancing due to internal use of consumer pause and resume mechanisms while records are being processed.
+- Provides ability to reprocess the same set of records automatically when failures occur.
+- Push model instead of polling model. Records are read from Kafka and pushed into client's logic implementation. Continuous polling is eliminated.
+- Hides complex operations such as poll, commit, pause, resume, and seek which are handled internally. 
 
 
 Code highlights are shown below:
@@ -254,8 +254,8 @@ Steps to create a Push Consumer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Create a DatabusPushConsumer by using a specific consumer configuration and a DatabusPushConsumerListener instance
-that contains the logic to manage the received records. In this case MessageProcessor class implements
-DatabusPushConsumerListener interface to listen to messages coming from Databus.
+that will handle the received records. In this particular case the MessageProcessor class implements
+the DatabusPushConsumerListener interface to handle messages from the Databus.
 
 .. code:: java
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Push Consumer Example &mdash; OpenDXL Databus Java Client Library 2.4.0-SNAPSHOT documentation</title>
+  <title>Push Consumer Example &mdash; OpenDXL Databus Java Client Library 2.4.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                2.4.0-SNAPSHOT
+                2.4.0
               </div>
             
           
@@ -162,14 +162,14 @@
 <p>This sample demonstrates how to consume messages from the
 DXL Databus client by using a DatabusPushConsumer consumer in a
 running Kafka cluster.</p>
-<p>A DatabusPushConsumer allows clients focus on manipulate messages received from Databus and free them to
-to deal with the transport mechanism like commit and retry.</p>
-<p>Main advantage</p>
+<p>The DatabusPushConsumer allows clients to focus on receiving message from the databus and not focusing
+on transport-level mechanism details such as commit and retry.</p>
+<p>Benefits</p>
 <ul class="simple">
-<li>It eliminates rebalancing because it takes advantage of consumer pause and resume behind scene while records are being processed.</li>
-<li>It offers Retry operation to reprocess the same set of records automatically when they fail.</li>
-<li>Push model instead of Polling model. Records are read from Kafka and pushed into client’s logic implementation. Continuous polling is eliminated.</li>
-<li>Hide consumer complexity operation like poll, commit, pause, resume, and seek. Let the user focus on processing records logic.</li>
+<li>Eliminates rebalancing due to internal use of consumer pause and resume mechanisms while records are being processed.</li>
+<li>Provides ability to reprocess the same set of records automatically when failures occur.</li>
+<li>Push model instead of polling model. Records are read from Kafka and pushed into client’s logic implementation. Continuous polling is eliminated.</li>
+<li>Hides complex operations such as poll, commit, pause, resume, and seek which are handled internally.</li>
 </ul>
 <p>Code highlights are shown below:</p>
 <div class="section" id="sample-code">
@@ -405,8 +405,8 @@ public class BasicPushConsumerExample {
 <div class="section" id="steps-to-create-a-push-consumer">
 <h2>Steps to create a Push Consumer<a class="headerlink" href="#steps-to-create-a-push-consumer" title="Permalink to this headline">¶</a></h2>
 <p>1. Create a DatabusPushConsumer by using a specific consumer configuration and a DatabusPushConsumerListener instance
-that contains the logic to manage the received records. In this case MessageProcessor class implements
-DatabusPushConsumerListener interface to listen to messages coming from Databus.</p>
+that will handle the received records. In this particular case the MessageProcessor class implements
+the DatabusPushConsumerListener interface to handle messages from the Databus.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="n">DatabusPushConsumer</span><span class="o">&lt;</span><span class="n">byte</span><span class="p">[]</span><span class="o">&gt;</span> <span class="n">consumer</span> <span class="o">=</span>
             <span class="n">new</span> <span class="n">DatabusPushConsumer</span><span class="p">(</span><span class="n">getConsumerConfig</span><span class="p">(),</span>
