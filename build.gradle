@@ -273,9 +273,6 @@ publishing {
             artifact(javadocJar) {
                 classifier = 'javadoc'
             }
-            artifact(shadowJar) {
-                classifier = 'all'
-            }
         }
     }
     repositories {
