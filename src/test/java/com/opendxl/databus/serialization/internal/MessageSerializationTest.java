@@ -30,7 +30,7 @@ public class MessageSerializationTest {
             DatabusMessage actualMessage = new DatabusMessage(new Headers(map),payload);
 
             byte[] serializedMessage = ser.serialize(actualMessage);
-            DatabusMessage deserializedMessage = des.deserialize(topic,serializedMessage);
+            DatabusMessage deserializedMessage = des.deserialize(topic, serializedMessage);
 
             Assert.assertTrue(Arrays.equals(deserializedMessage.getPayload(),payload));
             Assert.assertTrue(deserializedMessage.getHeaders().getAll().equals(headers.getAll()));

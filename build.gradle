@@ -70,17 +70,23 @@ dependencies {
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
+    implementation 'commons-io:commons-io:2.6'
+
+    implementation 'software.amazon.awssdk:bom:2.10.73'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.731'
+
+    testImplementation 'org.apache.zookeeper:zookeeper:3.5.5'
     testImplementation('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     testImplementation 'org.scala-lang:scala-reflect:2.12.11'
-    testImplementation 'org.apache.zookeeper:zookeeper:3.5.5'
     testImplementation('io.netty:netty-all:4.1.43.Final') {
         force = true
     }
     testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
+
     kafkaInMemory ('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
