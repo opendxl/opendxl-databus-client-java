@@ -5,9 +5,11 @@
 package com.opendxl.databus.serialization.internal;
 
 
+import com.opendxl.databus.common.internal.util.HeaderInternalField;
 import com.opendxl.databus.consumer.ConsumerRecord;
 import com.opendxl.databus.consumer.DatabusConsumer;
 import com.opendxl.databus.entities.Headers;
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.common.internal.adapter.HeadersAvroDeserializedAdapter;
 import com.opendxl.databus.common.internal.adapter.PayloadHeadersAvroDeserializedAdapter;
@@ -17,6 +19,8 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Avro Message Deserializer
@@ -24,6 +28,11 @@ import org.apache.avro.io.DecoderFactory;
  * after reading a {@link ConsumerRecord}
  */
 public final class AvroMessageDeserializer implements InternalDeserializer<DatabusMessage> {
+
+    /**
+     * The logger object.
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(AvroMessageDeserializer.class);
 
     /**
      * The schema to define the message.
@@ -52,24 +61,56 @@ public final class AvroMessageDeserializer implements InternalDeserializer<Datab
      */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] data) {
+        return this.deserialize(topic, data, null);
+    }
+
+    @Override
+    public DatabusMessage deserialize(String topic, byte[] data, TierStorage tierStorage) {
         try {
 
-            final GenericRecord avroRecord = reader.read(null, DecoderFactory.get().binaryDecoder(data, null));
+            GenericRecord avroRecord = reader.read(null, DecoderFactory.get().binaryDecoder(data, null));
 
-            final Headers headers =
+            Headers headers =
                     new HeadersAvroDeserializedAdapter()
                             .adapt(avroRecord.get("headers"));
 
-            final byte[] payload =
+            byte[] payload =
                     new PayloadHeadersAvroDeserializedAdapter()
                             .adapt(avroRecord.get("payload"));
+
+
+            // Tier Storage Section
+            if (tierStorage != null) {
+                final String bucketName = headers.get(HeaderInternalField.TIER_STORAGE_BUCKET_NAME_KEY);
+                final String objectName = headers.get(HeaderInternalField.TIER_STORAGE_OBJECT_NAME_KEY);
+                if (bucketName != null && objectName != null) {
+                    byte[] object = null;
+                    try {
+                        object =  tierStorage.get(bucketName, objectName);
+                    } catch (Exception e) {
+                        LOG.error("Error when reading message from Tier Storage. Bucket Name: "
+                                + bucketName  + "Object Name: "
+                                + objectName, e);
+                    }
+
+                    if (object != null || object.length > 0) {
+                        avroRecord = reader.read(null, DecoderFactory.get().binaryDecoder(object, null));
+                        headers = new HeadersAvroDeserializedAdapter().adapt(avroRecord.get("headers"));
+                        payload = new PayloadHeadersAvroDeserializedAdapter().adapt(avroRecord.get("payload"));
+                    } else {
+                        LOG.warn("Object content reading from Tier Storage is null or empty. Bucket: " + bucketName
+                                + " Object: " + objectName);
+                    }
+                }
+            }
 
             final DatabusMessage message = new DatabusMessage(headers, payload);
             return message;
 
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("Error deserializing Avro schema:" + schema.toString(true),
-                    e, AvroMessageDeserializer.class);
+            final String errMsg = "Error deserializing Avro schema:" + schema.toString(true);
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, AvroMessageDeserializer.class);
         }
     }
 }

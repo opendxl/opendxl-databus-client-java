@@ -4,6 +4,7 @@
 
 package com.opendxl.databus.serialization.internal;
 
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.entities.internal.DatabusMessage;
 
 /**
@@ -22,5 +23,10 @@ public final class RawMessageDeserializer implements InternalDeserializer<Databu
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] data) {
         return new DatabusMessage(null, data);
+    }
+
+    @Override
+    public DatabusMessage deserialize(String topic, byte[] data, TierStorage tierStorage) {
+        return deserialize(topic, data);
     }
 }

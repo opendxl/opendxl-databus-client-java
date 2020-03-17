@@ -6,6 +6,7 @@ package com.opendxl.databus.consumer;
 
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.credential.Credential;
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.Deserializer;
 import org.apache.kafka.common.errors.WakeupException;
@@ -101,6 +102,22 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     }
 
     /**
+     * Constructor
+     *
+     * @param configs             consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Map<String, Object> configs,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final TierStorage tierStorage) {
+        super(configs, messageDeserializer, null, tierStorage);
+        this.consumerListener = consumerListener;
+    }
+
+    /**
      * @param configs             consumer configuration
      * @param messageDeserializer consumer message deserializer
      * @param consumerListener    consumer listener
@@ -110,7 +127,23 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener,
                                final Credential credential) {
-        super(configs, messageDeserializer, credential);
+        super(configs, messageDeserializer, credential, null);
+        this.consumerListener = consumerListener;
+    }
+
+    /**
+     * @param configs             consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param credential          credential to get access to Databus in case security is enabled
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Map<String, Object> configs,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final Credential credential,
+                               final TierStorage tierStorage) {
+        super(configs, messageDeserializer, credential, tierStorage);
         this.consumerListener = consumerListener;
     }
 
@@ -131,17 +164,46 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
      * @param properties          consumer configuration
      * @param messageDeserializer consumer message deserializer
      * @param consumerListener    consumer listener
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Properties properties,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final TierStorage tierStorage) {
+        super(properties, messageDeserializer,  null, tierStorage);
+        this.consumerListener = consumerListener;
+
+    }
+
+    /**
+     * @param properties          consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
      * @param credential          credential to get access to Databus in case security is enabled
      */
     public DatabusPushConsumer(final Properties properties,
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener,
                                final Credential credential) {
-        super(properties, messageDeserializer, credential);
+        super(properties, messageDeserializer, credential, null);
         this.consumerListener = consumerListener;
     }
 
-
+    /**
+     * @param properties          consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param credential          credential to get access to Databus in case security is enabled
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Properties properties,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final Credential credential,
+                               final TierStorage tierStorage) {
+        super(properties, messageDeserializer, credential, tierStorage);
+        this.consumerListener = consumerListener;
+    }
     /**
      * {@inheritDoc}
      */
