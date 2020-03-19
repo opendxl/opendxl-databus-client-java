@@ -9,26 +9,28 @@ import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.consumer.Consumer;
 import com.opendxl.databus.consumer.ConsumerConfiguration;
 import com.opendxl.databus.consumer.DatabusConsumer;
-import com.opendxl.databus.producer.DatabusProducer;
-import com.opendxl.databus.producer.Producer;
-import com.opendxl.databus.producer.ProducerConfig;
-import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.consumer.metric.ConsumerMetric;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopicPartitions;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopics;
 import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.entities.RoutingData;
+import com.opendxl.databus.producer.DatabusProducer;
+import com.opendxl.databus.producer.Producer;
+import com.opendxl.databus.producer.ProducerConfig;
+import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -150,7 +152,7 @@ public class ConsumerMetricsExample {
                 consumer.unsubscribe();
                 try {
                     consumer.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOG.error(e.getMessage());
                 }
                 LOG.info("Consumer closed");

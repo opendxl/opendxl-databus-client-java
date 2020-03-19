@@ -22,10 +22,9 @@ import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
 import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import org.apache.commons.lang.NullArgumentException;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1199,9 +1198,8 @@ public abstract class Consumer<P> {
      * cannot be used to interrupt close.
      *
      * @throws DatabusClientRuntimeException if it fails.
-     * @throws IOException NA
      */
-    public void close() throws IOException {
+    public void close() {
         try {
             consumer.close();
         } catch (Exception e) {

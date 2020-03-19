@@ -4,28 +4,19 @@
 
 package sample;
 
+import broker.ClusterHelper;
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.Consumer;
-import com.opendxl.databus.consumer.ConsumerConfiguration;
-import com.opendxl.databus.consumer.ConsumerRecord;
-import com.opendxl.databus.consumer.ConsumerRecords;
-import com.opendxl.databus.consumer.DatabusConsumer;
+import com.opendxl.databus.consumer.*;
 import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.entities.RoutingData;
-import com.opendxl.databus.producer.Callback;
-import com.opendxl.databus.producer.DatabusProducer;
-import com.opendxl.databus.producer.Producer;
-import com.opendxl.databus.producer.ProducerConfig;
-import com.opendxl.databus.producer.ProducerRecord;
+import com.opendxl.databus.producer.*;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
-import broker.ClusterHelper;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -155,7 +146,7 @@ public class BasicConsumerProducerExample {
                 consumer.unsubscribe();
                 try {
                     consumer.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOG.error(e.getMessage());
                 }
                 LOG.info("Consumer closed");

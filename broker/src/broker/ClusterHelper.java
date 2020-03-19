@@ -134,6 +134,8 @@ public class ClusterHelper {
             config.setProperty("delete.topic.enable", String.valueOf(true));
             config.setProperty("offsets.topic.replication.factor", String.valueOf(1));
             config.setProperty("num.partitions", String.valueOf(6));
+            config.setProperty("transaction.state.log.replication.factor", String.valueOf(1));
+            config.setProperty("transaction.state.log.min.isr", String.valueOf(1));
         } catch (Exception e) {
             e.printStackTrace();
         }

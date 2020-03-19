@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -415,7 +414,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
      * {@inheritDoc}
      */
     @Override
-    public void close() throws IOException {
+    public void close() {
 
         try {
             stopRequested.set(true);
