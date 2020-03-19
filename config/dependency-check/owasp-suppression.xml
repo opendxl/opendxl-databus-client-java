@@ -7,4 +7,10 @@
       <packageUrl regex="true">^pkg:maven/commons\-beanutils/commons\-beanutils@.*$</packageUrl>
       <cve>CVE-2019-10086</cve>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: checkstyle-8.23.jar
+      ]]></notes>
+      <cve>CVE-2019-10782</cve>
+   </suppress>
 </suppressions>

@@ -61,7 +61,7 @@ dependencies {
     implementation 'org.apache.kafka:kafka-streams:2.3.1'
     implementation 'org.apache.avro:avro:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'org.apache.commons:commons-configuration2:2.5'
+    implementation 'org.apache.commons:commons-configuration2:2.7'
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'

@@ -16,10 +16,8 @@ import com.opendxl.databus.consumer.DatabusConsumer;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionSet;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
-import java.io.IOException;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -134,7 +132,7 @@ public class ConsumeOperation implements CommandLineOperation {
             if (consumer != null) {
                 try {
                     consumer.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOG.error(e.getMessage());
                 }
             }

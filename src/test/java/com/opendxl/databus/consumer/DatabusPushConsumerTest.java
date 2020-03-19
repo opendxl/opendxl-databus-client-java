@@ -91,7 +91,7 @@ public class DatabusPushConsumerTest {
                     == DatabusPushConsumerStatus.Status.STOPPED);
 
             Assert.assertTrue(databusPushConsumerFuture.isDone());
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Assert.fail();
             e.printStackTrace();
         }
@@ -152,7 +152,7 @@ public class DatabusPushConsumerTest {
             Assert.assertTrue( databusPushConsumerStatus.getStatus() == DatabusPushConsumerStatus.Status.STOPPED );
 
 
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Assert.fail();
             e.printStackTrace();
         }
@@ -232,7 +232,7 @@ public class DatabusPushConsumerTest {
             Assert.assertTrue( databusPushConsumerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
             Assert.assertTrue( databusPushConsumerStatus.getStatus() == DatabusPushConsumerStatus.Status.STOPPED );
 
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Assert.fail();
             e.printStackTrace();
         }
@@ -340,7 +340,7 @@ public class DatabusPushConsumerTest {
             Assert.assertTrue( databusPushConsumerStatus.getListenerResult() == DatabusPushConsumerListenerResponse.STOP_AND_COMMIT );
             Assert.assertTrue( databusPushConsumerStatus.getStatus() == DatabusPushConsumerStatus.Status.STOPPED );
 
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -402,7 +402,7 @@ public class DatabusPushConsumerTest {
 
         } catch (DatabusClientRuntimeException e) {
             Assert.assertTrue(e.getCausedByClass().equals(DatabusPushConsumer.class.getName()));
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
             Assert.fail();
         } catch (ExecutionException e) {
