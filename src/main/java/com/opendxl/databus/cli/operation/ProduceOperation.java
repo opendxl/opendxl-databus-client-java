@@ -196,7 +196,8 @@ public class ProduceOperation implements CommandLineOperation {
                                          final String partition) {
         RoutingData routingData;
         if (!partition.isEmpty()) {
-            routingData = new RoutingData(topic, shardingKey, tenantGroup, Integer.parseInt(partition));
+            routingData = new RoutingData(topic, shardingKey, tenantGroup, Integer.parseInt(partition),
+                    null);
         } else {
             routingData = new RoutingData(topic, shardingKey, tenantGroup);
         }

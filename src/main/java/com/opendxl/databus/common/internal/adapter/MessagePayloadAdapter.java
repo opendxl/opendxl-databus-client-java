@@ -16,30 +16,22 @@ import com.opendxl.databus.serialization.Serializer;
  *
  * @param <P> payload's type
  */
-public final class MessagePayloadAdapter<P> implements Adapter<MessagePayload<P>, DatabusMessage> {
+public final class MessagePayloadAdapter<P> {
 
     /**
      * The message deserializer.
      */
-    private final Serializer<P> messageSerializer;
-
-    /**
-     * The headers map.
-     */
-    private final Headers headers;
+    private final Serializer<P> userSerializer;
 
     /**
      * Constructor
      *
-     * @param messageSerializer A {@link Serializer} instance
+     * @param userSerializer A {@link Serializer} instance
      * or creating a {@link DatabusMessage}.
-     * @param headers Headers map.
      */
-    public MessagePayloadAdapter(final Serializer<P> messageSerializer,
-                                 final Headers headers) {
+    public MessagePayloadAdapter(final Serializer<P> userSerializer) {
 
-        this.messageSerializer = messageSerializer;
-        this.headers = headers;
+        this.userSerializer = userSerializer;
     }
 
     /**
@@ -48,10 +40,10 @@ public final class MessagePayloadAdapter<P> implements Adapter<MessagePayload<P>
      *
      * @param messagePayload a {@link MessagePayload} instance to be adapted.
      * @return a {@link DatabusMessage} instance.
+     * @param headers headers
      */
-    @Override
-    public DatabusMessage adapt(final MessagePayload<P> messagePayload) {
-        final byte[] payload = messageSerializer.serialize(messagePayload.getPayload());
+    public DatabusMessage adapt(final MessagePayload<P> messagePayload, final Headers headers) {
+        final byte[] payload = userSerializer.serialize(messagePayload.getPayload());
         return new DatabusMessage(headers, payload);
     }
 

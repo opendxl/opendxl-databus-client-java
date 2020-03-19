@@ -75,6 +75,12 @@ dependencies {
     testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
+    //testImplementation 'com.adobe.testing:s3mock:2.1.19'
+    // https://mvnrepository.com/artifact/io.findify/s3mock
+    testImplementation 'io.findify:s3mock_2.12:0.2.5'
+    // https://mvnrepository.com/artifact/com.e-movimento.tinytools/privilegedaccessor
+    testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
+
     kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.1'
     kafkaInMemory 'commons-io:commons-io:2.6'
 

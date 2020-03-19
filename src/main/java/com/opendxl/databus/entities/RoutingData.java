@@ -50,14 +50,22 @@ public class RoutingData {
     private String tenantGroup = DEFAULT_TENANT_GROUP;
 
     /**
+     * Tier Storage Metadata
+     */
+    private TierStorageMetadata tierStorageMetadata;
+
+    /**
      * RoutingData constructor with only topic name parameter
      *
      * @param topic The topic name where the message must be sent
      */
     public RoutingData(final String topic) {
-        this(topic, null, null, null);
+        this(topic, null, null, null, null);
     }
 
+    public RoutingData(final String topic, final TierStorageMetadata tierStorageMetadata) {
+        this(topic, null, null, null, tierStorageMetadata);
+    }
     /**
      * RoutingData constructor with topic name sharding key and tenant group parameters
      *
@@ -66,9 +74,15 @@ public class RoutingData {
      * @param tenantGroup The name that groups topics
      */
     public RoutingData(final String topic, final String shardingKey, final String tenantGroup) {
-        this(topic, shardingKey, tenantGroup, null);
+        this(topic, shardingKey, tenantGroup, null, null);
     }
 
+    public RoutingData(final String topic,
+                       final String shardingKey,
+                       final String tenantGroup,
+                       final TierStorageMetadata tierStorageMetadata) {
+        this(topic, shardingKey, tenantGroup, null, tierStorageMetadata);
+    }
     /**
      * RoutingData constructor with all parameters
      *
@@ -76,10 +90,11 @@ public class RoutingData {
      * @param shardingKey The Databus sharding key
      * @param tenantGroup The name that groups topics
      * @param partition The partition number
+     * @param tierStorageMetadata Tier Storage Metadata
+     *
      */
     public RoutingData(final String topic, final String shardingKey, final String tenantGroup,
-                       final Integer partition) {
-
+                       final Integer partition, final TierStorageMetadata tierStorageMetadata) {
         if (StringUtils.isBlank(topic)) {
             throw new DatabusClientRuntimeException("topic cannot be empty or null", RoutingData.class);
         }
@@ -87,6 +102,7 @@ public class RoutingData {
         this.tenantGroup = Optional.ofNullable(tenantGroup).orElse("").trim();
         this.shardingKey = shardingKey;
         this.partition = partition;
+        this.tierStorageMetadata = tierStorageMetadata;
     }
 
     /**
@@ -124,4 +140,9 @@ public class RoutingData {
     public Integer getPartition() {
         return partition;
     }
+
+    public TierStorageMetadata getTierStorageMetadata() {
+        return tierStorageMetadata;
+    }
+
 }

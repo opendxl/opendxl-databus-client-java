@@ -30,7 +30,8 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- *  A abstract producer, responsible for handling Databus outgoing messages.
+ * A abstract producer, responsible for handling Databus outgoing messages.
+ *
  * @param <P> payload's type
  */
 public abstract class Producer<P> {
@@ -43,7 +44,7 @@ public abstract class Producer<P> {
     /**
      * A Kafka Serializer of {@link DatabusMessage}.
      */
-    private org.apache.kafka.common.serialization.Serializer<DatabusMessage> valueSerializer;
+    private org.apache.kafka.common.serialization.Serializer<DatabusMessage> kafkaValueSerializer;
 
     /**
      * A configuration map for the producer.
@@ -133,9 +134,9 @@ public abstract class Producer<P> {
      * expensive callbacks it is recommended to use your own {@link java.util.concurrent.Executor} in the callback body
      * to parallelize processing.
      *
-     * @param producerRecord   The non-null record to send
-     * @param callback A user-supplied callback to execute when the record has been acknowledged by the server (null
-     *                 indicates no callback)
+     * @param producerRecord The non-null record to send
+     * @param callback       A user-supplied callback to execute when the record has been acknowledged by the server
+     *                       (null indicates no callback)
      * @throws IllegalArgumentException      If record argumet is null
      * @throws DatabusClientRuntimeException If send method fails. The original cause could be any of these exceptions:
      *                                       <p> SerializationException   If the key or value are not valid objects
@@ -161,11 +162,17 @@ public abstract class Producer<P> {
                 callbackAdapter = null;
             }
 
-            producer.send(targetProducerRecord, callbackAdapter);
+            sendKafkaRecord(targetProducerRecord, callbackAdapter);
 
         } catch (Exception e) {
             throw new DatabusClientRuntimeException("send cannot be performed: " + e.getMessage(), e, Producer.class);
         }
+    }
+
+    protected void
+    sendKafkaRecord(final org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> record,
+                    final org.apache.kafka.clients.producer.Callback callback) {
+        producer.send(record, callback);
     }
 
     /**
@@ -216,7 +223,7 @@ public abstract class Producer<P> {
      * @param topic to get info
      * @return List of {@link PartitionInfo}
      * @throws DatabusClientRuntimeException If partitionsFor method fails.
-     * The original cause could be the following exception:
+     *                                       The original cause could be the following exception:
      *                                       <p> InterruptException If the thread is interrupted while blocked
      */
     public List<PartitionInfo> partitionsFor(final String topic) {
@@ -301,7 +308,7 @@ public abstract class Producer<P> {
      *
      * @param keySerializer A DatabusKeySerializer Instance
      */
-    protected void setKeySerializer(final DatabusKeySerializer keySerializer) {
+    protected void setKafkaKeySerializer(final DatabusKeySerializer keySerializer) {
         this.keySerializer = keySerializer;
     }
 
@@ -311,14 +318,15 @@ public abstract class Producer<P> {
      * @param valueSerializer A Serializer object instance for the value serializer
      */
     protected void
-    setValueSerializer(final org.apache.kafka.common.serialization.Serializer<DatabusMessage> valueSerializer) {
-        this.valueSerializer = valueSerializer;
+    setKafkaValueSerializer(final org.apache.kafka.common.serialization.Serializer<DatabusMessage>
+                                    kafkaValueSerializer) {
+        this.kafkaValueSerializer = kafkaValueSerializer;
     }
 
     /**
      * Get the key serializer from producer
      *
-     * @return  A {@link DatabusKeySerializer} object instance
+     * @return A {@link DatabusKeySerializer} object instance
      */
     protected DatabusKeySerializer getKeySerializer() {
         return keySerializer;
@@ -327,16 +335,16 @@ public abstract class Producer<P> {
     /**
      * Get the value serializer from producer
      *
-     * @return  A {@link org.apache.kafka.common.serialization.Serializer} object instance
+     * @return A {@link org.apache.kafka.common.serialization.Serializer} object instance
      */
-    protected org.apache.kafka.common.serialization.Serializer<DatabusMessage> getValueSerializer() {
-        return valueSerializer;
+    protected org.apache.kafka.common.serialization.Serializer<DatabusMessage> getKafkaValueSerializer() {
+        return kafkaValueSerializer;
     }
 
     /**
      * Set a Kafka producer instance to the producer.
      *
-     * @return  A {@link org.apache.kafka.clients.producer.Producer} object instance to set in the producer
+     * @return A {@link org.apache.kafka.clients.producer.Producer} object instance to set in the producer
      */
     protected void setProducer(final org.apache.kafka.clients.producer.Producer<String, DatabusMessage> producer) {
         this.producer = producer;
@@ -349,6 +357,16 @@ public abstract class Producer<P> {
      */
     protected void setDatabusProducerRecordAdapter(final DatabusProducerRecordAdapter<P> databusProducerRecordAdapter) {
         this.databusProducerRecordAdapter = databusProducerRecordAdapter;
+    }
+
+
+    /**
+     * Set a {@link DatabusProducerRecordAdapter} associated to the producer.
+     *
+     * @param databusProducerRecordAdapter The {@link DatabusProducerRecordAdapter} to set to the producer
+     */
+    protected DatabusProducerRecordAdapter<P> getDatabusProducerRecordAdapter() {
+        return this.databusProducerRecordAdapter;
     }
 
     /**
@@ -406,7 +424,7 @@ public abstract class Producer<P> {
 
     /**
      * Needs to be called before any other methods when the transactional.id is set in the configuration.
-     *
+     * <p>
      * This method does the following:
      *   1. Ensures any transactions initiated by previous instances of the producer with the same
      *      transactional.id are completed. If the previous instance had failed with a transaction in
@@ -471,7 +489,7 @@ public abstract class Producer<P> {
      * (via {@link Consumer#commitSync(Map) sync} or
      * {@link Consumer#commitAsync(OffsetCommitCallback)} commits).
      *
-     * @param offsets offsets
+     * @param offsets         offsets
      * @param consumerGroupId consumer group id
      * @throws DatabusClientRuntimeException If method fails. The original cause could be any of these exceptions:
      * <p> IllegalStateException if no transactional.id has been configured or no transaction has been started
@@ -486,7 +504,7 @@ public abstract class Producer<P> {
      *         other unexpected error
      */
     public void sendOffsetsToTransaction(final Map<TopicPartition, OffsetAndMetadata> offsets,
-                                         final String consumerGroupId)  {
+                                         final String consumerGroupId) {
         try {
             Map<org.apache.kafka.common.TopicPartition,
                     org.apache.kafka.clients.consumer.OffsetAndMetadata> adaptedOffsets = new HashMap();
@@ -509,20 +527,20 @@ public abstract class Producer<P> {
     /**
      * Commits the ongoing transaction. This method will flush any unsent records before actually
      * committing the transaction.
-     *
+     * <p>
      * Further, if any of the {@link #send(ProducerRecord)} calls which were part of the transaction hit irrecoverable
      * errors, this method will throw the last received exception immediately and the transaction will not be committed.
      * So all {@link #send(ProducerRecord)} calls in a transaction must succeed in order for this method to succeed.
-     *
+     * <p>
      * DatabusClientRuntimeException If method fails. The original cause could be any of these exceptions:
      * <p> IllegalStateException if no transactional.id has been configured or no transaction has been started
      * <p> ProducerFencedException fatal error indicating another producer with the same transactional.id is active
      * <p> org.apache.kafka.common.errors.UnsupportedVersionException fatal error indicating the broker
-     *         does not support transactions (i.e. if its version is lower than 0.11.0.0)
+     * does not support transactions (i.e. if its version is lower than 0.11.0.0)
      * <p> org.apache.kafka.common.errors.AuthorizationException fatal error indicating that the configured
-     *         transactional.id is not authorized. See the exception for more details
+     * transactional.id is not authorized. See the exception for more details
      * <p> KafkaException if the producer has encountered a previous fatal or abortable error, or for any
-     *         other unexpected error
+     * other unexpected error
      */
     public void commitTransaction() {
         try {
@@ -544,9 +562,9 @@ public abstract class Producer<P> {
      * <p> IllegalStateException if no transactional.id has been configured or no transaction has been started
      * <p> ProducerFencedException fatal error indicating another producer with the same transactional.id is active
      * <p> org.apache.kafka.common.errors.UnsupportedVersionException fatal error indicating the broker
-     *         does not support transactions (i.e. if its version is lower than 0.11.0.0)
+     * does not support transactions (i.e. if its version is lower than 0.11.0.0)
      * <p> org.apache.kafka.common.errors.AuthorizationException fatal error indicating that the configured
-     *         transactional.id is not authorized. See the exception for more details
+     * transactional.id is not authorized. See the exception for more details
      * <p> KafkaException if the producer has encountered a previous fatal error or for any other unexpected error
      */
     public void abortTransaction() {
@@ -715,7 +733,7 @@ public abstract class Producer<P> {
     /**
      * Gets a {@link ProducerMetric} given a Topic name and a {@link ProducerMetricEnum}.
      *
-     * @param topic The topic name.
+     * @param topic              The topic name.
      * @param producerMetricEnum The {@link ProducerMetricEnum} to get the metric.
      * @return a {@link ProducerMetric} instance.
      */

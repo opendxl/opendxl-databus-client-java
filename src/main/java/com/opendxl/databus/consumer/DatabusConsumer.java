@@ -85,7 +85,25 @@ public class DatabusConsumer<P> extends Consumer<P> {
      *
      * @param configs The consumer configs
      * @param messageDeserializer a {@link Deserializer} getInstance implementd by SDK's user
+     * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
+     * @param tierStorage Tier Storage
+     */
+    public DatabusConsumer(final Map<String, Object> configs, final Deserializer<P> messageDeserializer,
+                           final TierStorage tierStorage) {
+        this(configs, messageDeserializer, null, tierStorage);
+    }
+    /**
+     * A consumer is instantiated by providing a set of key-value pairs as configuration. Valid configuration strings
+     * are documented <a href="http://kafka.apache.org/documentation.html#consumerconfigs" >here</a>. Values can be
+     * either strings or objects of the appropriate type (for example a numeric configuration would accept either the
+     * string "42" or the integer 42).
+     * <p>
+     * Valid configuration strings are documented at {@link org.apache.kafka.clients.consumer.ConsumerConfig}
+     *
+     * @param configs The consumer configs
+     * @param messageDeserializer a {@link Deserializer} getInstance implementd by SDK's user
      * @param credential identity to authenticate/authorization
+     * @param tierStorage Tier Storage
      *
      * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
      */
@@ -121,6 +139,11 @@ public class DatabusConsumer<P> extends Consumer<P> {
         this(properties, messageDeserializer, null, null);
     }
 
+    public DatabusConsumer(final Properties properties, final Deserializer<P> messageDeserializer,
+                           final TierStorage tierStorage) {
+        this(properties, messageDeserializer, null, tierStorage);
+    }
+
     /**
      * A consumer is instantiated by providing a {@link Properties} object as configuration. Valid
      * configuration strings are documented at {@link org.apache.kafka.clients.consumer.ConsumerConfig}
@@ -132,6 +155,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
      * @param properties The consumer configuration properties
      * @param messageDeserializer  a {@link Deserializer} getInstance implementd by SDK's user
      * @param credential identity to authenticate/authorization
+     * @param tierStorage Tier Storage
      *
      * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
      */
@@ -140,6 +164,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
         try {
             Map<String, Object> configuration = configureCredential((Map) properties, credential);
             configuration = configureClientId(configuration);
+            configuration.put(ConsumerConfiguration.ISOLATION_LEVEL_CONFIG, "read_committed");
             setFieldMembers(messageDeserializer, configuration, tierStorage);
             setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
         } catch (DatabusClientRuntimeException e) {
