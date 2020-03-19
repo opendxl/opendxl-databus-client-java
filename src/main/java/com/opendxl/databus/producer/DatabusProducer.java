@@ -128,7 +128,7 @@ public class DatabusProducer<P> extends Producer<P> {
             setFieldMembers(messageSerializer);
             this.setConfiguration(overrideConfig(configs));
             this.configureCredential(getConfiguration(), credential);
-            setProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getValueSerializer()));
+            setProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getKafkaValueSerializer()));
             setClientId((String) configs.get(ProducerConfig.CLIENT_ID_CONFIG));
         } catch (DatabusClientRuntimeException e) {
             throw e;
@@ -176,7 +176,7 @@ public class DatabusProducer<P> extends Producer<P> {
             Properties fixedProperties = overrideConfig(properties);
             this.setConfiguration((Map) fixedProperties);
             this.configureCredential(getConfiguration(), credential);
-            setProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getValueSerializer()));
+            setProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getKafkaValueSerializer()));
             setClientId((String) fixedProperties.get(ProducerConfig.CLIENT_ID_CONFIG));
         } catch (DatabusClientRuntimeException e) {
             throw e;
@@ -197,8 +197,8 @@ public class DatabusProducer<P> extends Producer<P> {
                     + "Message Serializer cannot be null" , DatabusProducer.class);
         }
 
-        setKeySerializer(new DatabusKeySerializer());
-        setValueSerializer(new MessageSerializer());
+        setKafkaKeySerializer(new DatabusKeySerializer());
+        setKafkaValueSerializer(new MessageSerializer());
         setDatabusProducerRecordAdapter(new DatabusProducerRecordAdapter<P>(messageSerializer));
     }
 

@@ -1,0 +1,137 @@
+HTTP/1.0 200 Connection established
+
+HTTP/1.1 403 cnmismatch
+Connection: Keep-Alive
+Content-Type: text/html
+Cache-Control: no-cache
+Content-Length: 3646
+X-Frame-Options: deny
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<!-- FileName: index.html
+     Language: [en]
+-->
+<!--Head-->
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=7" />
+  <meta content="text/html http-equiv="Content-Type">
+  <title>McAfee Web Gateway - Notification</title>
+  <script src="/mwg-internal/de5fs23hu73ds/files/javascript/sw.js" type="text/javascript" ></script>
+  <link rel="stylesheet" href="/mwg-internal/de5fs23hu73ds/files/default/stylesheet.css" />
+</head>
+<!--/Head-->
+<!--Body-->
+<body onload="swOnLoad();">
+  <table class='bodyTable'>
+    <tr>
+      <td class='bodyData' background='/mwg-internal/de5fs23hu73ds/files/default/img/bg_body.gif'>
+<!--Logo-->
+<table class='logoTable'>
+  <tr>
+    <td class='logoData'>
+      <a href='http://www.mcafee.com'>
+        <img src='/mwg-internal/de5fs23hu73ds/files/default/img/logo_mwg.png'></a>
+    </td>
+  </tr>
+</table>
+<!--/Logo-->
+<!--Contents-->
+<!-- FileName: cnmismatch.html
+     Language: [en]
+-->
+<!--Title-->
+<table class='titleTable' background='/mwg-internal/de5fs23hu73ds/files/default/img/bg_navbar.jpg'>
+  <tr>
+    <td class='titleData'>
+      Common Name Mismatch.
+    </td>
+  </tr>
+</table>
+<!--/Title-->
+
+<!--Content-->
+<table class="contentTable">
+  <tr>
+    <td class="contentData">
+      The certificate verification failed due to a common name mismatch.
+    </td>
+  </tr>
+</table>
+<!--/Content-->
+
+<!--Info-->
+<table class="infoTable">
+  <tr>
+    <td class="infoData">
+      <b>Host: </b>e1581825-govprodsupportgat-28a7-27882486.us-gov-west-1.elb.amazonaws.com<br />
+      <b>Common name: </b>ui.soc.mcafee-gov.com<br />
+      <b>Alternative subject names: </b>regex(ui\.soc\.mcafee-gov\.com), regex(api\.soc\.mcafee-gov\.com) <br />
+    </td>
+  </tr>
+</table>
+<!--/Info-->
+
+<!--/Contents-->
+<!--Policy-->
+<!--<table class='policyTable'>
+  <tr>
+    <td class='policyHeading'>
+      <hr>
+      Company Acceptable Use Policy
+    </td>
+  </tr>
+  <tr>
+    <td class='policyData'>
+    </td>
+  </tr>
+</table>-->
+<!--/Policy-->
+<!--Foot-->
+<table class='footTable'>
+  <tr>
+ <td class='helpDeskData' background='/mwg-internal/de5fs23hu73ds/files/default/img/bg_navbar.jpg'>
+      For assistance, please contact the InfoSec team by submitting this <a href="https://mcafeeprod.service-now.com/ITServices?id=sc_cat_item&sys_id=68f9dac3dbecef40e907572e5e96196f
+"><font color="FFFF00">form</font></a>.   
+    </td>
+  </tr>
+  <tr>
+    <td class='footData'>
+<!-- CA Cert Check
+Please define a URL for User-Defined.Certificate.Authority.URL
+-->
+
+<script>
+
+function caCert(){
+
+document.getElementById("caFooter").innerHTML ='<img style="vertical-align: middle;" src="/mwg-internal/de5fs23hu73ds/files/default/img/icon_cacert.gif"/> CA Certificate not installed. '
+
+}
+
+</script>
+
+<div id="caFooter" style="text-align:left;" >
+
+<img style="vertical-align: middle;" src="https://mcp.webwasher.com/mwg-internal/de5fs23hu73ds/files/default/img/icon_cacert.gif" onerror="caCert()"/> CA Certificate installed.
+</div>
+<!-- CA Cert Download -->
+<div id="caFooter" style="text-align:left;" >
+<a href="/mwg-internal/de5fs23hu73ds/files/default/certs/MWG-InfoSec-SSL-CA.crt">Click here to download the CA Certificate.</a>
+</div>
+<!-- /CA Cert Download -->
+<!-- /CA Cert Check -->
+      generated <span id="time">2020-03-18 17:14:28</span> by MWG: us-dal-mwg6, IP 10.52.64.203, ProxyPort: 9090
+Client IP: 10.52.241.166, RuleName: Block Incident, User: ,AuthProto: 
+      <br />
+     User-Agent curl/7.54.0
+    </td>
+  </tr>
+</table>
+<!--/Foot-->
+      </td>
+    </tr>
+  </table>
+</body>
+<!--/Body-->
+</html>

@@ -91,6 +91,10 @@ dependencies {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
+    testImplementation 'io.findify:s3mock_2.12:0.2.5'
+    testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
+
+    kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.1'
     kafkaInMemory 'commons-io:commons-io:2.6'
 
     // This following section mitigates OWASP vulnerabilities report.
