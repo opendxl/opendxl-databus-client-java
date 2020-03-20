@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 2.4.0 documentation</title>
+  <title>CLI (Command Line Interface) &mdash; OpenDXL Databus Java Client Library 2.4.1 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                2.4.0
+                2.4.1
               </div>
             
           
@@ -173,7 +173,7 @@
 <p>The OpenDXL Databus client can be invoked from command line interface (CLI)
 for testing or checking purposes. Executing the CLI like a standard Java
 library with no arguments displays help information:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-2.4.0.jar
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-2.4.1.jar
 
 ERROR: There are not options
 Option (* = required)                  Description
@@ -212,7 +212,7 @@ correct field name.</p>
 <p>In order to get records from the Databus client, the user has to invoke a
 few CLI operations. Operations arguments are placed after
 <code class="docutils literal notranslate"><span class="pre">--operation</span></code> option. For instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-2.4.0.jar --operation &lt;OPERATION_ARGUMENT&gt; ...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-2.4.1.jar --operation &lt;OPERATION_ARGUMENT&gt; ...
 </pre></div>
 </div>
 <div class="section" id="operation-arguments">
@@ -332,7 +332,7 @@ string</td>
 </table>
 <div class="section" id="example">
 <h4>example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-2.4.0.jar \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar dxldatabusclient-2.4.1.jar \
 --operation produce \
 --to-topic &lt;TOPIC_NAME&gt; \
 --brokers &lt;0.0.0.0&gt;:&lt;PORT&gt; \
@@ -473,7 +473,7 @@ milliseconds</td>
 </table>
 <div class="section" id="id1">
 <h4>example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">dxldatabusclient</span><span class="o">-</span><span class="mf">2.4</span><span class="o">.</span><span class="mf">0.</span><span class="n">jar</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">dxldatabusclient</span><span class="o">-</span><span class="mf">2.4</span><span class="o">.</span><span class="mf">1.</span><span class="n">jar</span> \
 <span class="o">--</span><span class="n">operation</span> <span class="n">consume</span> \
 <span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">topic</span> <span class="o">&lt;</span><span class="n">TOPIC_1</span><span class="p">,</span><span class="n">TOPIC_2</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">TOPIC_N</span><span class="o">&gt;</span> \
 <span class="o">--</span><span class="n">brokers</span> <span class="o">&lt;</span><span class="n">BROKER_1_IP</span><span class="p">:</span><span class="n">BROKER_1_PORT</span><span class="p">,</span><span class="n">BROKER_2_PORT</span><span class="p">:</span><span class="n">BROKER_2_PORT</span><span class="p">,</span><span class="o">...&gt;</span> \
