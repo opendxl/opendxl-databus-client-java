@@ -4,8 +4,6 @@
 
 package com.opendxl.databus.producer;
 
-import com.opendxl.databus.consumer.Consumer;
-import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.common.MetricName;
 import com.opendxl.databus.common.PartitionInfo;
 import com.opendxl.databus.common.RecordMetadata;
@@ -13,20 +11,24 @@ import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.common.internal.adapter.DatabusProducerRecordAdapter;
 import com.opendxl.databus.common.internal.adapter.MetricNameMapAdapter;
 import com.opendxl.databus.common.internal.adapter.PartitionInfoListAdapter;
+import com.opendxl.databus.consumer.Consumer;
 import com.opendxl.databus.consumer.OffsetAndMetadata;
 import com.opendxl.databus.consumer.OffsetCommitCallback;
 import com.opendxl.databus.entities.internal.DatabusMessage;
+import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.producer.metric.ProducerMetric;
 import com.opendxl.databus.producer.metric.ProducerMetricBuilder;
 import com.opendxl.databus.producer.metric.ProducerMetricEnum;
 import com.opendxl.databus.serialization.internal.DatabusKeySerializer;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.List;
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -91,7 +93,7 @@ public abstract class Producer<P> {
      *                                       and the buffer is full.
      *                                       <p> InterruptException       If the thread is interrupted while blocked
      */
-    public void send(final ProducerRecord record) {
+    public void send(final ProducerRecord<P> record) {
         send(record, null);
     }
 
@@ -165,7 +167,9 @@ public abstract class Producer<P> {
             sendKafkaRecord(targetProducerRecord, callbackAdapter);
 
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("send cannot be performed: " + e.getMessage(), e, Producer.class);
+            final String errMsg = "send cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
     }
 
@@ -173,6 +177,11 @@ public abstract class Producer<P> {
     sendKafkaRecord(final org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> record,
                     final org.apache.kafka.clients.producer.Callback callback) {
         producer.send(record, callback);
+    }
+
+    protected void
+    sendKafkaRecord(final org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> record) {
+        producer.send(record);
     }
 
     /**
@@ -212,7 +221,9 @@ public abstract class Producer<P> {
         try {
             producer.flush();
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("flush cannot be performed :" + e.getMessage(), e, Producer.class);
+            final String errMsg = "flush cannot be performed :" + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
 
         }
     }
@@ -231,8 +242,9 @@ public abstract class Producer<P> {
             List<org.apache.kafka.common.PartitionInfo> partitions = producer.partitionsFor(topic);
             return new PartitionInfoListAdapter().adapt(partitions);
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("partitionsFor cannot be performed :"
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "partitionsFor cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
     }
 
@@ -249,8 +261,9 @@ public abstract class Producer<P> {
 
             return new MetricNameMapAdapter().adapt(metrics);
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("metrics cannot be performed :"
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "metrics cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
 
         }
     }
@@ -272,7 +285,9 @@ public abstract class Producer<P> {
         try {
             producer.close();
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("close cannot be performed :" + e.getMessage(), e, Producer.class);
+            final String errMsg = "close cannot be performed :" + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
     }
 
@@ -294,14 +309,47 @@ public abstract class Producer<P> {
      *                                       <p> InterruptException       If the thread is interrupted while blocked
      *                                       <p> IllegalArgumentException If the <code>timeout</code> is negative.
      */
+    @Deprecated
     public void close(final long timeout, final TimeUnit timeUnit) {
         try {
             producer.close(timeout, timeUnit);
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("close cannot be performed :" + e.getMessage(), e, Producer.class);
+            final String errMsg = "close cannot be performed :" + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
 
     }
+
+    /**
+     * This method waits up to <code>timeout</code> for the producer to complete the sending of all incomplete requests.
+     * <p>
+     * If the producer is unable to complete all requests before the timeout expires, this method will fail
+     * any unsent and unacknowledged records immediately.
+     * <p>
+     * If invoked from within a {@link Callback} this method will not block and will be equivalent to
+     * <code>close(0, TimeUnit.MILLISECONDS)</code>. This is done since no further sending will happen while
+     * blocking the I/O thread of the producer.
+     *
+     * @param duration  The maximum time to wait for producer to complete any pending requests. The value should be
+     *                 non-negative. Specifying a timeout of zero means do not wait for pending send
+     *                 requests to complete.
+     * @param timeUnit The time unit for the <code>timeout</code>l
+     * @throws DatabusClientRuntimeException If close method fails. The original cause could be any of these exceptions:
+     *                                       <p> InterruptException       If the thread is interrupted while blocked
+     *                                       <p> IllegalArgumentException If the <code>timeout</code> is negative.
+     */
+    public void close(long duration, TemporalUnit timeUnit) {
+        try {
+            producer.close(Duration.of(duration, timeUnit));
+        } catch (Exception e) {
+            final String errMsg = "close cannot be performed :" + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
+        }
+
+    }
+
 
     /**
      * Set the DatabusKeySerializer in producer
@@ -315,7 +363,7 @@ public abstract class Producer<P> {
     /**
      * Set the value serializer in producer
      *
-     * @param valueSerializer A Serializer object instance for the value serializer
+     * @param kafkaValueSerializer A Serializer object instance for the value serializer
      */
     protected void
     setKafkaValueSerializer(final org.apache.kafka.common.serialization.Serializer<DatabusMessage>
@@ -343,8 +391,7 @@ public abstract class Producer<P> {
 
     /**
      * Set a Kafka producer instance to the producer.
-     *
-     * @return A {@link org.apache.kafka.clients.producer.Producer} object instance to set in the producer
+     * @param producer Producer
      */
     protected void setProducer(final org.apache.kafka.clients.producer.Producer<String, DatabusMessage> producer) {
         this.producer = producer;
@@ -360,10 +407,10 @@ public abstract class Producer<P> {
     }
 
 
+
     /**
-     * Set a {@link DatabusProducerRecordAdapter} associated to the producer.
      *
-     * @param databusProducerRecordAdapter The {@link DatabusProducerRecordAdapter} to set to the producer
+     * @return Databus producer adapter
      */
     protected DatabusProducerRecordAdapter<P> getDatabusProducerRecordAdapter() {
         return this.databusProducerRecordAdapter;
@@ -445,8 +492,9 @@ public abstract class Producer<P> {
         try {
             producer.initTransactions();
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("initTransactions cannot be performed: "
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "initTransactions cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
     }
 
@@ -468,8 +516,9 @@ public abstract class Producer<P> {
         try {
             producer.beginTransaction();
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("beginTransaction cannot be performed: "
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "beginTransaction cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
 
     }
@@ -519,8 +568,9 @@ public abstract class Producer<P> {
 
             producer.sendOffsetsToTransaction(adaptedOffsets, consumerGroupId);
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("sendOffsetsToTransaction cannot be performed: "
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "sendOffsetsToTransaction cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
     }
 
@@ -546,8 +596,9 @@ public abstract class Producer<P> {
         try {
             producer.commitTransaction();
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("commitTransaction cannot be performed: "
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "commitTransaction cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
 
     }
@@ -571,8 +622,9 @@ public abstract class Producer<P> {
         try {
             producer.abortTransaction();
         } catch (Exception e) {
-            throw new DatabusClientRuntimeException("abortTransaction cannot be performed: "
-                    + e.getMessage(), e, Producer.class);
+            final String errMsg = "abortTransaction cannot be performed: " + e.getMessage();
+            LOG.error(errMsg, e);
+            throw new DatabusClientRuntimeException(errMsg, e, Producer.class);
         }
 
     }

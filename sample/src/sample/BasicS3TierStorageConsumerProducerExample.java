@@ -8,18 +8,34 @@ import broker.ClusterHelper;
 import com.amazonaws.ClientConfiguration;
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
-import com.opendxl.databus.consumer.*;
-import com.opendxl.databus.entities.*;
-import com.opendxl.databus.producer.*;
+import com.opendxl.databus.consumer.Consumer;
+import com.opendxl.databus.consumer.ConsumerConfiguration;
+import com.opendxl.databus.consumer.ConsumerRecord;
+import com.opendxl.databus.consumer.ConsumerRecords;
+import com.opendxl.databus.consumer.DatabusConsumer;
+import com.opendxl.databus.entities.Headers;
+import com.opendxl.databus.entities.MessagePayload;
+import com.opendxl.databus.entities.RoutingData;
+import com.opendxl.databus.entities.S3TierStorage;
+import com.opendxl.databus.entities.TierStorage;
+import com.opendxl.databus.entities.TierStorageMetadata;
+import com.opendxl.databus.producer.Callback;
+import com.opendxl.databus.producer.DatabusTierStorageProducer;
+import com.opendxl.databus.producer.Producer;
+import com.opendxl.databus.producer.ProducerConfig;
+import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +44,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BasicS3TierStorageConsumerProducerExample {
 
+    private static final String AWS_REGION = "add-aws-region-name-here";
+    private static final String S3_ACCESS_KEY = "add-your-access-key-here";
+    private static final String S3_SECRET_KEY = "add-your-secret-key-here";
     private final Producer<byte[]> producer;
     private final ExecutorService executor;
     private final TierStorage tierStorage;
@@ -50,12 +69,12 @@ public class BasicS3TierStorageConsumerProducerExample {
                 .zookeeperPort(2181)
                 .start();
 
-
+        // Prepare a S3 Tiered Storage
         ClientConfiguration awsClientConfiguration = new ClientConfiguration();
-
-        this.tierStorage = new S3TierStorage("",
-                "",
-                "", awsClientConfiguration);
+        this.tierStorage = new S3TierStorage(AWS_REGION,
+                awsClientConfiguration,
+                S3_ACCESS_KEY,
+                S3_SECRET_KEY);
 
         // Prepare a Producer
         this.producer = getProducer();
@@ -77,8 +96,7 @@ public class BasicS3TierStorageConsumerProducerExample {
         config.put(ProducerConfig.LINGER_MS_CONFIG, "100");
         config.put(ProducerConfig.BATCH_SIZE_CONFIG, "150000");
         config.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, UUID.randomUUID().toString());
-        config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
-        return new DatabusTierStorageProducer<byte[]>(config, new ByteArraySerializer(), null);
+        return new DatabusTierStorageProducer<byte[]>(config, new ByteArraySerializer(), tierStorage);
     }
 
     public Consumer<byte[]> getConsumer() {
@@ -158,7 +176,7 @@ public class BasicS3TierStorageConsumerProducerExample {
                 consumer.unsubscribe();
                 try {
                     consumer.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOG.error(e.getMessage());
                 }
                 LOG.info("Consumer closed");
@@ -172,10 +190,8 @@ public class BasicS3TierStorageConsumerProducerExample {
         String key = String.valueOf(System.currentTimeMillis());
         TierStorageMetadata tStorageMetadata = new TierStorageMetadata("databus-poc-test", topic + key);
         RoutingData routingData = new RoutingData(topic, key, null, tStorageMetadata);
-
         Headers headers = new Headers();
         headers.put("k","v");
-
         MessagePayload<byte[]> messagePayload = new MessagePayload<>(payload);
         return new ProducerRecord<>(routingData, headers, messagePayload);
     }

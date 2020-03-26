@@ -15,12 +15,23 @@ import java.util.Map;
 public final class MessageDeserializer implements org.apache.kafka.common.serialization.Deserializer<DatabusMessage> {
 
 
+    /**
+     * Tier Storage
+     */
     private TierStorage tierStorage;
 
+    /**
+     * Constructor
+     *
+     * @param tierStorage If null it will be ignored and payload won't be read
+     */
     public MessageDeserializer(final TierStorage tierStorage) {
         this.tierStorage = tierStorage;
     }
 
+    /**
+     * Constructor
+     */
     public MessageDeserializer() {
         this(null);
     }
@@ -35,6 +46,7 @@ public final class MessageDeserializer implements org.apache.kafka.common.serial
 
     /**
      * Deserialize a message to a {@link DatabusMessage}
+     * If tierStorage is not null will be used to read the payload from the underlying Tier Storage.
      *
      * @param topic The topic name.
      * @param serializedMessage A serialized message.

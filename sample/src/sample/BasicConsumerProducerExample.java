@@ -4,7 +4,6 @@
 
 package sample;
 
-import broker.ClusterHelper;
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
 import com.opendxl.databus.consumer.*;
@@ -47,11 +46,11 @@ public class BasicConsumerProducerExample {
     public BasicConsumerProducerExample() {
 
         // Start Kafka cluster
-        ClusterHelper
-                .getInstance()
-                .addBroker(9092)
-                .zookeeperPort(2181)
-                .start();
+//        ClusterHelper
+//                .getInstance()
+//                .addBroker(9092)
+//                .zookeeperPort(2181)
+//                .start();
 
         // Prepare a Producer
         this.producer = getProducer();
@@ -197,7 +196,7 @@ public class BasicConsumerProducerExample {
         try {
             closed.set(true);
             consumer.wakeup();
-            ClusterHelper.getInstance().stop();
+//            ClusterHelper.getInstance().stop();
             executor.shutdown();
             executor.awaitTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {

@@ -53,10 +53,11 @@ public final class AvroMessageDeserializer implements InternalDeserializer<Datab
         this.reader = new GenericDatumReader(schema);
     }
 
+
     /**
-     * Deserialize a message
      *
-     * @param data The data to serialize.
+     * @param topic the topic where the message comes from
+     * @param data data to be deserialized
      * @return A {@link DatabusMessage} instance.
      */
     @Override
@@ -64,8 +65,15 @@ public final class AvroMessageDeserializer implements InternalDeserializer<Datab
         return this.deserialize(topic, data, null);
     }
 
+    /**
+     *
+     * @param topic the topic where the message comes from
+     * @param data data to be deserialized
+     * @param tierStorage tier storage where the payload should be read
+     * @return A {@link DatabusMessage} instance.
+     */
     @Override
-    public DatabusMessage deserialize(String topic, byte[] data, TierStorage tierStorage) {
+    public DatabusMessage deserialize(final String topic, final byte[] data, final TierStorage tierStorage) {
         try {
 
             GenericRecord avroRecord = reader.read(null, DecoderFactory.get().binaryDecoder(data, null));
@@ -79,7 +87,8 @@ public final class AvroMessageDeserializer implements InternalDeserializer<Datab
                             .adapt(avroRecord.get("payload"));
 
 
-            // Tier Storage Section
+            // Tier Storage Section.
+            // When it is not null, it will try to read the object from Tier Storage and override headers and payload.
             if (tierStorage != null) {
                 final String bucketName = headers.get(HeaderInternalField.TIER_STORAGE_BUCKET_NAME_KEY);
                 final String objectName = headers.get(HeaderInternalField.TIER_STORAGE_OBJECT_NAME_KEY);
@@ -98,18 +107,18 @@ public final class AvroMessageDeserializer implements InternalDeserializer<Datab
                         MessageStructure messageStructure =
                                 MessageStructureFactory.getStructure(tierStorageObjectContent);
                         avroRecord = reader
-                                .read(null, DecoderFactory.get().binaryDecoder(messageStructure.getPayload(), null));
+                                .read(null, DecoderFactory.get().binaryDecoder(messageStructure.getPayload(),
+                                        null));
                         headers = new HeadersAvroDeserializedAdapter().adapt(avroRecord.get("headers"));
                         payload = new PayloadHeadersAvroDeserializedAdapter().adapt(avroRecord.get("payload"));
                     } else {
-                        LOG.warn("Object content reading from Tier Storage is null or empty. Bucket: " + bucketName
+                        LOG.warn("Object content read from Tier Storage is null or empty. Bucket: " + bucketName
                                 + " Object: " + objectName);
                     }
                 }
             }
 
-            final DatabusMessage message = new DatabusMessage(headers, payload);
-            return message;
+            return new DatabusMessage(headers, payload);
 
         } catch (Exception e) {
             final String errMsg = "Error deserializing Avro schema:" + schema.toString(true);

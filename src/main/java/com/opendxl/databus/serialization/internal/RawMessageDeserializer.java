@@ -25,8 +25,15 @@ public final class RawMessageDeserializer implements InternalDeserializer<Databu
         return new DatabusMessage(null, data);
     }
 
+    /**
+     *
+     * @param topic the topic where the message comes from
+     * @param data data to be deserialized
+     * @param tierStorage It is not used
+     * @return A {@link DatabusMessage} with binary data as is.
+     */
     @Override
-    public DatabusMessage deserialize(String topic, byte[] data, TierStorage tierStorage) {
+    public DatabusMessage deserialize(final String topic, final byte[] data, final TierStorage tierStorage) {
         return deserialize(topic, data);
     }
 }
