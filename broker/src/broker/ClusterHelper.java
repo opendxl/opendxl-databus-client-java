@@ -136,6 +136,7 @@ public class ClusterHelper {
             config.setProperty("num.partitions", String.valueOf(6));
             config.setProperty("transaction.state.log.replication.factor", String.valueOf(1));
             config.setProperty("transaction.state.log.min.isr", String.valueOf(1));
+            config.setProperty("log.message.format.version", "2.3.0");
         } catch (Exception e) {
             e.printStackTrace();
         }

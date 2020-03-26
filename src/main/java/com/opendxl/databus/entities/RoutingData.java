@@ -16,7 +16,8 @@ import java.util.Optional;
  * Represent a address where a message must be sent.
  * It is used by {@link ProducerRecord}
  * to know what the destination is.
- * It contains a mandatory topic name as well as optionals sharding key and tenant group and partitions.
+ * It contains a mandatory topic name as well as optionals sharding key, tenant group,
+ * partitions and tier storage metadata.
  * </p>
  * <p>
  * See how to use in {@link DatabusProducer} example
@@ -37,12 +38,12 @@ public class RoutingData {
     /**
      * The topic name
      */
-    private String topic = null;
+    private String topic;
 
     /**
      * The sharding key value
      */
-    private String shardingKey = null;
+    private String shardingKey;
 
     /**
      * The tenant group

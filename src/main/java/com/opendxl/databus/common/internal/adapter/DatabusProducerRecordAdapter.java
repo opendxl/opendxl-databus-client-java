@@ -26,15 +26,15 @@ public final class DatabusProducerRecordAdapter<P>
     /**
      * The message deserializer.
      */
-    private final Serializer<P> messageSerializer;
+    private final Serializer<P> userSerializer;
 
     /**
      * Constructor
      *
-     * @param messageSerializer a {@link Serializer} instance used for Serializing the payload.
+     * @param userSerializer a {@link Serializer} instance used for Serializing the payload.
      */
-    public DatabusProducerRecordAdapter(final Serializer<P> messageSerializer) {
-        this.messageSerializer = messageSerializer;
+    public DatabusProducerRecordAdapter(final Serializer<P> userSerializer) {
+        this.userSerializer = userSerializer;
     }
 
     /**
@@ -46,7 +46,7 @@ public final class DatabusProducerRecordAdapter<P>
      */
     @Override
     public org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage>
-    adapt(final ProducerRecord sourceProducerRecord) {
+    adapt(final ProducerRecord<P> sourceProducerRecord) {
 
         final Headers clonedHeaders = sourceProducerRecord.getHeaders().clone();
 
@@ -60,7 +60,7 @@ public final class DatabusProducerRecordAdapter<P>
         }
 
         // Add internal headers to let consumer knows the payload is tiered storage
-        TierStorageMetadata tierStorageMetadata = sourceProducerRecord.getRoutingData().getTierStorageMetadata();
+        final TierStorageMetadata tierStorageMetadata = sourceProducerRecord.getRoutingData().getTierStorageMetadata();
         if (tierStorageMetadata != null
                 && tierStorageMetadata.getBucketName() != null && !tierStorageMetadata.getBucketName().isEmpty()
                 && tierStorageMetadata.getObjectName() != null && !tierStorageMetadata.getObjectName().isEmpty()
@@ -70,7 +70,7 @@ public final class DatabusProducerRecordAdapter<P>
         }
 
         final DatabusMessage databusMessage =
-                new MessagePayloadAdapter<P>(messageSerializer)
+                new MessagePayloadAdapter<>(userSerializer)
                         .adapt(sourceProducerRecord.payload(), clonedHeaders);
 
         final String targetTopic =

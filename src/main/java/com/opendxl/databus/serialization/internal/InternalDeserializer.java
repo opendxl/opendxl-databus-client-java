@@ -24,6 +24,13 @@ public interface InternalDeserializer<P> {
      */
     P deserialize(String topic, byte[] data);
 
+    /**
+     *
+     * @param topic the topic where the message comes from
+     * @param data data to be deserialized
+     * @param tierStorage tier storage where the payload should be read
+     * @return data of type P
+     */
     P deserialize(String topic, byte[] data, TierStorage tierStorage);
 
 
