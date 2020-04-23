@@ -76,6 +76,7 @@ Basic
         Consumer-metrics-sample.rst
         Transactions-producer-consumer-example.rst
         Basic-push-consumer-example.rst
+        Basic-S3-tiered-storage-example.rst
 
 Bugs and Feedback
 -----------------

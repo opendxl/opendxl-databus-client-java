@@ -166,7 +166,7 @@ public class DatabusTierStorageProducer<P> extends DatabusProducer<P> {
                     messagePayloadAdapter.adapt(producerRecord.payload(), producerRecord.getHeaders());
             final byte[] databusMessageSerialized = getKafkaValueSerializer().serialize("", databusMessage);
 
-            // Remove the producerRecord payload to be written in kafka.
+            // Remove the producerRecord payload to be written in kafka and keeps Headers.
             final ProducerRecord<P> adaptedProducerRecord = new ProducerRecord<>(producerRecord.getRoutingData(),
                     producerRecord.getHeaders(),
                     new MessagePayload<>(null));
@@ -248,9 +248,9 @@ public class DatabusTierStorageProducer<P> extends DatabusProducer<P> {
             // Serialize the producerRecord payload to be stored with TieredStorage when callback being invoked by Kafka
             final DatabusMessage databusMessage =
                     messagePayloadAdapter.adapt(producerRecord.payload(), producerRecord.getHeaders());
-            final byte[] kafkaValueSerializer = getKafkaValueSerializer().serialize("", databusMessage);
+            final byte[] kafkaValueSerialized = getKafkaValueSerializer().serialize("", databusMessage);
 
-            // Remove the producerRecord payload to be written in kafka.
+            // Remove the producerRecord payload to be written in kafka and keeps Headers.
             final ProducerRecord<P> adaptedProducerRecord = new ProducerRecord<>(producerRecord.getRoutingData(),
                     producerRecord.getHeaders(),
                     new MessagePayload<>(null));
@@ -263,7 +263,7 @@ public class DatabusTierStorageProducer<P> extends DatabusProducer<P> {
             CountDownLatch latch = new CountDownLatch(1);
             final CallbackAdapterTierStorage callbackAdapterTierStorage;
             callbackAdapterTierStorage = new CallbackAdapterTierStorage(callback,
-                    kafkaValueSerializer,
+                    kafkaValueSerialized,
                     latch,
                     tierStorageMetadata);
 
@@ -338,7 +338,7 @@ public class DatabusTierStorageProducer<P> extends DatabusProducer<P> {
         /**
          * the kafka value serializer
          */
-        private final byte[] kafkaValueSerializer;
+        private final byte[] kafkaValueSerialized;
 
         /**
          * An object to signal when callback has finished
@@ -357,15 +357,15 @@ public class DatabusTierStorageProducer<P> extends DatabusProducer<P> {
 
         /**
          * @param userCallback user callback
-         * @param kafkaValueSerializer kafka serializer
+         * @param kafkaValueSerialized kafka serializer
          * @param latch a object to signal when callback
          */
         CallbackAdapterTierStorage(final Callback userCallback,
-                                   final byte[] kafkaValueSerializer,
+                                   final byte[] kafkaValueSerialized,
                                    final CountDownLatch latch,
                                    final TierStorageMetadata tierStorageMetadata) {
             this.userCallback = userCallback;
-            this.kafkaValueSerializer = kafkaValueSerializer;
+            this.kafkaValueSerialized = kafkaValueSerialized;
             this.latch = latch;
             this.tierStorageMetadata = tierStorageMetadata;
         }
@@ -391,7 +391,7 @@ public class DatabusTierStorageProducer<P> extends DatabusProducer<P> {
 
                 tierStorage.put(tierStorageMetadata.getBucketName(),
                         tierStorageMetadata.getObjectName(),
-                        kafkaValueSerializer);
+                        kafkaValueSerialized);
                 response(recordMetadata, exception);
             } catch (DatabusClientRuntimeException databusException) {
                 LOG.error("Send cannot be performed. The record was not produced. ERROR:"
