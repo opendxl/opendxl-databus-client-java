@@ -19,7 +19,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "4.0.3"
     id "kr.motd.sphinx" version "2.3.1"
     id "jacoco"
-    id "org.owasp.dependencycheck" version "5.2.1"
+    id "org.owasp.dependencycheck" version "5.3.2"
 }
 
 group 'com.opendxl'
@@ -65,11 +65,12 @@ dependencies {
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    implementation 'software.amazon.awssdk:bom:2.11.1'
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.751'
+    implementation 'software.amazon.awssdk:bom:2.13.0'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.766'
+    implementation 'commons-io:commons-io:2.6'
     testImplementation 'org.apache.kafka:kafka_2.12:2.3.1'
     testImplementation 'org.apache.zookeeper:zookeeper:3.5.5'
-    testImplementation('io.netty:netty-all:4.1.43.Final') {
+    testImplementation('io.netty:netty-all:4.1.48.Final') {
         force = true
     }
     testImplementation 'commons-io:commons-io:2.6'
