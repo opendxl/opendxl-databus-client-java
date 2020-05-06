@@ -63,6 +63,7 @@ dependencies {
     implementation ('org.apache.kafka:kafka-streams:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
+    implementation group: 'org.scala-lang', name: 'scala-reflect', version: '2.12.11'
     implementation 'org.apache.avro:avro:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.commons:commons-configuration2:2.7'
