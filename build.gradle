@@ -63,7 +63,7 @@ dependencies {
     implementation ('org.apache.kafka:kafka-streams:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
-    implementation group: 'org.scala-lang', name: 'scala-reflect', version: '2.12.11'
+    implementation 'org.scala-lang:scala-reflect:2.12.11'
     implementation 'org.apache.avro:avro:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.commons:commons-configuration2:2.7'
@@ -73,7 +73,7 @@ dependencies {
     testImplementation('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
-    testImplementation group: 'org.scala-lang', name: 'scala-reflect', version: '2.12.11'
+    testImplementation 'org.scala-lang:scala-reflect:2.12.11'
     testImplementation 'org.apache.zookeeper:zookeeper:3.5.5'
     testImplementation('io.netty:netty-all:4.1.43.Final') {
         force = true
@@ -84,7 +84,7 @@ dependencies {
     kafkaInMemory ('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
-    kafkaInMemory group: 'org.scala-lang', name: 'scala-reflect', version: '2.12.11'
+    kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
     kafkaInMemory 'commons-io:commons-io:2.6'
 
     // This following section mitigates OWASP vulnerabilities report.
