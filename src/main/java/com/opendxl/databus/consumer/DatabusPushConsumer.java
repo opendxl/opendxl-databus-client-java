@@ -247,30 +247,6 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         super.subscribe(topics, new PushConsumerRebalanceListener(null));
     }
 
-    private class PushConsumerRebalanceListener implements ConsumerRebalanceListener {
-
-        private final ConsumerRebalanceListener customerListener;
-
-        PushConsumerRebalanceListener(final ConsumerRebalanceListener customerListener) {
-            this.customerListener = Optional.ofNullable(customerListener).orElse(new NoOpConsumerRebalanceListener());
-
-        }
-
-        @Override
-        public void onPartitionsRevoked(final Collection<TopicPartition> partitions) {
-            customerListener.onPartitionsRevoked(partitions);
-
-        }
-
-        @Override
-        public void onPartitionsAssigned(final Collection<TopicPartition> partitions) {
-            refreshPause.set(true);
-            customerListener.onPartitionsAssigned(partitions);
-
-        }
-    }
-
-
     /**
      * {@inheritDoc}
      */
@@ -575,6 +551,28 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         }
     }
 
+    private class PushConsumerRebalanceListener implements ConsumerRebalanceListener {
+
+        private final ConsumerRebalanceListener customerListener;
+
+        PushConsumerRebalanceListener(final ConsumerRebalanceListener customerListener) {
+            this.customerListener = Optional.ofNullable(customerListener).orElse(new NoOpConsumerRebalanceListener());
+
+        }
+
+        @Override
+        public void onPartitionsRevoked(final Collection<TopicPartition> partitions) {
+            customerListener.onPartitionsRevoked(partitions);
+
+        }
+
+        @Override
+        public void onPartitionsAssigned(final Collection<TopicPartition> partitions) {
+            refreshPause.set(true);
+            customerListener.onPartitionsAssigned(partitions);
+
+        }
+    }
 
 }
 
