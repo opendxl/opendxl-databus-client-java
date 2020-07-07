@@ -15,8 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -86,6 +89,11 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
      * A latch to signal that the main loop has finished.
      */
     private CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    /**
+     * An boolean to signal if pause operation has to be refreshed
+     */
+    private AtomicBoolean refreshPause = new AtomicBoolean(false);
 
     /**
      * Constructor
@@ -204,6 +212,65 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         super(properties, messageDeserializer, credential, tierStorage);
         this.consumerListener = consumerListener;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final Map<String, List<String>> groupTopics) {
+        super.subscribe(groupTopics, new PushConsumerRebalanceListener(null));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final Map<String, List<String>> groupTopics,
+                          final ConsumerRebalanceListener consumerRebalanceListener) {
+        super.subscribe(groupTopics, new PushConsumerRebalanceListener(consumerRebalanceListener));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final List<String> topics,
+                          final ConsumerRebalanceListener consumerRebalanceListener) {
+        super.subscribe(topics, new PushConsumerRebalanceListener(consumerRebalanceListener));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final List<String> topics) {
+        super.subscribe(topics, new PushConsumerRebalanceListener(null));
+    }
+
+    private class PushConsumerRebalanceListener implements ConsumerRebalanceListener {
+
+        private final ConsumerRebalanceListener customerListener;
+
+        PushConsumerRebalanceListener(final ConsumerRebalanceListener customerListener) {
+            this.customerListener = Optional.ofNullable(customerListener).orElse(new NoOpConsumerRebalanceListener());
+
+        }
+
+        @Override
+        public void onPartitionsRevoked(final Collection<TopicPartition> partitions) {
+            customerListener.onPartitionsRevoked(partitions);
+
+        }
+
+        @Override
+        public void onPartitionsAssigned(final Collection<TopicPartition> partitions) {
+            refreshPause.set(true);
+            customerListener.onPartitionsAssigned(partitions);
+
+        }
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -367,6 +434,13 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
 
                         LOG.info("Consumer " + super.getClientId() + " is resumed");
                     } catch (TimeoutException e) {
+                        // refreshPause == true means a rebalance was performed and partitions might be reassigned.
+                        // Then, in order to avoid reading messages and just sends the heartbeat when poll(),
+                        // a pause() method has to be invoked with the updated partitions assignment.
+                        if (refreshPause.get()) {
+                            refreshPause.set(false);
+                            pause(assignment());
+                        }
                         // TimeoutException means that listener is still working.
                         // So, a poll is performed to heartbeat Databus
                         super.poll(Duration.ofMillis(0));
