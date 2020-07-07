@@ -6,6 +6,7 @@ package com.opendxl.databus.serialization.internal;
 
 
 import com.google.gson.Gson;
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
 import com.opendxl.databus.common.internal.util.HeaderInternalField;
@@ -32,6 +33,13 @@ public final class LegacyMessageDeserializer implements InternalDeserializer<Dat
      * @param data Data to be deserialized.
      * @return A {@link DatabusMessage} instance.
      */
+
+    /**
+     *
+     * @param topic the topic where the message comes from
+     * @param data data to be deserialized
+     * @return A {@link DatabusMessage} instance.
+     */
     @Override
     public DatabusMessage deserialize(final String topic, final byte[] data) {
 
@@ -45,6 +53,19 @@ public final class LegacyMessageDeserializer implements InternalDeserializer<Dat
                     LegacyMessageDeserializer.class);
         }
 
+    }
+
+    /**
+     * Deserialize data to a {@link DatabusMessage}.
+     *
+     * @param topic topic the topic where the message comes from
+     * @param data data data to be deserialized
+     * @param tierStorage Not used
+     * @return A {@link DatabusMessage} instance.
+     */
+    @Override
+    public DatabusMessage deserialize(final String topic, final byte[] data, final TierStorage tierStorage) {
+        return deserialize(topic, data);
     }
 
     /**

@@ -4,6 +4,7 @@
 
 package com.opendxl.databus.serialization;
 
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.entities.internal.DatabusMessage;
 import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import com.opendxl.databus.serialization.internal.MessageSerializer;
@@ -16,6 +17,17 @@ import java.util.Map;
  * Serializer / Deserializer for Databus messages
  */
 public class SerdeDatabus implements Serde<DatabusMessage> {
+
+    private final TierStorage tierStorage;
+
+    public SerdeDatabus(final TierStorage tierStorage) {
+
+        this.tierStorage = tierStorage;
+    }
+
+    public SerdeDatabus() {
+        this(null);
+    }
 
     /**
      * Not implemented.
@@ -50,6 +62,6 @@ public class SerdeDatabus implements Serde<DatabusMessage> {
      */
     @Override
     public Deserializer<DatabusMessage> deserializer() {
-        return new MessageDeserializer();
+        return new MessageDeserializer(tierStorage);
     }
 }

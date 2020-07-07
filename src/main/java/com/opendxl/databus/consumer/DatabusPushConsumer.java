@@ -6,6 +6,7 @@ package com.opendxl.databus.consumer;
 
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.credential.Credential;
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.serialization.Deserializer;
 import org.apache.kafka.common.errors.WakeupException;
@@ -14,8 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -87,6 +91,11 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     /**
+     * An boolean to signal if pause operation has to be refreshed
+     */
+    private AtomicBoolean refreshPause = new AtomicBoolean(false);
+
+    /**
      * Constructor
      *
      * @param configs             consumer configuration
@@ -101,6 +110,22 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
     }
 
     /**
+     * Constructor
+     *
+     * @param configs             consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Map<String, Object> configs,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final TierStorage tierStorage) {
+        super(configs, messageDeserializer, null, tierStorage);
+        this.consumerListener = consumerListener;
+    }
+
+    /**
      * @param configs             consumer configuration
      * @param messageDeserializer consumer message deserializer
      * @param consumerListener    consumer listener
@@ -110,7 +135,23 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener,
                                final Credential credential) {
-        super(configs, messageDeserializer, credential);
+        super(configs, messageDeserializer, credential, null);
+        this.consumerListener = consumerListener;
+    }
+
+    /**
+     * @param configs             consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param credential          credential to get access to Databus in case security is enabled
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Map<String, Object> configs,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final Credential credential,
+                               final TierStorage tierStorage) {
+        super(configs, messageDeserializer, credential, tierStorage);
         this.consumerListener = consumerListener;
     }
 
@@ -131,16 +172,80 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
      * @param properties          consumer configuration
      * @param messageDeserializer consumer message deserializer
      * @param consumerListener    consumer listener
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Properties properties,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final TierStorage tierStorage) {
+        super(properties, messageDeserializer,  null, tierStorage);
+        this.consumerListener = consumerListener;
+
+    }
+
+    /**
+     * @param properties          consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
      * @param credential          credential to get access to Databus in case security is enabled
      */
     public DatabusPushConsumer(final Properties properties,
                                final Deserializer<P> messageDeserializer,
                                final DatabusPushConsumerListener consumerListener,
                                final Credential credential) {
-        super(properties, messageDeserializer, credential);
+        super(properties, messageDeserializer, credential, null);
         this.consumerListener = consumerListener;
     }
 
+    /**
+     * @param properties          consumer configuration
+     * @param messageDeserializer consumer message deserializer
+     * @param consumerListener    consumer listener
+     * @param credential          credential to get access to Databus in case security is enabled
+     * @param tierStorage Tier storage
+     */
+    public DatabusPushConsumer(final Properties properties,
+                               final Deserializer<P> messageDeserializer,
+                               final DatabusPushConsumerListener consumerListener,
+                               final Credential credential,
+                               final TierStorage tierStorage) {
+        super(properties, messageDeserializer, credential, tierStorage);
+        this.consumerListener = consumerListener;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final Map<String, List<String>> groupTopics) {
+        super.subscribe(groupTopics, new PushConsumerRebalanceListener(null));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final Map<String, List<String>> groupTopics,
+                          final ConsumerRebalanceListener consumerRebalanceListener) {
+        super.subscribe(groupTopics, new PushConsumerRebalanceListener(consumerRebalanceListener));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final List<String> topics,
+                          final ConsumerRebalanceListener consumerRebalanceListener) {
+        super.subscribe(topics, new PushConsumerRebalanceListener(consumerRebalanceListener));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(final List<String> topics) {
+        super.subscribe(topics, new PushConsumerRebalanceListener(null));
+    }
 
     /**
      * {@inheritDoc}
@@ -305,6 +410,13 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
 
                         LOG.info("Consumer " + super.getClientId() + " is resumed");
                     } catch (TimeoutException e) {
+                        // refreshPause == true means a rebalance was performed and partitions might be reassigned.
+                        // Then, in order to avoid reading messages and just sends the heartbeat when poll(),
+                        // a pause() method has to be invoked with the updated partitions assignment.
+                        if (refreshPause.get()) {
+                            refreshPause.set(false);
+                            pause(assignment());
+                        }
                         // TimeoutException means that listener is still working.
                         // So, a poll is performed to heartbeat Databus
                         super.poll(Duration.ofMillis(0));
@@ -439,6 +551,28 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
         }
     }
 
+    private class PushConsumerRebalanceListener implements ConsumerRebalanceListener {
+
+        private final ConsumerRebalanceListener customerListener;
+
+        PushConsumerRebalanceListener(final ConsumerRebalanceListener customerListener) {
+            this.customerListener = Optional.ofNullable(customerListener).orElse(new NoOpConsumerRebalanceListener());
+
+        }
+
+        @Override
+        public void onPartitionsRevoked(final Collection<TopicPartition> partitions) {
+            customerListener.onPartitionsRevoked(partitions);
+
+        }
+
+        @Override
+        public void onPartitionsAssigned(final Collection<TopicPartition> partitions) {
+            refreshPause.set(true);
+            customerListener.onPartitionsAssigned(partitions);
+
+        }
+    }
 
 }
 

@@ -7,6 +7,7 @@ package com.opendxl.databus.common.internal.adapter;
 import com.opendxl.databus.common.internal.builder.TopicNameBuilder;
 import com.opendxl.databus.common.internal.util.HeaderInternalField;
 import com.opendxl.databus.entities.Headers;
+import com.opendxl.databus.entities.TierStorageMetadata;
 import com.opendxl.databus.entities.internal.DatabusMessage;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.Serializer;
@@ -19,21 +20,21 @@ import org.apache.commons.lang.StringUtils;
  * @param <P> payload's type
  */
 public final class DatabusProducerRecordAdapter<P>
-        implements Adapter<ProducerRecord,
+        implements Adapter<ProducerRecord<P>,
         org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage>> {
 
     /**
      * The message deserializer.
      */
-    private final Serializer<P> messageSerializer;
+    private final Serializer<P> userSerializer;
 
     /**
      * Constructor
      *
-     * @param messageSerializer a {@link Serializer} instance used for Serializing the payload.
+     * @param userSerializer a {@link Serializer} instance used for Serializing the payload.
      */
-    public DatabusProducerRecordAdapter(final Serializer<P> messageSerializer) {
-        this.messageSerializer = messageSerializer;
+    public DatabusProducerRecordAdapter(final Serializer<P> userSerializer) {
+        this.userSerializer = userSerializer;
     }
 
     /**
@@ -45,7 +46,7 @@ public final class DatabusProducerRecordAdapter<P>
      */
     @Override
     public org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage>
-    adapt(final ProducerRecord sourceProducerRecord) {
+    adapt(final ProducerRecord<P> sourceProducerRecord) {
 
         final Headers clonedHeaders = sourceProducerRecord.getHeaders().clone();
 
@@ -58,9 +59,19 @@ public final class DatabusProducerRecordAdapter<P>
                     sourceProducerRecord.getRoutingData().getTopic());
         }
 
+        // Add internal headers to let consumer knows the payload is tiered storage
+        final TierStorageMetadata tierStorageMetadata = sourceProducerRecord.getRoutingData().getTierStorageMetadata();
+        if (tierStorageMetadata != null
+                && tierStorageMetadata.getBucketName() != null && !tierStorageMetadata.getBucketName().isEmpty()
+                && tierStorageMetadata.getObjectName() != null && !tierStorageMetadata.getObjectName().isEmpty()
+        ) {
+            clonedHeaders.put(HeaderInternalField.TIER_STORAGE_BUCKET_NAME_KEY, tierStorageMetadata.getBucketName());
+            clonedHeaders.put(HeaderInternalField.TIER_STORAGE_OBJECT_NAME_KEY, tierStorageMetadata.getObjectName());
+        }
+
         final DatabusMessage databusMessage =
-                new MessagePayloadAdapter(messageSerializer, clonedHeaders)
-                        .adapt(sourceProducerRecord.payload());
+                new MessagePayloadAdapter<>(userSerializer)
+                        .adapt(sourceProducerRecord.payload(), clonedHeaders);
 
         final String targetTopic =
                 TopicNameBuilder.getTopicName(sourceProducerRecord.getRoutingData().getTopic(),

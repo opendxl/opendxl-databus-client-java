@@ -5,6 +5,7 @@
 package com.opendxl.databus.consumer;
 
 import com.opendxl.databus.credential.Credential;
+import com.opendxl.databus.entities.TierStorage;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.producer.DatabusProducer;
 import com.opendxl.databus.serialization.Deserializer;
@@ -71,7 +72,7 @@ public class DatabusConsumer<P> extends Consumer<P> {
      * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
      */
     public DatabusConsumer(final Map<String, Object> configs, final Deserializer<P> messageDeserializer) {
-        this(configs, messageDeserializer, null);
+        this(configs, messageDeserializer, null, null);
     }
 
     /**
@@ -84,16 +85,34 @@ public class DatabusConsumer<P> extends Consumer<P> {
      *
      * @param configs The consumer configs
      * @param messageDeserializer a {@link Deserializer} getInstance implementd by SDK's user
+     * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
+     * @param tierStorage Tier Storage
+     */
+    public DatabusConsumer(final Map<String, Object> configs, final Deserializer<P> messageDeserializer,
+                           final TierStorage tierStorage) {
+        this(configs, messageDeserializer, null, tierStorage);
+    }
+    /**
+     * A consumer is instantiated by providing a set of key-value pairs as configuration. Valid configuration strings
+     * are documented <a href="http://kafka.apache.org/documentation.html#consumerconfigs" >here</a>. Values can be
+     * either strings or objects of the appropriate type (for example a numeric configuration would accept either the
+     * string "42" or the integer 42).
+     * <p>
+     * Valid configuration strings are documented at {@link org.apache.kafka.clients.consumer.ConsumerConfig}
+     *
+     * @param configs The consumer configs
+     * @param messageDeserializer a {@link Deserializer} getInstance implementd by SDK's user
      * @param credential identity to authenticate/authorization
+     * @param tierStorage Tier Storage
      *
      * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
      */
     public DatabusConsumer(final Map<String, Object> configs, final Deserializer<P> messageDeserializer,
-                           final Credential credential) {
+                           final Credential credential, final TierStorage tierStorage) {
         try {
             Map<String, Object> configuration = configureCredential(configs, credential);
             configuration = configureClientId(configuration);
-            setFieldMembers(messageDeserializer, configuration);
+            setFieldMembers(messageDeserializer, configuration, tierStorage);
             setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
         } catch (DatabusClientRuntimeException e) {
             throw e;
@@ -117,7 +136,12 @@ public class DatabusConsumer<P> extends Consumer<P> {
      * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
      */
     public DatabusConsumer(final Properties properties, final Deserializer<P> messageDeserializer) {
-        this(properties, messageDeserializer, null);
+        this(properties, messageDeserializer, null, null);
+    }
+
+    public DatabusConsumer(final Properties properties, final Deserializer<P> messageDeserializer,
+                           final TierStorage tierStorage) {
+        this(properties, messageDeserializer, null, tierStorage);
     }
 
     /**
@@ -131,15 +155,17 @@ public class DatabusConsumer<P> extends Consumer<P> {
      * @param properties The consumer configuration properties
      * @param messageDeserializer  a {@link Deserializer} getInstance implementd by SDK's user
      * @param credential identity to authenticate/authorization
+     * @param tierStorage Tier Storage
      *
      * @throws DatabusClientRuntimeException if a DatabusConsumer getInstance was not able to be created
      */
     public DatabusConsumer(final Properties properties, final Deserializer<P> messageDeserializer,
-                           final Credential credential) {
+                           final Credential credential, final TierStorage tierStorage) {
         try {
             Map<String, Object> configuration = configureCredential((Map) properties, credential);
             configuration = configureClientId(configuration);
-            setFieldMembers(messageDeserializer, configuration);
+            configuration.put(ConsumerConfiguration.ISOLATION_LEVEL_CONFIG, "read_committed");
+            setFieldMembers(messageDeserializer, configuration, tierStorage);
             setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
         } catch (DatabusClientRuntimeException e) {
             throw e;
@@ -156,14 +182,16 @@ public class DatabusConsumer<P> extends Consumer<P> {
      * @param configuration The consumer configuration map.
      * @param messageDeserializer  a {@link Deserializer} getInstance implemented by SDK's user.
      */
-    private void setFieldMembers(final Deserializer<P> messageDeserializer, final Map<String, Object> configuration) {
+    private void setFieldMembers(final Deserializer<P> messageDeserializer,
+                                 final Map<String, Object> configuration,
+                                 final TierStorage tierStorage) {
         if (messageDeserializer == null) {
             throw new DatabusClientRuntimeException(DATABUS_CONSUMER_INSTANCE_CANNOT_BE_CREATED_MESSAGE
                     + "Message Deserializer cannot be null" , DatabusConsumer.class);
         }
 
         setKeyDeserializer(new DatabusKeyDeserializer());
-        setValueDeserializer(new MessageDeserializer());
+        setValueDeserializer(new MessageDeserializer(tierStorage));
         setConsumerRecordsAdapter(new ConsumerRecordsAdapter<P>(messageDeserializer));
         setClientId((String) configuration.get(ConsumerConfiguration.CLIENT_ID_CONFIG));
     }

@@ -10,6 +10,7 @@ package com.opendxl.databus.common.internal.util;
  */
 public final class HeaderInternalField {
 
+
     private HeaderInternalField() {
     }
 
@@ -27,4 +28,11 @@ public final class HeaderInternalField {
      * The topic name key name.
      */
     public static final String TOPIC_NAME_KEY = INTERNAL_HEADER_IDENTIFIER + "TN" + INTERNAL_HEADER_IDENTIFIER;
+
+    public static final String TIER_STORAGE_BUCKET_NAME_KEY = INTERNAL_HEADER_IDENTIFIER + "BN"
+            + INTERNAL_HEADER_IDENTIFIER;;
+
+    public static final String TIER_STORAGE_OBJECT_NAME_KEY = INTERNAL_HEADER_IDENTIFIER + "OB"
+            + INTERNAL_HEADER_IDENTIFIER;;
+
 }
