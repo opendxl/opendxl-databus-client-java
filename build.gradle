@@ -64,8 +64,6 @@ dependencies {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     implementation 'org.scala-lang:scala-reflect:2.12.11'
-    implementation 'org.apache.avro:avro:1.9.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.avro:avro:1.9.2'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.apache.commons:commons-configuration2:2.7'
@@ -73,17 +71,15 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
     implementation 'commons-io:commons-io:2.6'
-
-
-    implementation 'software.amazon.awssdk:bom:2.11.1'
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.751'
+    implementation 'software.amazon.awssdk:bom:2.13.1'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.766'
     testImplementation 'org.apache.zookeeper:zookeeper:3.5.5'
     testImplementation('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     testImplementation 'org.scala-lang:scala-reflect:2.12.11'
-    testImplementation('io.netty:netty-all:4.1.43.Final') {
 
+    testImplementation('io.netty:netty-all:4.1.48.Final') {
         force = true
     }
     testImplementation 'commons-io:commons-io:2.6'
@@ -95,9 +91,9 @@ dependencies {
     }
     kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
     testImplementation 'io.findify:s3mock_2.12:0.2.5'
+    testImplementation 'io.findify:s3mock_2.12:0.2.5'
     testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
 
-    kafkaInMemory 'org.apache.kafka:kafka_2.12:2.3.1'
     kafkaInMemory 'commons-io:commons-io:2.6'
 
     // This following section mitigates OWASP vulnerabilities report.
