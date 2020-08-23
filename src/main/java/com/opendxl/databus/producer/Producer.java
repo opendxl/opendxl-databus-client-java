@@ -161,7 +161,9 @@ public abstract class Producer<P> {
                 callbackAdapter = null;
             }
 
-            producer.send(targetProducerRecord, callbackAdapter);
+            synchronized (this) {
+                producer.send(targetProducerRecord, callbackAdapter);
+            }
 
         } catch (Exception e) {
             throw new DatabusClientRuntimeException("send cannot be performed: " + e.getMessage(), e, Producer.class);
