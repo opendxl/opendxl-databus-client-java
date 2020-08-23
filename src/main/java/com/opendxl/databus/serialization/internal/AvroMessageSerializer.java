@@ -39,9 +39,9 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
     protected static final String PAYLOAD_FIELD_NAME = "payload";
 
     /**
-     * The a record representation.
+     * The record schema.
      */
-    private final GenericData.Record databusValue;
+    private final Schema schema;
 
     /**
      * A Writer data of a schema.
@@ -53,19 +53,19 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
      * @param schema Avro schema
      */
     public AvroMessageSerializer(final Schema schema) {
-        this.databusValue = new GenericData.Record(schema);
+        this.schema = schema;
         this.writer = new GenericDatumWriter<>(schema);
     }
 
     /**
-     * Deserialize a message
+     * Serialize a message
      *
      * @param data Data to be serialized
      * @return A serialized avro message as byte[]
      */
     @Override
     public byte[] serialize(final DatabusMessage data) {
-
+        final GenericData.Record databusValue = new GenericData.Record(schema);
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             databusValue.put(HEADERS_FIELD_NAME, data.getHeaders().getAll());
