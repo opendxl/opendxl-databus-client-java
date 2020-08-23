@@ -39,7 +39,7 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
     protected static final String PAYLOAD_FIELD_NAME = "payload";
 
     /**
-     * The a record representation.
+     * The record schema.
      */
     private final Schema schema;
 
@@ -58,7 +58,7 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
     }
 
     /**
-     * Deserialize a message
+     * Serialize a message
      *
      * @param data Data to be serialized
      * @return A serialized avro message as byte[]
