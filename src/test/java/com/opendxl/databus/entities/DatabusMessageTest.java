@@ -147,6 +147,7 @@ public class DatabusMessageTest {
         assertThat("The same databusMessage must be not equals to a different object type", databusMessage.equals(""), is(false));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void databus_message_should_be_serializable() throws Exception {
         Map<String, String> headersMap = new HashMap<>();
