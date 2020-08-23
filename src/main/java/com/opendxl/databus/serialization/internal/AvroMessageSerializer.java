@@ -41,7 +41,7 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
     /**
      * The a record representation.
      */
-    private final GenericData.Record databusValue;
+    private final Schema schema;
 
     /**
      * A Writer data of a schema.
@@ -53,7 +53,7 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
      * @param schema Avro schema
      */
     public AvroMessageSerializer(final Schema schema) {
-        this.databusValue = new GenericData.Record(schema);
+        this.schema = schema;
         this.writer = new GenericDatumWriter<>(schema);
     }
 
@@ -65,7 +65,7 @@ public final class AvroMessageSerializer implements InternalSerializer<DatabusMe
      */
     @Override
     public byte[] serialize(final DatabusMessage data) {
-
+        final GenericData.Record databusValue = new GenericData.Record(schema);
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             databusValue.put(HEADERS_FIELD_NAME, data.getHeaders().getAll());
