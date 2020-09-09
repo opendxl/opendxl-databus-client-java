@@ -81,6 +81,8 @@ dependencies {
     testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
+    testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
+
     kafkaInMemory ('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
