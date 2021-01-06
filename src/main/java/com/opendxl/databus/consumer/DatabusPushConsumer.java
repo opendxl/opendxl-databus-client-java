@@ -255,7 +255,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                 LOG.info("Consumer " + super.getClientId() + " number of records read: " + records.count());
 
                 if (records.count() > 0) {
-                    super.pause(assignment);
+                    super.pause(super.assignment());
                     LOG.info("Consumer " + super.getClientId() + " is paused");
                 } else {
                     continue;
@@ -291,7 +291,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                                 break;
                             case CONTINUE_AND_COMMIT:
                             default:
-                                super.commitSync();
+                                super.commitAsync();
                                 LOG.info("Consumer " + getClientId() + " listener returns "
                                         + onConsumeResponse.toString());
                                 break;
@@ -307,7 +307,15 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                     } catch (TimeoutException e) {
                         // TimeoutException means that listener is still working.
                         // So, a poll is performed to heartbeat Databus
-                        super.poll(Duration.ofMillis(0));
+                        super.pause(super.assignment());
+                        ConsumerRecords poll = super.poll(Duration.ofMillis(0));
+                        if (poll.count() != 0) {
+                            LOG.error("Consumer " + super.getClientId()
+                                    + " discarded " + poll.count() + " messages which were unexpectedly received"
+                                    + " possibly due to new TP being assigned:"
+                                    + " original TP assigment: " + assignment
+                                    + " current TP assignment: " + super.assignment());
+                        }
                         LOG.info("Consumer " + super.getClientId() + " sends heartbeat to coordinator. "
                                 + "The listener continue processing messages...");
                     } catch (ExecutionException | InterruptedException e) {
