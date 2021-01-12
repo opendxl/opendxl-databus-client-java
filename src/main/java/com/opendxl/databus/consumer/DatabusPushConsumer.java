@@ -310,6 +310,7 @@ public final class DatabusPushConsumer<P> extends DatabusConsumer<P> implements 
                         super.pause(super.assignment());
                         ConsumerRecords poll = super.poll(Duration.ofMillis(0));
                         if (poll.count() != 0) {
+                            stopRequested.set(true);
                             LOG.error("Consumer " + super.getClientId()
                                     + " discarded " + poll.count() + " messages which were unexpectedly received"
                                     + " possibly due to new TP being assigned:"
