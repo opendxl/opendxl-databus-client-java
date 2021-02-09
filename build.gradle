@@ -39,7 +39,7 @@ dependencyCheck {
 }
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.6"
     reportsDir = file("$buildDir/reports/coverage")
 }
 
@@ -59,11 +59,13 @@ configurations {
 dependencies {
     implementation ('org.apache.kafka:kafka-clients:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
+        exclude group: 'org.lz4', module: 'lz4-java'
     }
     implementation ('org.apache.kafka:kafka-streams:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     implementation 'org.scala-lang:scala-reflect:2.12.11'
+    implementation 'org.lz4:lz4-java:1.7.1'
     implementation 'org.apache.avro:avro:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.apache.commons:commons-configuration2:2.7'
@@ -85,8 +87,10 @@ dependencies {
 
     kafkaInMemory ('org.apache.kafka:kafka_2.12:2.3.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
+        exclude group: 'org.lz4', module: 'lz4-java'
     }
     kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
+    kafkaInMemory 'org.lz4:lz4-java:1.7.1'
     kafkaInMemory 'commons-io:commons-io:2.6'
 
     // This following section mitigates OWASP vulnerabilities report.
@@ -249,7 +253,8 @@ task versionFile()  {
 
 checkstyle {
     sourceSets = []
-    toolVersion '8.23'
+    toolVersion '8.39'
+
 
 }
 
