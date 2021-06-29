@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+        classpath 'org.owasp:dependency-check-gradle:6.1.5'
     }
 }
 
@@ -19,7 +19,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "4.0.3"
     id "kr.motd.sphinx" version "2.3.1"
     id "jacoco"
-    id "org.owasp.dependencycheck" version "5.2.1"
+    id "org.owasp.dependencycheck" version "6.1.5"
 }
 
 group 'com.opendxl'
@@ -76,11 +76,11 @@ dependencies {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     testImplementation 'org.scala-lang:scala-reflect:2.12.11'
-    testImplementation 'org.apache.zookeeper:zookeeper:3.5.5'
+    testImplementation 'org.apache.zookeeper:zookeeper:3.5.7'
     testImplementation('io.netty:netty-all:4.1.43.Final') {
         force = true
     }
-    testImplementation 'commons-io:commons-io:2.6'
+    testImplementation 'commons-io:commons-io:2.7'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
@@ -91,7 +91,7 @@ dependencies {
     }
     kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
     kafkaInMemory 'org.lz4:lz4-java:1.7.1'
-    kafkaInMemory 'commons-io:commons-io:2.6'
+    kafkaInMemory 'commons-io:commons-io:2.7'
 
     // This following section mitigates OWASP vulnerabilities report.
     // It enforces to use specific transitive dependency versions
