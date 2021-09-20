@@ -116,10 +116,10 @@ dependencies {
     }
 
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-12402
-    kafkaInMemory ('org.apache.commons:commons-compress:1.19') {
+    kafkaInMemory ('org.apache.commons:commons-compress:1.21') {
         force = true
     }
-    compile ('org.apache.commons:commons-compress:1.19') {
+    compile ('org.apache.commons:commons-compress:1.21') {
         force = true
     }
 }
