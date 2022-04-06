@@ -34,4 +34,39 @@
    <packageUrl regex="true">^pkg:maven/org\.apache\.zookeeper/zookeeper@.*$</packageUrl>
    <vulnerabilityName>CVE-2021-21409</vulnerabilityName>
    </suppress>
+   <suppress>
+     <notes><![CDATA[
+     file name: kafka-clients-2.3.1.jar
+     ]]></notes>
+     <sha1>21664b0318d201ec412f9b02357b07ba94009c87</sha1>
+     <cpe>cpe:/a:apache:kafka</cpe>
+   </suppress>
+   <suppress>
+     <notes><![CDATA[
+     file name: connect-api-2.3.1.jar
+     ]]></notes>
+     <sha1>8b977c5478a612524014e30058c408131a4ae82f</sha1>
+     <cpe>cpe:/a:apache:kafka</cpe>
+   </suppress>
+   <suppress>
+     <notes><![CDATA[
+     file name: connect-json-2.3.1.jar
+     ]]></notes>
+     <sha1>cc076dbc77c731fc7c28f582b00aa0c2a5e6d83c</sha1>
+     <cpe>cpe:/a:apache:kafka</cpe>
+   </suppress>
+   <suppress>
+     <notes><![CDATA[
+     file name: kafka-streams-2.3.1.jar
+     ]]></notes>
+     <sha1>3db25419a99124bb247470150539a1b5ecba409e</sha1>
+     <cve>CVE-2021-38153</cve>
+   </suppress>
+   <suppress>
+     <notes><![CDATA[
+     file name: kafka_2.12-2.3.1.jar
+     ]]></notes>
+     <sha1>c361d28608e0ddab7d6b7bb1f4bb456a74d7e294</sha1>
+     <cpe>cpe:/a:apache:kafka</cpe>
+  </suppress>
 </suppressions>
