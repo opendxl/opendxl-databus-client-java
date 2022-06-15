@@ -173,7 +173,7 @@ public class ClusterHelper {
             } });
 
         return KafkaZkClient.apply(connectString,
-                JaasUtils.isZkSecurityEnabled(),
+                JaasUtils.isZkSaslEnabled(),
                 SESSION_TIMEOUT_MS,
                 CONNECTION_TIMEOUT_MS,
                 MAX_IN_FLIGHT_REQUESTS,

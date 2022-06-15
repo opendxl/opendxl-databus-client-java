@@ -24,7 +24,7 @@ plugins {
 
 group 'com.opendxl'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 apply plugin: 'base'
 apply plugin: 'java'
@@ -57,7 +57,7 @@ configurations {
 }
 
 dependencies {
-    implementation ('org.apache.kafka:kafka-clients:2.3.1') {
+    implementation ('org.apache.kafka:kafka-clients:3.1.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.lz4', module: 'lz4-java'
     }
