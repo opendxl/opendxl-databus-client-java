@@ -54,6 +54,9 @@ jacocoTestReport {
 configurations {
     kafkaInMemory
     sampleJars.extendsFrom testImplementation
+    // Added below to get away of VSCode complaints - This might need only on local
+    // Comment it out before generating final artifacts 
+    implementation.extendsFrom kafkaInMemory
 }
 
 dependencies {
@@ -216,6 +219,16 @@ sourceSets {
         }
         resources {
             srcDir 'sample/src'
+        }
+        compileClasspath += main.output + test.output + configurations.compileClasspath + configurations.kafkaInMemory
+        runtimeClasspath += main.output + test.output + configurations.runtimeClasspath + configurations.kafkaInMemory
+    }
+    broker {
+        java {
+            srcDir 'broker/src'
+        }
+        resources {
+            srcDir 'broker/src'
         }
         compileClasspath += main.output + test.output + configurations.compileClasspath + configurations.kafkaInMemory
         runtimeClasspath += main.output + test.output + configurations.runtimeClasspath + configurations.kafkaInMemory
