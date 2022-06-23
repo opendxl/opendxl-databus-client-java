@@ -253,12 +253,13 @@ public class BasicStreamingExample {
         return () -> {
 
             while(true) {
-                ReadOnlyKeyValueStore<String, DatabusMessage> keyValueStore =
-                        this.stream.store("keyvaluestore", QueryableStoreTypes.keyValueStore());
+                StoreQueryParameters<ReadOnlyKeyValueStore<String, DatabusMessage>> storeQryParam = StoreQueryParameters
+                                .fromNameAndType("keyvaluestore", QueryableStoreTypes.keyValueStore());
+                ReadOnlyKeyValueStore<String, DatabusMessage> keyValueStore = this.stream.store(storeQryParam);
 
-                KeyValueIterator<String, DatabusMessage> iter = keyValueStore.all();
-                while (iter.hasNext()) {
-                    KeyValue<String, DatabusMessage> entry = iter.next();
+                KeyValueIterator<String, DatabusMessage> keyValueStoreIter = keyValueStore.all();
+                while(keyValueStoreIter.hasNext()){
+                    KeyValue<String, DatabusMessage> entry = keyValueStoreIter.next();
                     LOG.info(entry.key + entry.value);
                 }
             }
