@@ -75,7 +75,7 @@ dependencies {
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    testImplementation('org.apache.kafka:kafka_2.12:2.3.1') {
+    testImplementation('org.apache.kafka:kafka_2.12:3.1.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     testImplementation 'org.scala-lang:scala-reflect:2.12.11'
@@ -88,7 +88,7 @@ dependencies {
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
 
-    kafkaInMemory ('org.apache.kafka:kafka_2.12:2.3.1') {
+    kafkaInMemory ('org.apache.kafka:kafka_2.12:3.1.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.lz4', module: 'lz4-java'
     }

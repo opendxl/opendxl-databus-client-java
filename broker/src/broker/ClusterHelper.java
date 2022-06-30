@@ -5,6 +5,7 @@
 package broker;
 
 import kafka.admin.TopicCommand;
+import kafka.admin.TopicCommand.TopicService;
 import kafka.zk.KafkaZkClient;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
@@ -12,7 +13,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.kafka.common.utils.SystemTime;
-import scala.runtime.AbstractFunction0;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -33,7 +33,8 @@ public class ClusterHelper {
     private static int zookeeperPort = 2181;
     private static Zookeeper zkNode;
     private static List<KafkaBroker> brokers = new ArrayList<>();
-    private static final String ZKHOST = "localhost";
+    private static final String KAFKAHOST = "localhost";
+    private static int kafkaPort = 2181;
     private static final int SESSION_TIMEOUT_MS = 30000;
     private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static final int MAX_IN_FLIGHT_REQUESTS = 1000;
@@ -51,19 +52,36 @@ public class ClusterHelper {
     int partitions) throws Exception {
         String[] arguments = {
             "--create",
-            "--zookeeper", ZKHOST.concat(":").concat(String.valueOf(zookeeperPort)),
+            "--bootstrap-server", KAFKAHOST.concat(":").concat(String.valueOf(kafkaPort)),
             "--replication-factor", String.valueOf(replicationFactor),
             "--partitions", String.valueOf(partitions),
             "--topic", topicName
         };
 
         TopicCommand.TopicCommandOptions opts = new TopicCommand.TopicCommandOptions(arguments);
-        try (KafkaZkClient zkUtils = getZkClient(opts)) {
-            new TopicCommand.ZookeeperTopicService(zkUtils).createTopic(opts);
+        TopicService topicService=null;
+        try {
+            final AdminClient adminClient = createAdminClient();
+            topicService = new TopicCommand.TopicService(adminClient);
+            topicService.createTopic(opts);
         } catch (Exception e) {
             // In case of exceptions, abort topic creation.
             throw new Exception("Error creating a new Kafka topic");
+        }finally{
+            if (topicService!=null) {
+                topicService.close();
+            }
         }
+    }
+
+    public AdminClient createAdminClient() {
+        final Map<String, Object> props = new HashMap<>();
+        final Properties brokerConfig = brokers.get(0).getBrokerConfig();
+        final String bootstrapServer = brokerConfig.getProperty("host.name")
+                .concat(":")
+                .concat(brokerConfig.getProperty("port"));
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        return AdminClient.create(props);
     }
 
     public ClusterHelper addBroker(final int port) {
@@ -166,11 +184,7 @@ public class ClusterHelper {
     }
 
     private KafkaZkClient getZkClient(TopicCommand.TopicCommandOptions opts) {
-        final String connectString = opts.zkConnect().getOrElse(new AbstractFunction0<String>() {
-            @Override
-            public String apply() {
-                return "";
-            } });
+        final String connectString = "";
 
         return KafkaZkClient.apply(connectString,
                 JaasUtils.isZkSaslEnabled(),
@@ -178,7 +192,9 @@ public class ClusterHelper {
                 CONNECTION_TIMEOUT_MS,
                 MAX_IN_FLIGHT_REQUESTS,
                 new SystemTime(),
+                "", null,
                 METRIC_GROUP,
-                METRIC_TYPE, null);
+                METRIC_TYPE, false);
     }
+
 }
