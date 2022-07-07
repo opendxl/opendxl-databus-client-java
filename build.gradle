@@ -67,34 +67,35 @@ dependencies {
     implementation ('org.apache.kafka:kafka-streams:3.1.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
-    implementation 'org.scala-lang:scala-reflect:2.12.11'
-    implementation 'org.lz4:lz4-java:1.7.1'
+    implementation 'org.scala-lang:scala-reflect:2.13.8'
+    implementation 'org.lz4:lz4-java:1.8.0'
     implementation 'org.apache.avro:avro:1.11.0'
     implementation 'com.google.code.gson:gson:2.9.0'
-    implementation 'org.apache.commons:commons-configuration2:2.7'
+    implementation 'org.apache.commons:commons-configuration2:2.8.0'
     implementation 'commons-lang:commons-lang:2.6'
-    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    testImplementation('org.apache.kafka:kafka_2.12:3.1.1') {
+    testImplementation('org.apache.kafka:kafka_2.13:3.1.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
-    testImplementation 'org.scala-lang:scala-reflect:2.12.11'
+    testImplementation 'org.scala-lang:scala-reflect:2.13.8'
     testImplementation 'org.apache.zookeeper:zookeeper:3.5.7'
-    testImplementation('io.netty:netty-all:4.1.43.Final') {
+    testImplementation('io.netty:netty-all:4.1.78.Final') {
         force = true
     }
-    testImplementation 'commons-io:commons-io:2.7'
+    testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
 
-    kafkaInMemory ('org.apache.kafka:kafka_2.12:3.1.1') {
+    kafkaInMemory ('org.apache.kafka:kafka_2.13:3.1.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.lz4', module: 'lz4-java'
+        exclude group: 'io.netty'
     }
-    kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
-    kafkaInMemory 'org.lz4:lz4-java:1.7.1'
-    kafkaInMemory 'commons-io:commons-io:2.7'
+    kafkaInMemory 'org.scala-lang:scala-reflect:2.13.8'
+    kafkaInMemory 'org.lz4:lz4-java:1.8.0'
+    kafkaInMemory 'commons-io:commons-io:2.11.0'
 
     // This following section mitigates OWASP vulnerabilities report.
     // It enforces to use specific transitive dependency versions
