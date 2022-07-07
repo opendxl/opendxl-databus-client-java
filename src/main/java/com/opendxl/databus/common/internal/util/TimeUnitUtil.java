@@ -4,7 +4,10 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.concurrent.TimeUnit;
 
-public class TimeUnitUtil {
+public final class TimeUnitUtil {
+    private TimeUnitUtil() {
+        //not called
+    }
     public static TemporalUnit convert(final TimeUnit timeUnit) {
         switch (timeUnit) {
             case NANOSECONDS:
