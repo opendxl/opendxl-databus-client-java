@@ -125,6 +125,7 @@ public class DatabusProducer<P> extends Producer<P> {
     public DatabusProducer(final Map<String, Object> configs, final Serializer<P> messageSerializer,
                            final Credential credential) {
         try {
+            this.produceKafkaHeaders = true;
             setFieldMembers(messageSerializer);
             this.setConfiguration(overrideConfig(configs));
             this.configureCredential(getConfiguration(), credential);
@@ -172,6 +173,7 @@ public class DatabusProducer<P> extends Producer<P> {
     public DatabusProducer(final Properties properties, final Serializer<P> messageSerializer,
                            final Credential credential) {
         try {
+            this.produceKafkaHeaders = true;
             setFieldMembers(messageSerializer);
             Properties fixedProperties = overrideConfig(properties);
             this.setConfiguration((Map) fixedProperties);

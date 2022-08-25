@@ -17,8 +17,8 @@ import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientId;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopicPartitions;
 import com.opendxl.databus.consumer.metric.ConsumerMetricPerClientIdAndTopics;
 import com.opendxl.databus.consumer.metric.ConsumerMetricsBuilder;
-import com.opendxl.databus.entities.internal.DatabusMessage;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
 import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import org.apache.commons.lang.NullArgumentException;
@@ -54,6 +54,11 @@ public abstract class Consumer<P> {
     private MessageDeserializer valueDeserializer = null;
 
     /**
+     * The MessageDeserializer to deserialize a DatabusMessage.
+     */
+    private ByteArrayDeserializer intermediateValueDeserializer = null;
+
+    /**
      * The ConsumerRecordsAdapter to deserialize a DatabusMessage.
      */
     private ConsumerRecordsAdapter<P> consumerRecordsAdapter;
@@ -69,6 +74,11 @@ public abstract class Consumer<P> {
     private List<TopicPartition> topicPartitions;
 
     /**
+     * The header filter to filter records.
+     */
+    protected Map<String, Object> headerFilter;
+
+    /**
      * The logger object.
      */
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
@@ -76,7 +86,7 @@ public abstract class Consumer<P> {
     /**
      * The Kafka associated consumer.
      */
-    private org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer = null;
+    private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer = null;
 
     /**
      * Subscribe to the given list of tenantGroups and topics to get dynamically
@@ -430,7 +440,7 @@ public abstract class Consumer<P> {
      */
     public ConsumerRecords poll(final long timeout) {
         try {
-            final org.apache.kafka.clients.consumer.ConsumerRecords<String, DatabusMessage>
+            final org.apache.kafka.clients.consumer.ConsumerRecords<String, byte[]>
                     sourceConsumerRecords = consumer.poll(timeout);
 
             return consumerRecordsAdapter.adapt(sourceConsumerRecords);
@@ -488,7 +498,7 @@ public abstract class Consumer<P> {
      */
     public ConsumerRecords poll(final Duration timeout) {
         try {
-            final org.apache.kafka.clients.consumer.ConsumerRecords<String, DatabusMessage>
+            final org.apache.kafka.clients.consumer.ConsumerRecords<String, byte[]>
                     sourceConsumerRecords = consumer.poll(timeout);
 
             return consumerRecordsAdapter.adapt(sourceConsumerRecords);
@@ -1477,7 +1487,7 @@ public abstract class Consumer<P> {
      *
      * @param consumer - The Kafka consumer to set.
      */
-    protected void setConsumer(final org.apache.kafka.clients.consumer.Consumer<String, DatabusMessage> consumer) {
+    protected void setConsumer(final org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer) {
         this.consumer = consumer;
     }
 
@@ -1497,6 +1507,15 @@ public abstract class Consumer<P> {
      */
     protected void setValueDeserializer(final MessageDeserializer valueDeserializer) {
         this.valueDeserializer = valueDeserializer;
+    }
+
+    /**
+     * Sets the ByteArrayDeserializer
+     *
+     * @param valueDeserializer - The ByteArrayDeserializer to set.
+     */
+    protected void setIntermediateValueDeserializer(final ByteArrayDeserializer deserializer) {
+        this.intermediateValueDeserializer = deserializer;
     }
 
     /**
@@ -1543,6 +1562,20 @@ public abstract class Consumer<P> {
      */
     protected MessageDeserializer getValueDeserializer() {
         return valueDeserializer;
+    }
+
+    /**
+     * Gets the ByteArrayDeserializer to get the message value.
+     *
+     * @return A ByteArrayDeserializer.
+     */
+    protected org.apache.kafka.common.serialization.ByteArrayDeserializer getIntermediateValueDeserializer() {
+        return intermediateValueDeserializer;
+    }
+
+    protected void headerFilter(Map<String, Object> filter) {
+        this.headerFilter = filter;
+        this.consumerRecordsAdapter.setHeaderFilter(filter);
     }
 
     /**

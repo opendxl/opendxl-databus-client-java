@@ -1,8 +1,3 @@
-/*---------------------------------------------------------------------------*
- * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
- *---------------------------------------------------------------------------*/
-
-
 package com.opendxl.databus.common.internal.adapter;
 
 import com.opendxl.databus.common.internal.util.HeaderInternalField;
@@ -12,15 +7,25 @@ import com.opendxl.databus.entities.internal.DatabusMessage;
 import com.opendxl.databus.serialization.Deserializer;
 import com.opendxl.databus.serialization.internal.MessageDeserializer;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 
-/**
- * Adapter for ConsumerRecord.
- */
-public final class ConsumerRecordAdapter<P> implements
-        Adapter<org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>,
-                ConsumerRecord<P>> {
+public final class ConsumerRecordFilterableAdapter<P> implements
+Adapter<org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>,
+        ConsumerRecord<P>> {
+    /**
+     * Logger
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(ConsumerRecordFilterableAdapter.class);
 
     /**
      * The message deserializer.
@@ -32,13 +37,22 @@ public final class ConsumerRecordAdapter<P> implements
      */
     private final MessageDeserializer databusMessageDeserializer;
 
+    /**
+     * The header filter to filter records.
+     */
+    protected Map<String, Object> headerFilter;
+
     /** Constructor
      * @param messageDeserializer a {@link Deserializer} getInstance getInstance used for deserialize the payload.
      */
-    public ConsumerRecordAdapter(final Deserializer<P> messageDeserializer,
+    public ConsumerRecordFilterableAdapter(final Deserializer<P> messageDeserializer,
             final MessageDeserializer databusMessageDeserializer) {
         this.messageDeserializer = messageDeserializer;
         this.databusMessageDeserializer = databusMessageDeserializer;
+    }
+
+    public void setHeaderFilter(final Map<String, Object> filter) {
+        this.headerFilter = filter;
     }
 
     /**
@@ -52,9 +66,10 @@ public final class ConsumerRecordAdapter<P> implements
     public ConsumerRecord<P>
     adapt(final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]> sourceConsumerRecord) {
         final Headers headers = sourceConsumerRecord.headers();
-        final byte[] value = sourceConsumerRecord.value();
-        final DatabusMessage databusMessage = getDatabusMessage(sourceConsumerRecord.topic(), headers, value);
-        if (databusMessage != null) {
+        boolean matchingRecord = isMatchingRecord(headers, headerFilter);
+        if (matchingRecord) {
+            final byte[] value = sourceConsumerRecord.value();
+            final DatabusMessage databusMessage = getDatabusMessage(sourceConsumerRecord.topic(), headers, value);
             MessagePayload<P> payload =
             new DatabusMessageAdapter<P>(messageDeserializer).adapt(databusMessage);
             String topic = getTopic(databusMessage, sourceConsumerRecord);
@@ -71,6 +86,12 @@ public final class ConsumerRecordAdapter<P> implements
         } else {
             return null;
         }
+    }
+
+    private DatabusMessage getDatabusMessage(final String topic, final Headers headers, final byte[] value) {
+        final DatabusMessage databusMessage = value == null ? null
+            : this.databusMessageDeserializer.deserialize(topic, headers, value);
+        return databusMessage;
     }
 
     /**
@@ -113,10 +134,50 @@ public final class ConsumerRecordAdapter<P> implements
         }
     }
 
-    private DatabusMessage getDatabusMessage(final String topic, final Headers headers, final byte[] value) {
-        final DatabusMessage databusMessage = value == null ? null
-            : this.databusMessageDeserializer.deserialize(topic, headers, value);
-        return databusMessage;
+    private boolean isMatchingRecord(final Headers headers, final Map<String, Object> headerFilter) {
+        Iterator<Header> iterator = headers.iterator();
+        Map<String, Object> kafkaHeaderData = new HashMap<>();
+        while (iterator.hasNext()) {
+            Header header = iterator.next();
+            kafkaHeaderData.put(header.key(), header.value().toString());
+        }
+
+        if (kafkaHeaderData.size() == 0) {
+            LOG.debug("Empty Kafka Headers");
+            return true;
+        }
+
+        return filterRecordMessage(kafkaHeaderData, headerFilter);
     }
 
+    private boolean filterRecordMessage(final Map<String, Object> messageMap,
+            final Map<String, Object> filterCondition) {
+        boolean found = true;
+        for (final String key : filterCondition.keySet()) {
+            if (messageMap.containsKey(key)) {
+                String headerValue = String.valueOf(messageMap.get(key));
+                Object objectValue = filterCondition.get(key);
+                if (objectValue instanceof Set) {
+                    Set<String> filterSet = (Set<String>) objectValue;
+                    found = found && filterSet.contains(headerValue);
+                    if (!found) {
+                        LOG.debug("Record skipped because filter " + key + ": " + filterSet + " not found in record");
+                        break;
+                    }
+                } else {
+                    String filterValue = String.valueOf(filterCondition.get(key));
+                    found = found && filterValue.equals(headerValue);
+                    if (!found) {
+                        LOG.debug("Record skipped because filter " + key + ": " + filterValue + " not found in record");
+                        break;
+                    }
+                }
+            } else {
+                found = false;
+                LOG.debug("Record skipped because filtering key " + key + " not found in record");
+                break;
+            }
+        }
+        return found;
+    }
 }
