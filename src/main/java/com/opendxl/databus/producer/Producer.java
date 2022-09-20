@@ -77,6 +77,22 @@ public abstract class Producer<P> {
     }
 
     /**
+     * A boolean which indicates to produce Kafka Header with specified values.
+     */
+    protected boolean produceKafkaHeaders;
+
+    /**
+     * This method add credential kept into a configuration for the {@link Producer} instance
+     *
+     * @param configuration It is the configuration that a SDK's user sends when a new instance of DatabusProducer
+     *                      is created
+     * @param credential Identity to authentication/authorization
+     */
+    public void setProduceKafkaHeader(final boolean produceKafkaHeaders) {
+        this.produceKafkaHeaders = produceKafkaHeaders;
+    }
+
+    /**
      * Asynchronously send a record to a topic. Equivalent to <code>send(record, null)</code>.
      * See {@link #send(ProducerRecord, Callback)} for details.
      *
@@ -152,7 +168,7 @@ public abstract class Producer<P> {
 
         try {
             org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord =
-                    databusProducerRecordAdapter.adapt(producerRecord);
+                    databusProducerRecordAdapter.adapt(producerRecord, produceKafkaHeaders);
 
             final CallbackAdapter callbackAdapter;
             if (callback != null) {

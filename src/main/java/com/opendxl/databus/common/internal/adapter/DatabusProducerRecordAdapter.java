@@ -10,7 +10,14 @@ import com.opendxl.databus.entities.Headers;
 import com.opendxl.databus.entities.internal.DatabusMessage;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.Serializer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 
 
 /**
@@ -46,6 +53,18 @@ public final class DatabusProducerRecordAdapter<P>
     @Override
     public org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage>
     adapt(final ProducerRecord sourceProducerRecord) {
+        return adapt(sourceProducerRecord, false);
+    }
+
+    /**
+     * Adapter pattern implementation for DatabusProducerRecord instance.
+     * Adapts a ProducerRecord to a DatabusProducerRecord instance.
+     *
+     * @param sourceProducerRecord a {@link ProducerRecord} instance.
+     * @return a DatabusProducerRecord with a String key and a DatabusMessage value.
+     */
+    public org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage>
+    adapt(final ProducerRecord sourceProducerRecord, final boolean produceKafkaHeaders) {
 
         final Headers clonedHeaders = sourceProducerRecord.getHeaders().clone();
 
@@ -65,19 +84,26 @@ public final class DatabusProducerRecordAdapter<P>
         final String targetTopic =
                 TopicNameBuilder.getTopicName(sourceProducerRecord.getRoutingData().getTopic(),
                         sourceProducerRecord.getRoutingData().getTenantGroup());
+        final List<Header> kafkaHeaders = produceKafkaHeaders
+                ? generateKafkaHeaders(databusMessage.getHeaders()) : null;
+        System.out.println("produceKafkaHeaders: " + produceKafkaHeaders);
+        System.out.println("kafkaHeaders: " + kafkaHeaders);
+        final org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord =
+                new org.apache.kafka.clients.producer.ProducerRecord<>(targetTopic,
+                sourceProducerRecord.getRoutingData().getPartition(),
+                sourceProducerRecord.getRoutingData().getShardingKey(),
+                databusMessage,
+                kafkaHeaders);
 
-        final org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord;
-
-        if (sourceProducerRecord.getRoutingData().getPartition() == null) {
-            targetProducerRecord = new org.apache.kafka.clients.producer.ProducerRecord<>(targetTopic,
-                    sourceProducerRecord.getRoutingData().getShardingKey(),
-                    databusMessage);
-        } else {
-            targetProducerRecord = new org.apache.kafka.clients.producer.ProducerRecord<>(targetTopic,
-                    sourceProducerRecord.getRoutingData().getPartition(),
-                    sourceProducerRecord.getRoutingData().getShardingKey(),
-                    databusMessage);
-        }
         return targetProducerRecord;
+    }
+
+    private List<Header> generateKafkaHeaders(Headers headers) {
+        final List<Header> kafkaHeaders = new ArrayList<>();
+        final Map<String, String> headerMap = headers.getAll();
+        for (final String key : headerMap.keySet()) {
+                kafkaHeaders.add(new RecordHeader(key, headers.get(key).getBytes()));
+        }
+        return kafkaHeaders.size() > 0 ? kafkaHeaders : null;
     }
 }
