@@ -36,6 +36,14 @@ public class ConsumerRecordsAdapter<P>
     protected Map<String, Object> headerFilter;
 
     /**
+     * A boolean value if set
+     * true  - Will consume the records from Kafka as a JSON payload.
+     *         Headers and other routing information are retreived from Kafka headers section.
+     * false - Will consume records in DataBusMessage format
+     */
+    private boolean consumeRecordAsJSON = false;
+
+    /**
      * Consumer record adaptor.
      */
     private ConsumerRecordAdapter<P> recordAdapter;
@@ -44,6 +52,12 @@ public class ConsumerRecordsAdapter<P>
      * Consumer record adaptor.
      */
     private ConsumerRecordFilterableAdapter<P> recordFilterableAdapter;
+
+
+    /**
+     * The ConsumerJSONRecordsAdapter to deserialize a JSON record.
+     */
+    private ConsumerJSONRecordAdapter<P> consumerJSONRecordsAdapter;
 
     /**
      * Is Searchable.
@@ -59,6 +73,7 @@ public class ConsumerRecordsAdapter<P>
         this.recordAdapter = new ConsumerRecordAdapter<P>(messageDeserializer, databusMessageDeserializer);
         this.recordFilterableAdapter = new ConsumerRecordFilterableAdapter<P>(messageDeserializer,
             databusMessageDeserializer);
+        this.consumerJSONRecordsAdapter = new ConsumerJSONRecordAdapter<P>();
     }
 
     public void setHeaderFilter(final Map<String, Object> filter) {
@@ -68,6 +83,17 @@ public class ConsumerRecordsAdapter<P>
             filterable = true;
             LOG.debug("Record filter is set : " + filter);
         }
+    }
+
+    /**
+     * Sets the record format. If the parameter is
+     * true  - Will consume the records from Kafka as a JSON payload.
+     *         Headers and other routing information are retreived from Kafka headers section.
+     * false - Will consume records in DataBusMessage format
+     * @param consumeRecordAsJSON sets the record format
+     */
+    public void consumeRecordAsJSON(boolean consumeRecordAsJSON) {
+        this.consumeRecordAsJSON = consumeRecordAsJSON;
     }
 
     /**
@@ -93,8 +119,14 @@ public class ConsumerRecordsAdapter<P>
             // Get a list of databus ConsumerRecord based on kafka ConsumerRecord
             final List<ConsumerRecord<P>> databusConsumerRecords = new ArrayList<>();
             topicPartitionRecords.forEach(kafkaConsumerRecord -> {
-                final ConsumerRecord<P> databusConsumerRecord = filterable
+            ConsumerRecord<P> databusConsumerRecord = null;
+            if (consumeRecordAsJSON) {
+                databusConsumerRecord = consumerJSONRecordsAdapter.adapt(kafkaConsumerRecord);
+            } else {
+                databusConsumerRecord = filterable
                     ? recordFilterableAdapter.adapt(kafkaConsumerRecord) : recordAdapter.adapt(kafkaConsumerRecord);
+            }
+
                 if (databusConsumerRecord != null) {
                     databusConsumerRecords.add(databusConsumerRecord);
                 }

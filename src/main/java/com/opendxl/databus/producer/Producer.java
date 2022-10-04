@@ -11,6 +11,7 @@ import com.opendxl.databus.common.PartitionInfo;
 import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.common.internal.adapter.DatabusProducerRecordAdapter;
+import com.opendxl.databus.common.internal.adapter.DatabusProducerJSONRecordAdapter;
 import com.opendxl.databus.common.internal.adapter.MetricNameMapAdapter;
 import com.opendxl.databus.common.internal.adapter.PartitionInfoListAdapter;
 import com.opendxl.databus.consumer.OffsetAndMetadata;
@@ -46,14 +47,24 @@ public abstract class Producer<P> {
     private org.apache.kafka.common.serialization.Serializer<DatabusMessage> valueSerializer;
 
     /**
+     * A Kafka Serializer for JSON Records.
+     */
+    private org.apache.kafka.common.serialization.Serializer<byte[]> jsonValueSerializer;
+
+    /**
      * A configuration map for the producer.
      */
     private Map<String, Object> configuration;
 
     /**
-     * A Kakfa Producer associated to the producer.
+     * A Kafka Producer associated to the producer.
      */
     private org.apache.kafka.clients.producer.Producer<String, DatabusMessage> producer;
+
+    /**
+     * A Kafka Producer associated to the producer generating JSON records.
+     */
+    private org.apache.kafka.clients.producer.Producer<String, byte[]> jsonProducer;
 
     /**
      * A {@link DatabusProducerRecordAdapter} Producer associated to the producer.
@@ -61,9 +72,23 @@ public abstract class Producer<P> {
     private DatabusProducerRecordAdapter<P> databusProducerRecordAdapter;
 
     /**
+     * A {@link DatabusProducerJSONRecordAdapter} Producer associated to the
+     * producer.
+     */
+    private DatabusProducerJSONRecordAdapter<P> databusProducerJSONRecordAdapter;
+
+    /**
      * A String which represents the clientId associated to the producer.
      */
     private String clientId;
+
+    /**
+     * A boolean value if set
+     * true  - Will produce the records with original JSON payload.
+     *         Headers and other routing information are set in Kafka headers section.
+     * false - Will produce records in DataBusMessage format
+     */
+    private boolean produceRecordAsJSON = false;
 
     private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
 
@@ -166,10 +191,10 @@ public abstract class Producer<P> {
             throw new IllegalArgumentException("record cannot be null");
         }
 
-        try {
-            org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord =
-                    databusProducerRecordAdapter.adapt(producerRecord, produceKafkaHeaders);
+        org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord = null;
+        org.apache.kafka.clients.producer.ProducerRecord<String, byte[]> targetProducerJSONRecord = null;
 
+        try {
             final CallbackAdapter callbackAdapter;
             if (callback != null) {
                 callbackAdapter = new CallbackAdapter(callback);
@@ -177,7 +202,13 @@ public abstract class Producer<P> {
                 callbackAdapter = null;
             }
 
-            producer.send(targetProducerRecord, callbackAdapter);
+            if (produceRecordAsJSON) {
+                targetProducerJSONRecord = databusProducerJSONRecordAdapter.adapt(producerRecord);
+                jsonProducer.send(targetProducerJSONRecord, callbackAdapter);
+            } else {
+                targetProducerRecord = databusProducerRecordAdapter.adapt(producerRecord);
+                producer.send(targetProducerRecord, callbackAdapter);
+            }
 
         } catch (Exception e) {
             throw new DatabusClientRuntimeException("send cannot be performed: " + e.getMessage(), e, Producer.class);
@@ -313,6 +344,17 @@ public abstract class Producer<P> {
     }
 
     /**
+     * Sets the record format. If the parameter is
+     * true  - Records are produced in original JSON payload format.
+     *         Headers and other routing information are set in Kafka headers section.
+     * false - Records are produced in DataBusMessage format
+     * @param produceRecordAsJSON sets the record format
+     */
+    public void produceRecordAsJSON(final boolean produceRecordAsJSON) {
+        this.produceRecordAsJSON = produceRecordAsJSON;
+    }
+
+    /**
      * Set the DatabusKeySerializer in producer
      *
      * @param keySerializer A DatabusKeySerializer Instance
@@ -329,6 +371,16 @@ public abstract class Producer<P> {
     protected void
     setValueSerializer(final org.apache.kafka.common.serialization.Serializer<DatabusMessage> valueSerializer) {
         this.valueSerializer = valueSerializer;
+    }
+
+    /**
+     * Set the JSON value serializer in producer
+     *
+     * @param jsonValueSerializer A byte array Serializer object instance for the JSON value serializer
+     */
+    protected void
+    setJSONValueSerializer(final org.apache.kafka.common.serialization.Serializer<byte[]> jsonValueSerializer) {
+        this.jsonValueSerializer = jsonValueSerializer;
     }
 
     /**
@@ -350,6 +402,15 @@ public abstract class Producer<P> {
     }
 
     /**
+     * Get the JSON value serializer from producer
+     *
+     * @return  A {@link org.apache.kafka.common.serialization.Serializer} object instance
+     */
+    protected org.apache.kafka.common.serialization.Serializer<byte[]> getJSONValueSerializer() {
+        return jsonValueSerializer;
+    }
+
+    /**
      * Set a Kafka producer instance to the producer.
      *
      * @return  A {@link org.apache.kafka.clients.producer.Producer} object instance to set in the producer
@@ -359,12 +420,31 @@ public abstract class Producer<P> {
     }
 
     /**
+     * Set a JSON Kafka producer instance to the producer.
+     *
+     * @return  A {@link org.apache.kafka.clients.producer.Producer} object instance to set in the producer
+     */
+    protected void setJSONProducer(final org.apache.kafka.clients.producer.Producer<String, byte[]> producer) {
+        this.jsonProducer = producer;
+    }
+
+    /**
      * Set a {@link DatabusProducerRecordAdapter} associated to the producer.
      *
      * @param databusProducerRecordAdapter The {@link DatabusProducerRecordAdapter} to set to the producer
      */
     protected void setDatabusProducerRecordAdapter(final DatabusProducerRecordAdapter<P> databusProducerRecordAdapter) {
         this.databusProducerRecordAdapter = databusProducerRecordAdapter;
+    }
+
+    /**
+     * Set a {@link DatabusProducerJSONRecordAdapter} associated to the producer.
+     *
+     * @param databusProducerJSONRecordAdapter The {@link DatabusProducerJSONRecordAdapter} to set to the producer
+     */
+    protected void setDatabusProducerJSONRecordAdapter(final DatabusProducerJSONRecordAdapter<P>
+    databusProducerJSONRecordAdapter) {
+        this.databusProducerJSONRecordAdapter = databusProducerJSONRecordAdapter;
     }
 
     /**

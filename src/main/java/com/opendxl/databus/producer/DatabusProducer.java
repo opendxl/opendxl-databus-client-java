@@ -11,10 +11,12 @@ import com.opendxl.databus.exception.DatabusClientRuntimeException;
 import com.opendxl.databus.producer.internal.ProducerDefaultConfiguration;
 import com.opendxl.databus.serialization.internal.MessageSerializer;
 import com.opendxl.databus.common.internal.adapter.DatabusProducerRecordAdapter;
+import com.opendxl.databus.common.internal.adapter.DatabusProducerJSONRecordAdapter;
 import com.opendxl.databus.credential.Credential;
 import com.opendxl.databus.serialization.Serializer;
 import com.opendxl.databus.serialization.internal.DatabusKeySerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -130,6 +132,7 @@ public class DatabusProducer<P> extends Producer<P> {
             this.setConfiguration(overrideConfig(configs));
             this.configureCredential(getConfiguration(), credential);
             setProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getValueSerializer()));
+            setJSONProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getJSONValueSerializer()));
             setClientId((String) configs.get(ProducerConfig.CLIENT_ID_CONFIG));
         } catch (DatabusClientRuntimeException e) {
             throw e;
@@ -179,6 +182,7 @@ public class DatabusProducer<P> extends Producer<P> {
             this.setConfiguration((Map) fixedProperties);
             this.configureCredential(getConfiguration(), credential);
             setProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getValueSerializer()));
+            setJSONProducer(new KafkaProducer(this.getConfiguration(), getKeySerializer(), getJSONValueSerializer()));
             setClientId((String) fixedProperties.get(ProducerConfig.CLIENT_ID_CONFIG));
         } catch (DatabusClientRuntimeException e) {
             throw e;
@@ -201,7 +205,9 @@ public class DatabusProducer<P> extends Producer<P> {
 
         setKeySerializer(new DatabusKeySerializer());
         setValueSerializer(new MessageSerializer());
+        setJSONValueSerializer(new ByteArraySerializer());
         setDatabusProducerRecordAdapter(new DatabusProducerRecordAdapter<P>(messageSerializer));
+        setDatabusProducerJSONRecordAdapter(new DatabusProducerJSONRecordAdapter<P>(messageSerializer));
     }
 
     /**

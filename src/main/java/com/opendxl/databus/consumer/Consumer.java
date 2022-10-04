@@ -79,6 +79,14 @@ public abstract class Consumer<P> {
     protected Map<String, Object> headerFilter;
 
     /**
+     * A boolean value if set
+     * true  - Will consume the records from Kafka as a JSON payload.
+     *         Headers and other routing information are retreived from Kafka headers section.
+     * false - Will consume records in DataBusMessage format
+     */
+    private boolean consumeRecordAsJSON = false;
+
+    /**
      * The logger object.
      */
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
@@ -87,6 +95,18 @@ public abstract class Consumer<P> {
      * The Kafka associated consumer.
      */
     private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer = null;
+
+    /**
+     * Sets the record format. If the parameter is
+     * true  - Will consume the records from Kafka as a JSON payload.
+     *         Headers and other routing information are retreived from Kafka headers section.
+     * false - Will consume records in DataBusMessage format
+     * @param consumeRecordAsJSON sets the record format
+     */
+    public void consumeRecordAsJSON(final boolean consumeRecordAsJSON) {
+        this.consumeRecordAsJSON = consumeRecordAsJSON;
+        this.consumerRecordsAdapter.consumeRecordAsJSON(consumeRecordAsJSON);
+    }
 
     /**
      * Subscribe to the given list of tenantGroups and topics to get dynamically
