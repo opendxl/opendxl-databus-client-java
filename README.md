@@ -27,7 +27,7 @@ To start using the OpenDXL Databus Java client library:
 ## Maven Repository
 
 Visit the [OpenDXL Databus Java Client Maven Repository](https://search.maven.org/artifact/com.opendxl/dxldatabusclient) for
-access to all released versions including the appropriate dependency syntax for a large number of management 
+access to all released versions including the appropriate dependency syntax for a large number of management
 systems (Maven, Gradle, SBT, Ivy, Grape, etc.).
 
 Maven:
@@ -36,12 +36,12 @@ Maven:
 <dependency>
   <groupId>com.opendxl</groupId>
   <artifactId>dxldatabusclient</artifactId>
-  <version>2.4.9</version>
+  <version>2.4.10</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.opendxl:dxldatabusclient:2.4.9'
+compile 'com.opendxl:dxldatabusclient:2.4.10'
 ```
 
 ## Bugs and Feedback
