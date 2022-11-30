@@ -7,18 +7,18 @@ library with no arguments displays help information:
 
 ::
 
-    $ java -jar dxldatabusclient-2.4.9.jar
+    $ java -jar dxldatabusclient-2.4.10.jar
 
     ERROR: There are not options
-    Option (* = required)                  Description                            
-    ---------------------                  -----------                            
-    * --brokers <String: broker list>      Comma-separated broker list:  Example: 
-                                             broker1:port1,broker2:port2,...,     
-                                             brokerN:portN                        
-    --cg <String: cg>                      The consumer group name.               
-    --config [String: config]              The producer/consumer configuration    
-                                             list: Example: linger.ms=1000,batch. 
-                                             size=100000,compression.type=lz4     
+    Option (* = required)                  Description
+    ---------------------                  -----------
+    * --brokers <String: broker list>      Comma-separated broker list:  Example:
+                                             broker1:port1,broker2:port2,...,
+                                             brokerN:portN
+    --cg <String: cg>                      The consumer group name.
+    --config [String: config]              The producer/consumer configuration
+                                             list: Example: linger.ms=1000,batch.
+                                             size=100000,compression.type=lz4
     --consume-records <Integer: consume-   Number of expected records to finish
       records>                               the command line.  (default: 1)
     --consume-timeout <Integer: consume-   Max time the command line waits for
@@ -26,14 +26,14 @@ library with no arguments displays help information:
                                              Optional parameter, if absent, it
                                              defaults to 15000 ms. (default: 15000)
     --from-topic <String: from-topic>      Comma-separated topic name list to
-                                             consume. Example: topic1,topic2,..., 
-                                             topicN                               
-    --headers [String: headers]            The producer headers:  (default: )     
-    --msg <String: message>                message to be produced                 
+                                             consume. Example: topic1,topic2,...,
+                                             topicN
+    --headers [String: headers]            The producer headers:  (default: )
+    --msg <String: message>                message to be produced
     --operation <String: operation>        Operations: produce | consume
-    --partition [String: partition]        The partition number:  (default: )     
-    --sharding-key [String: sharding-key]  Sharding key (default: )               
-    --tenant-group [String: tenant-group]  Tenant Group (default: )               
+    --partition [String: partition]        The partition number:  (default: )
+    --sharding-key [String: sharding-key]  Sharding key (default: )
+    --tenant-group [String: tenant-group]  Tenant Group (default: )
     --to-topic <String: to-topic>          Topic name to produce
 
 *Note:* ``<String: FIELD>`` are mandatory placeholders which you should
@@ -50,7 +50,7 @@ few CLI operations. Operations arguments are placed after
 
 ::
 
-    $ java -jar dxldatabusclient-2.4.9.jar --operation <OPERATION_ARGUMENT> ...
+    $ java -jar dxldatabusclient-2.4.10.jar --operation <OPERATION_ARGUMENT> ...
 
 Operation Arguments
 ^^^^^^^^^^^^^^^^^^^
@@ -123,12 +123,12 @@ example
 
 ::
 
-    $ java -jar dxldatabusclient-2.4.9.jar \
+    $ java -jar dxldatabusclient-2.4.10.jar \
     --operation produce \
     --to-topic <TOPIC_NAME> \
     --brokers <0.0.0.0>:<PORT> \
     --msg <MESSAGE> \
-    --tenant-group <TENANT-GROUP> \ 
+    --tenant-group <TENANT-GROUP> \
     --sharding-key <KEY> \
     --partition <PARTITION-NUMBER> \
 
@@ -230,7 +230,7 @@ example
 
 ::
 
-    java -jar dxldatabusclient-2.4.9.jar \
+    java -jar dxldatabusclient-2.4.10.jar \
     --operation consume \
     --from-topic <TOPIC_1,TOPIC_2,...,TOPIC_N> \
     --brokers <BROKER_1_IP:BROKER_1_PORT,BROKER_2_PORT:BROKER_2_PORT,...> \
@@ -238,7 +238,7 @@ example
     --consume-records <CONSUME-RECORDS-NUMBER-TO-FINISH-CLI> \
     --tenant-group <TENANT-GROUP-NAME> \
     --cg <CONSUMER-GROUP>
-    --config enable.auto.commit=true 
+    --config enable.auto.commit=true
 
 The response example illustrates that two records are returned.
 
