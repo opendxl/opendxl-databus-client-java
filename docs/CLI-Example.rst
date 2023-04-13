@@ -7,7 +7,7 @@ library with no arguments displays help information:
 
 ::
 
-    $ java -jar dxldatabusclient-2.4.10.jar
+    $ java -jar dxldatabusclient-2.5.0.jar
 
     ERROR: There are not options
     Option (* = required)                  Description
@@ -49,8 +49,7 @@ few CLI operations. Operations arguments are placed after
 ``--operation`` option. For instance:
 
 ::
-
-    $ java -jar dxldatabusclient-2.4.10.jar --operation <OPERATION_ARGUMENT> ...
+    $ java -jar dxldatabusclient-2.5.0.jar --operation <OPERATION_ARGUMENT> ...
 
 Operation Arguments
 ^^^^^^^^^^^^^^^^^^^
@@ -123,7 +122,7 @@ example
 
 ::
 
-    $ java -jar dxldatabusclient-2.4.10.jar \
+    $ java -jar dxldatabusclient-2.5.0.jar \
     --operation produce \
     --to-topic <TOPIC_NAME> \
     --brokers <0.0.0.0>:<PORT> \
@@ -230,7 +229,7 @@ example
 
 ::
 
-    java -jar dxldatabusclient-2.4.10.jar \
+    java -jar dxldatabusclient-2.5.0.jar \
     --operation consume \
     --from-topic <TOPIC_1,TOPIC_2,...,TOPIC_N> \
     --brokers <BROKER_1_IP:BROKER_1_PORT,BROKER_2_PORT:BROKER_2_PORT,...> \
