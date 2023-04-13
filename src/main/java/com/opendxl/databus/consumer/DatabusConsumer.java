@@ -12,6 +12,7 @@ import com.opendxl.databus.serialization.internal.DatabusKeyDeserializer;
 import com.opendxl.databus.serialization.internal.MessageDeserializer;
 import com.opendxl.databus.common.internal.adapter.ConsumerRecordsAdapter;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 
 import java.util.Map;
 import java.util.Properties;
@@ -94,7 +95,8 @@ public class DatabusConsumer<P> extends Consumer<P> {
             Map<String, Object> configuration = configureCredential(configs, credential);
             configuration = configureClientId(configuration);
             setFieldMembers(messageDeserializer, configuration);
-            setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
+            //setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
+            setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getIntermediateValueDeserializer()));
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -140,7 +142,8 @@ public class DatabusConsumer<P> extends Consumer<P> {
             Map<String, Object> configuration = configureCredential((Map) properties, credential);
             configuration = configureClientId(configuration);
             setFieldMembers(messageDeserializer, configuration);
-            setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
+            // setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getValueDeserializer()));
+            setConsumer(new KafkaConsumer(configuration, getKeyDeserializer(), getIntermediateValueDeserializer()));
         } catch (DatabusClientRuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -164,7 +167,8 @@ public class DatabusConsumer<P> extends Consumer<P> {
 
         setKeyDeserializer(new DatabusKeyDeserializer());
         setValueDeserializer(new MessageDeserializer());
-        setConsumerRecordsAdapter(new ConsumerRecordsAdapter<P>(messageDeserializer));
+        setIntermediateValueDeserializer(new ByteArrayDeserializer());
+        setConsumerRecordsAdapter(new ConsumerRecordsAdapter<P>(messageDeserializer, getValueDeserializer()));
         setClientId((String) configuration.get(ConsumerConfiguration.CLIENT_ID_CONFIG));
     }
 
@@ -207,6 +211,10 @@ public class DatabusConsumer<P> extends Consumer<P> {
         clientId = UUID.randomUUID().toString();
         configuration.put(ConsumerConfiguration.CLIENT_ID_CONFIG, clientId);
         return configuration;
+    }
+
+    public void setHeaderFilter(final Map<String, Object> filter) {
+        this.headerFilter(filter);
     }
 
     /**
