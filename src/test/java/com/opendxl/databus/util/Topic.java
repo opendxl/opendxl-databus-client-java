@@ -5,11 +5,12 @@
 package com.opendxl.databus.util;
 
 import kafka.admin.TopicCommand;
+import kafka.admin.TopicCommand.TopicService;
 import kafka.zk.KafkaZkClient;
+
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.kafka.common.utils.SystemTime;
-import scala.runtime.AbstractFunction0;
-
 import java.util.UUID;
 
 public class Topic {
@@ -21,21 +22,21 @@ public class Topic {
         private String topicName = getRandomTopicName();
         private int partitions = 1;
         private int replicationFactor = 1;
-        private String zkHost = Constants.ZOOKEEPER_HOST;
-        private String zkPort = Constants.ZOOKEEPER_PORT;
+        private String kafkaHost = Constants.KAFKA_HOST;
+        private String KafkaPort = Constants.KAFKA_PORT;
 
         public Builder partitions(final int partitions) {
             this.partitions = partitions;
             return this;
         }
 
-        public Builder zkHost(final String zkHost) {
-            this.zkHost = zkHost;
+        public Builder kafkaHost(final String kafkaHost) {
+            this.kafkaHost = kafkaHost;
             return this;
         }
 
-        public Builder zkPort(final String zkPort) {
-            this.zkPort = zkPort;
+        public Builder kafkaPort(final String KafkaPort) {
+            this.KafkaPort = KafkaPort;
             return this;
         }
 
@@ -51,8 +52,8 @@ public class Topic {
 
         public String go() {
             String[] arguments = {"--create",
-                    "--zookeeper",
-                    zkHost.concat(":").concat(zkPort),
+                    "--bootstrap-server",
+                    kafkaHost.concat(":").concat(KafkaPort),
                     "--replication-factor",
                     String.valueOf(replicationFactor),
                     "--partitions",
@@ -61,29 +62,33 @@ public class Topic {
                     topicName};
 
             TopicCommand.TopicCommandOptions opts = new TopicCommand.TopicCommandOptions(arguments);
-            try (KafkaZkClient zkUtils = getZkClient(opts)) {
-                new TopicCommand.ZookeeperTopicService(zkUtils).createTopic(opts);
+            TopicService topicService=null;
+            try {
+                final AdminClient adminClient = AdminClientHelper.createAdminClient();
+                topicService = new TopicCommand.TopicService(adminClient);
+                topicService.createTopic(opts);
+            }
+            finally{
+                if (topicService!=null) {
+                    topicService.close();
+                }
             }
             return topicName;
-
-
         }
 
         private KafkaZkClient getZkClient(TopicCommand.TopicCommandOptions opts) {
-            final String connectString = opts.zkConnect().getOrElse(new AbstractFunction0<String>() {
-                @Override
-                public String apply() {
-                    return "";
-                } });
+            final String connectString = "";
 
             return KafkaZkClient.apply(connectString,
-                    JaasUtils.isZkSecurityEnabled(),
+                    JaasUtils.isZkSaslEnabled(),
                     30000,
                     30000,
                     1000,
                     new SystemTime(),
+                    "", null,
                     "kafka.server",
-                    "SessionExpireListener", null);
+                    "SessionExpireListener", false);
         }
     }
+    
 }
