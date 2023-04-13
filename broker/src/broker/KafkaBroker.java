@@ -5,8 +5,11 @@
 package broker;
 
 import kafka.server.KafkaConfig;
-import kafka.server.KafkaServerStartable;
+import kafka.server.KafkaServer;
+import scala.Option;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.kafka.common.utils.SystemTime;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -17,8 +20,7 @@ import java.util.Properties;
 public class KafkaBroker {
 
     private Properties brokerConfig;
-    private Zookeeper zookeeper;
-    private KafkaServerStartable broker;
+    private KafkaServer kafkaServer;
     private static final Logger LOG = LoggerFactory.getLogger(KafkaBroker.class);
 
     public KafkaBroker(final Properties brokerConfig) {
@@ -35,12 +37,19 @@ public class KafkaBroker {
                             }
                         }));
 
+        try {
+            final KafkaConfig kafkaConfig = new KafkaConfig(brokerConfig);
+            kafkaServer = new KafkaServer(kafkaConfig, new SystemTime(), 
+                Option.apply(this.getClass().getName()), true);
+            kafkaServer.startup();
 
-        broker = new KafkaServerStartable(new KafkaConfig(brokerConfig));
-        broker.startup();
-        LOG.info("Kafka broker started: " + brokerConfig.getProperty("host.name")
-                .concat(":")
-                .concat(brokerConfig.getProperty("port")));
+            LOG.info("Kafka broker started: " + brokerConfig.getProperty("host.name")
+                    .concat(":")
+                    .concat(brokerConfig.getProperty("port")));
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private Runnable getDeleteLogDirectoryAction() {
@@ -63,13 +72,13 @@ public class KafkaBroker {
     }
 
     public synchronized void shutdown() {
-        if (broker != null) {
-            broker.shutdown();
-            broker.awaitShutdown();
+        if(kafkaServer != null){
+            kafkaServer.shutdown();
+            kafkaServer.awaitShutdown();
             LOG.info("Kafka broker stopped: " + brokerConfig.getProperty("host.name")
-                    .concat(":")
-                    .concat(brokerConfig.getProperty("port")));
-            broker = null;
+            .concat(":")
+            .concat(brokerConfig.getProperty("port")));
+            kafkaServer = null;
         }
     }
 
