@@ -6,6 +6,7 @@ package com.opendxl.databus.producer;
 
 import com.opendxl.databus.consumer.Consumer;
 import com.opendxl.databus.exception.DatabusClientRuntimeException;
+import com.opendxl.databus.common.MessageFormat;
 import com.opendxl.databus.common.MetricName;
 import com.opendxl.databus.common.PartitionInfo;
 import com.opendxl.databus.common.RecordMetadata;
@@ -83,12 +84,9 @@ public abstract class Producer<P> {
     private String clientId;
 
     /**
-     * A boolean value if set
-     * true  - Will produce the records with original JSON payload.
-     *         Headers and other routing information are set in Kafka headers section.
-     * false - Will produce records in DataBusMessage format
+     * Takes one of the message formats as specified by enum MessageFormat.
      */
-    private boolean produceRecordAsJSON = false;
+    private MessageFormat messageFormat = MessageFormat.DATABUS;
 
     private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
 
@@ -190,10 +188,8 @@ public abstract class Producer<P> {
         if (producerRecord == null) {
             throw new IllegalArgumentException("record cannot be null");
         }
-
         org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord = null;
         org.apache.kafka.clients.producer.ProducerRecord<String, byte[]> targetProducerJSONRecord = null;
-
         try {
             final CallbackAdapter callbackAdapter;
             if (callback != null) {
@@ -201,15 +197,13 @@ public abstract class Producer<P> {
             } else {
                 callbackAdapter = null;
             }
-
-            if (produceRecordAsJSON) {
+            if (MessageFormat.JSON == messageFormat) {
                 targetProducerJSONRecord = databusProducerJSONRecordAdapter.adapt(producerRecord);
                 jsonProducer.send(targetProducerJSONRecord, callbackAdapter);
             } else {
                 targetProducerRecord = databusProducerRecordAdapter.adapt(producerRecord);
                 producer.send(targetProducerRecord, callbackAdapter);
             }
-
         } catch (Exception e) {
             throw new DatabusClientRuntimeException("send cannot be performed: " + e.getMessage(), e, Producer.class);
         }
@@ -344,14 +338,11 @@ public abstract class Producer<P> {
     }
 
     /**
-     * Sets the record format. If the parameter is
-     * true  - Records are produced in original JSON payload format.
-     *         Headers and other routing information are set in Kafka headers section.
-     * false - Records are produced in DataBusMessage format
-     * @param produceRecordAsJSON sets the record format
+     * Sets the record message format.
+     * @param messageFormat takes one of the values of enum MessageFormat.
      */
-    public void produceRecordAsJSON(final boolean produceRecordAsJSON) {
-        this.produceRecordAsJSON = produceRecordAsJSON;
+    public void setMessageFormat(MessageFormat messageFormat) {
+        this.messageFormat = messageFormat;
     }
 
     /**

@@ -20,7 +20,8 @@ import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 
 /**
- * Adapter for Databus Producer Record
+ * Adapter for Databus producer record in JSON message format. The incoming message headers are set as kafka message \
+ * headers. Message payload is stored as is in JSON format in kafka message payload.
  *
  * @param <P> payload's type
  */
@@ -57,7 +58,11 @@ public final class DatabusProducerJSONRecordAdapter<P>
                 final List<Header> kafkaHeaders = new ArrayList<>();
 
                 for (final String key : headers.keySet()) {
-                        kafkaHeaders.add(new RecordHeader(key, headers.get(key).getBytes()));
+                        String val = headers.get(key);
+                        if (null == val) {
+                                val = "";
+                        }
+                        kafkaHeaders.add(new RecordHeader(key, val.getBytes()));
                 }
 
                 // Add internals header to let the consumer knows a tenantGroup name is part of
@@ -65,6 +70,8 @@ public final class DatabusProducerJSONRecordAdapter<P>
                 if (!StringUtils.isBlank(sourceProducerRecord.getRoutingData().getTenantGroup())) {
                         kafkaHeaders.add(new RecordHeader(HeaderInternalField.TENANT_GROUP_NAME_KEY,
                                         sourceProducerRecord.getRoutingData().getTenantGroup().getBytes()));
+                }
+                if (!StringUtils.isBlank(sourceProducerRecord.getRoutingData().getTopic())) {
                         kafkaHeaders.add(new RecordHeader(HeaderInternalField.TOPIC_NAME_KEY,
                                         sourceProducerRecord.getRoutingData().getTopic().getBytes()));
                 }

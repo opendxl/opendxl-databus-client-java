@@ -4,6 +4,7 @@
 
 package com.opendxl.databus.consumer;
 
+import com.opendxl.databus.common.MessageFormat;
 import com.opendxl.databus.common.MetricName;
 import com.opendxl.databus.common.OffsetAndTimestamp;
 import com.opendxl.databus.common.PartitionInfo;
@@ -79,12 +80,9 @@ public abstract class Consumer<P> {
     protected Map<String, Object> headerFilter;
 
     /**
-     * A boolean value if set
-     * true  - Will consume the records from Kafka as a JSON payload.
-     *         Headers and other routing information are retreived from Kafka headers section.
-     * false - Will consume records in DataBusMessage format
+     * Takes one of the message formats as specified by enum MessageFormat.
      */
-    private boolean consumeRecordAsJSON = false;
+    private MessageFormat messageFormat = MessageFormat.DATABUS;
 
     /**
      * The logger object.
@@ -97,15 +95,11 @@ public abstract class Consumer<P> {
     private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer = null;
 
     /**
-     * Sets the record format. If the parameter is
-     * true  - Will consume the records from Kafka as a JSON payload.
-     *         Headers and other routing information are retreived from Kafka headers section.
-     * false - Will consume records in DataBusMessage format
-     * @param consumeRecordAsJSON sets the record format
+     * Sets the record message format.
+     * @param messageFormat takes one of the values of enum MessageFormat.
      */
-    public void consumeRecordAsJSON(final boolean consumeRecordAsJSON) {
-        this.consumeRecordAsJSON = consumeRecordAsJSON;
-        this.consumerRecordsAdapter.consumeRecordAsJSON(consumeRecordAsJSON);
+    public void setMessageFormat(MessageFormat messageFormat) {
+        this.messageFormat = messageFormat;
     }
 
     /**

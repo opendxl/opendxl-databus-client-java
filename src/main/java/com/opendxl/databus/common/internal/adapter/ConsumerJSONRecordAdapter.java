@@ -18,65 +18,78 @@ public final class ConsumerJSONRecordAdapter<P> implements
         Adapter<org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>,
                 ConsumerRecord<P>> {
 
+    class TargetRecord {
+        private com.opendxl.databus.entities.Headers targetRecordHeaders;
+        private String targetRecordTopic;
+        private String targetRecordTenantGroup;
+        TargetRecord() {
+            targetRecordHeaders = new com.opendxl.databus.entities.Headers();
+            targetRecordTopic = "";
+            targetRecordTenantGroup = "";
+        }
+        public com.opendxl.databus.entities.Headers getTargetRecordHeaders() {
+            return targetRecordHeaders;
+        }
+        public void putTargetRecordHeader(final String headerKey, final String value) {
+            targetRecordHeaders.put(headerKey, value);
+        }
+        public String getTargetRecordTopic() {
+            return targetRecordTopic;
+        }
+        public void setTargetRecordTopic(String targetRecordTopic) {
+            this.targetRecordTopic = targetRecordTopic;
+        }
+        public String getTargetRecordTenantGroup() {
+            return targetRecordTenantGroup;
+        }
+        public void setTargetRecordTenantGroup(String targetRecordTenantGroup) {
+            this.targetRecordTenantGroup = targetRecordTenantGroup;
+        }
 
-    private com.opendxl.databus.entities.Headers targetRecordHeaders;
-    private String targetRecordTopic;
-    private String targetRecordTenantGroup;
+    }
 
     /** Constructor
      */
     public ConsumerJSONRecordAdapter() {
-        targetRecordHeaders = new com.opendxl.databus.entities.Headers();
-        targetRecordTopic = "";
-        targetRecordTenantGroup = "";
     }
 
-    private void extractTargetHeaderInfo(final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>
+    private TargetRecord extractTargetHeaderInfo(final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>
         sourceConsumerRecord) {
-        targetRecordTopic = sourceConsumerRecord.topic() != null ? sourceConsumerRecord.topic() : "";
+        TargetRecord targetRecord = new TargetRecord();
+        targetRecord.setTargetRecordTopic(null != sourceConsumerRecord.topic() ? sourceConsumerRecord.topic() : "");
         Iterator<Header> iterator = sourceConsumerRecord.headers().iterator();
         while (iterator.hasNext()) {
             Header header = iterator.next();
-            switch (header.key()) {
-                case HeaderInternalField.TOPIC_NAME_KEY:
-                    targetRecordTopic = new String(header.value());
-                    break;
-                case HeaderInternalField.TENANT_GROUP_NAME_KEY:
-                    targetRecordTenantGroup = new String(header.value());
-                    break;
-                default:
-                    targetRecordHeaders.put(header.key(), new String(header.value()));
-                    break;
-            }
+            targetRecord.putTargetRecordHeader(header.key(), new String(header.value()));
         }
+        Header header = null;
+        if (null != (header = sourceConsumerRecord.headers().lastHeader(HeaderInternalField.TOPIC_NAME_KEY))) {
+            targetRecord.setTargetRecordTopic(new String(header.value()));
+        }
+        if (null != (header = sourceConsumerRecord.headers().lastHeader(HeaderInternalField.TENANT_GROUP_NAME_KEY))) {
+            targetRecord.setTargetRecordTenantGroup(new String(header.value()));
+        }
+        return targetRecord;
     }
 
     /**
      * Adapter pattern implementation for ConsumerRecord.
      * Adapts a DatabusMessage object to a ConsumerRecord.
      *
-     * @param sourceConsumerRecord the ConsumerRecord to be adapted.
+     * @param sourceConsumerRecord the ConsumerRecord from Kafka that needs be adapted to JSON format.
      * @return A Databus {@link ConsumerRecord}
      */
     @Override
     public ConsumerRecord<P>
     adapt(final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]> sourceConsumerRecord) {
-
-        if (null == sourceConsumerRecord) {
-            return null;
-        }
-        extractTargetHeaderInfo(sourceConsumerRecord);
+        TargetRecord targetRecord = extractTargetHeaderInfo(sourceConsumerRecord);
         final byte[] value = sourceConsumerRecord.value();
         MessagePayload<P> payload = new MessagePayload<P>((P) value);
-
-        final StringBuilder headers = new StringBuilder().append("[");
-                targetRecordHeaders.getAll().forEach((k, v) -> headers.append("[" + k + ":" + v + "]"));
-                headers.append("]");
         final ConsumerRecord<P> targetConsumerRecord = new ConsumerRecord<P>(sourceConsumerRecord.key(),
-        targetRecordHeaders,
+        targetRecord.getTargetRecordHeaders(),
         payload,
-        targetRecordTopic,
-        targetRecordTenantGroup,
+        targetRecord.getTargetRecordTopic(),
+        targetRecord.getTargetRecordTenantGroup(),
         sourceConsumerRecord.partition(),
         sourceConsumerRecord.offset(),
         sourceConsumerRecord.timestamp());

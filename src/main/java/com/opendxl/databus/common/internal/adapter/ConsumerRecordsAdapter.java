@@ -5,6 +5,7 @@
 
 package com.opendxl.databus.common.internal.adapter;
 
+import com.opendxl.databus.common.MessageFormat;
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.consumer.ConsumerRecord;
 import com.opendxl.databus.consumer.ConsumerRecords;
@@ -36,12 +37,9 @@ public class ConsumerRecordsAdapter<P>
     protected Map<String, Object> headerFilter;
 
     /**
-     * A boolean value if set
-     * true  - Will consume the records from Kafka as a JSON payload.
-     *         Headers and other routing information are retreived from Kafka headers section.
-     * false - Will consume records in DataBusMessage format
+     * Takes one of the message formats as specified by enum MessageFormat.
      */
-    private boolean consumeRecordAsJSON = false;
+    private MessageFormat messageFormat = MessageFormat.DATABUS;
 
     /**
      * Consumer record adaptor.
@@ -86,14 +84,11 @@ public class ConsumerRecordsAdapter<P>
     }
 
     /**
-     * Sets the record format. If the parameter is
-     * true  - Will consume the records from Kafka as a JSON payload.
-     *         Headers and other routing information are retreived from Kafka headers section.
-     * false - Will consume records in DataBusMessage format
-     * @param consumeRecordAsJSON sets the record format
+     * Sets the record message format.
+     * @param messageFormat takes one of the values of enum MessageFormat.
      */
-    public void consumeRecordAsJSON(boolean consumeRecordAsJSON) {
-        this.consumeRecordAsJSON = consumeRecordAsJSON;
+    public void setMessageFormat(MessageFormat messageFormat) {
+        this.messageFormat = messageFormat;
     }
 
     /**
@@ -109,29 +104,25 @@ public class ConsumerRecordsAdapter<P>
         if (sourceConsumerRecords == null) {
             throw new IllegalArgumentException("consumerRecords cannot be null");
         }
-
         Map<TopicPartition, List<ConsumerRecord<P>>> consumerRecords = new HashMap<>();
         sourceConsumerRecords.partitions().forEach(topicPartition -> {
             // Get a list of kafka record for a given topic / partition
             final List<org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>>
                     topicPartitionRecords = sourceConsumerRecords.records(topicPartition);
-
             // Get a list of databus ConsumerRecord based on kafka ConsumerRecord
             final List<ConsumerRecord<P>> databusConsumerRecords = new ArrayList<>();
             topicPartitionRecords.forEach(kafkaConsumerRecord -> {
-            ConsumerRecord<P> databusConsumerRecord = null;
-            if (consumeRecordAsJSON) {
-                databusConsumerRecord = consumerJSONRecordsAdapter.adapt(kafkaConsumerRecord);
-            } else {
-                databusConsumerRecord = filterable
-                    ? recordFilterableAdapter.adapt(kafkaConsumerRecord) : recordAdapter.adapt(kafkaConsumerRecord);
-            }
-
+                ConsumerRecord<P> databusConsumerRecord = null;
+                if (MessageFormat.JSON == messageFormat) {
+                    databusConsumerRecord = consumerJSONRecordsAdapter.adapt(kafkaConsumerRecord);
+                } else {
+                    databusConsumerRecord = filterable
+                        ? recordFilterableAdapter.adapt(kafkaConsumerRecord) : recordAdapter.adapt(kafkaConsumerRecord);
+                }
                 if (databusConsumerRecord != null) {
                     databusConsumerRecords.add(databusConsumerRecord);
                 }
             });
-
             final TopicPartition adaptedTopicPartition =
                     new TopicPartitionAdapter().adapt(topicPartition);
             consumerRecords.put(adaptedTopicPartition, databusConsumerRecords);
