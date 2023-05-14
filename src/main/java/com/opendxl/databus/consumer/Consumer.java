@@ -100,6 +100,7 @@ public abstract class Consumer<P> {
      */
     public void setMessageFormat(MessageFormat messageFormat) {
         this.messageFormat = messageFormat;
+        this.consumerRecordsAdapter.setMessageFormat(messageFormat);
     }
 
     /**
