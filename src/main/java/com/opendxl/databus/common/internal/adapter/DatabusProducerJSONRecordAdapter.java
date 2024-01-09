@@ -9,6 +9,8 @@ import com.opendxl.databus.common.internal.util.HeaderInternalField;
 import com.opendxl.databus.entities.MessagePayload;
 import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.Serializer;
+import com.opendxl.databus.common.MessageFormat;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +77,9 @@ public final class DatabusProducerJSONRecordAdapter<P>
                         kafkaHeaders.add(new RecordHeader(HeaderInternalField.TOPIC_NAME_KEY,
                                         sourceProducerRecord.getRoutingData().getTopic().getBytes()));
                 }
+
+                kafkaHeaders.add(new RecordHeader(HeaderInternalField.MESSAGE_FORMAT_KEY,
+                                        MessageFormat.JSON.name().getBytes()));
 
                 final String targetTopic = TopicNameBuilder.getTopicName(
                                 sourceProducerRecord.getRoutingData().getTopic(),

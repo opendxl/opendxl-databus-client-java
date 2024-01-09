@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- *  A abstract producer, responsible for handling Databus outgoing messages.
+ *  An abstract producer, responsible for handling Databus outgoing messages.
  * @param <P> payload's type
  */
 public abstract class Producer<P> {
@@ -83,11 +83,6 @@ public abstract class Producer<P> {
      */
     private String clientId;
 
-    /**
-     * Takes one of the message formats as specified by enum MessageFormat.
-     */
-    private MessageFormat messageFormat = MessageFormat.DATABUS;
-
     private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
 
     /**
@@ -105,11 +100,9 @@ public abstract class Producer<P> {
     protected boolean produceKafkaHeaders;
 
     /**
-     * This method add credential kept into a configuration for the {@link Producer} instance
+     * This method will set if kafka headers needs to be produced
      *
-     * @param configuration It is the configuration that a SDK's user sends when a new instance of DatabusProducer
-     *                      is created
-     * @param credential Identity to authentication/authorization
+     * @param produceKafkaHeaders parameter to set if Kafka Headers needs to be produced.
      */
     public void setProduceKafkaHeader(final boolean produceKafkaHeaders) {
         this.produceKafkaHeaders = produceKafkaHeaders;
@@ -130,7 +123,44 @@ public abstract class Producer<P> {
      *                                       <p> InterruptException       If the thread is interrupted while blocked
      */
     public void send(final ProducerRecord record) {
-        send(record, null);
+        send(record, MessageFormat.DATABUS,  null);
+    }
+
+    /**
+     * Asynchronously send a record to a topic. Equivalent to <code>send(record, null)</code>.
+     * See {@link #send(ProducerRecord, Callback)} for details.
+     *
+     * @param record The record to send
+     * @param messageFormat The message format in which the record to be produced
+     * @throws IllegalArgumentException      If record argumet is null
+     * @throws DatabusClientRuntimeException If send method fails. The original cause could be any of these exceptions:
+     *                                       <p> SerializationException   If the key or value are not valid objects
+     *                                       given the configured
+     *                                       serializers
+     *                                       <p> BufferExhaustedException If <code>block.on.buffer.full=false</code>
+     *                                       and the buffer is full.
+     *                                       <p> InterruptException       If the thread is interrupted while blocked
+     */
+    public void send(final ProducerRecord<P> record, MessageFormat messageFormat) {
+        send(record, messageFormat, null);
+    }
+
+    /**
+     *
+     * @param record   The non-null record to send
+     * @param callback A user-supplied callback to execute when the record has been acknowledged by the server (null
+     *                 indicates no callback)
+     * @throws IllegalArgumentException      If record argumet is null
+     * @throws DatabusClientRuntimeException If send method fails. The original cause could be any of these exceptions:
+     *                                       <p> SerializationException   If the key or value are not valid objects
+     *                                       given the configured
+     *                                       serializers
+     *                                       <p> BufferExhaustedException If <code>block.on.buffer.full=false</code>
+     *                                       and the buffer is full.
+     *                                       <p> InterruptException       If the thread is interrupted while blocked
+     */
+    public void send(final ProducerRecord<P> record, final Callback callback) {
+        send(record, MessageFormat.DATABUS , callback);
     }
 
     /**
@@ -173,8 +203,9 @@ public abstract class Producer<P> {
      * to parallelize processing.
      *
      * @param producerRecord   The non-null record to send
-     * @param callback A user-supplied callback to execute when the record has been acknowledged by the server (null
-     *                 indicates no callback)
+     * @param messageFormat    The message format in which the record to be produced
+     * @param callback         A user-supplied callback to execute when the record has been acknowledged
+     *                         by the server (null indicates no callback)
      * @throws IllegalArgumentException      If record argumet is null
      * @throws DatabusClientRuntimeException If send method fails. The original cause could be any of these exceptions:
      *                                       <p> SerializationException   If the key or value are not valid objects
@@ -184,7 +215,8 @@ public abstract class Producer<P> {
      *                                       and the buffer is full.
      *                                       <p> InterruptException       If the thread is interrupted while blocked
      */
-    public void send(final ProducerRecord<P> producerRecord, final Callback callback) {
+    public void send(final ProducerRecord<P> producerRecord, MessageFormat messageFormat,
+                final Callback callback) {
         if (producerRecord == null) {
             throw new IllegalArgumentException("record cannot be null");
         }
@@ -335,14 +367,6 @@ public abstract class Producer<P> {
             throw new DatabusClientRuntimeException("close cannot be performed :" + e.getMessage(), e, Producer.class);
         }
 
-    }
-
-    /**
-     * Sets the record message format.
-     * @param messageFormat takes one of the values of enum MessageFormat.
-     */
-    public void setMessageFormat(MessageFormat messageFormat) {
-        this.messageFormat = messageFormat;
     }
 
     /**

@@ -57,17 +57,20 @@ public final class ConsumerJSONRecordAdapter<P> implements
         sourceConsumerRecord) {
         TargetRecord targetRecord = new TargetRecord();
         targetRecord.setTargetRecordTopic(null != sourceConsumerRecord.topic() ? sourceConsumerRecord.topic() : "");
-        Iterator<Header> iterator = sourceConsumerRecord.headers().iterator();
-        while (iterator.hasNext()) {
-            Header header = iterator.next();
-            targetRecord.putTargetRecordHeader(header.key(), new String(header.value()));
-        }
         Header header = null;
         if (null != (header = sourceConsumerRecord.headers().lastHeader(HeaderInternalField.TOPIC_NAME_KEY))) {
             targetRecord.setTargetRecordTopic(new String(header.value()));
         }
         if (null != (header = sourceConsumerRecord.headers().lastHeader(HeaderInternalField.TENANT_GROUP_NAME_KEY))) {
             targetRecord.setTargetRecordTenantGroup(new String(header.value()));
+        }
+        sourceConsumerRecord.headers().remove(HeaderInternalField.TOPIC_NAME_KEY);
+        sourceConsumerRecord.headers().remove(HeaderInternalField.TENANT_GROUP_NAME_KEY);
+        sourceConsumerRecord.headers().remove(HeaderInternalField.MESSAGE_FORMAT_KEY);
+        Iterator<Header> iterator = sourceConsumerRecord.headers().iterator();
+        while (iterator.hasNext()) {
+            header = iterator.next();
+            targetRecord.putTargetRecordHeader(header.key(), new String(header.value()));
         }
         return targetRecord;
     }

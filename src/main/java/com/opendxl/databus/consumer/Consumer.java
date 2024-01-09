@@ -95,15 +95,6 @@ public abstract class Consumer<P> {
     private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer = null;
 
     /**
-     * Sets the record message format.
-     * @param messageFormat takes one of the values of enum MessageFormat.
-     */
-    public void setMessageFormat(MessageFormat messageFormat) {
-        this.messageFormat = messageFormat;
-        this.consumerRecordsAdapter.setMessageFormat(messageFormat);
-    }
-
-    /**
      * Subscribe to the given list of tenantGroups and topics to get dynamically
      * assigned topicPartitions. <b>Topic subscriptions are not incremental. This list will replace the current
      * assignment (if there is one).</b> Note that it is not possible to combine topic subscription with

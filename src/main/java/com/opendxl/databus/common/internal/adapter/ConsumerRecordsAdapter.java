@@ -7,6 +7,7 @@ package com.opendxl.databus.common.internal.adapter;
 
 import com.opendxl.databus.common.MessageFormat;
 import com.opendxl.databus.common.TopicPartition;
+import com.opendxl.databus.common.internal.util.HeaderInternalField;
 import com.opendxl.databus.consumer.ConsumerRecord;
 import com.opendxl.databus.consumer.ConsumerRecords;
 import com.opendxl.databus.serialization.Deserializer;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.kafka.common.header.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +38,6 @@ public class ConsumerRecordsAdapter<P>
      * The header filter to filter records.
      */
     protected Map<String, Object> headerFilter;
-
-    /**
-     * Takes one of the message formats as specified by enum MessageFormat.
-     */
-    private MessageFormat messageFormat = MessageFormat.DATABUS;
 
     /**
      * Consumer record adaptor.
@@ -84,11 +82,17 @@ public class ConsumerRecordsAdapter<P>
     }
 
     /**
-     * Sets the record message format.
-     * @param messageFormat takes one of the values of enum MessageFormat.
+     * Retrieves the message format header value from source kafka consumer record.
+     * @param sourceConsumerRecord source kafka record to extract the message format from
      */
-    public void setMessageFormat(MessageFormat messageFormat) {
-        this.messageFormat = messageFormat;
+     public MessageFormat getMessageFormat(final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>
+                          sourceConsumerRecord) {
+        Header header = null;
+        MessageFormat messageFormat = MessageFormat.DATABUS;
+        if (null != (header = sourceConsumerRecord.headers().lastHeader(HeaderInternalField.MESSAGE_FORMAT_KEY))) {
+            messageFormat = MessageFormat.JSON;
+        }
+        return messageFormat;
     }
 
     /**
@@ -113,7 +117,7 @@ public class ConsumerRecordsAdapter<P>
             final List<ConsumerRecord<P>> databusConsumerRecords = new ArrayList<>();
             topicPartitionRecords.forEach(kafkaConsumerRecord -> {
                 ConsumerRecord<P> databusConsumerRecord = null;
-                if (MessageFormat.JSON == messageFormat) {
+                if (MessageFormat.JSON == getMessageFormat(kafkaConsumerRecord)) {
                     databusConsumerRecord = consumerJSONRecordsAdapter.adapt(kafkaConsumerRecord);
                 } else {
                     databusConsumerRecord = filterable
