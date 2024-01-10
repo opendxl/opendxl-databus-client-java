@@ -11,7 +11,6 @@ import com.opendxl.databus.producer.ProducerRecord;
 import com.opendxl.databus.serialization.Serializer;
 import com.opendxl.databus.common.MessageFormat;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +21,10 @@ import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 
 /**
- * Adapter for Databus producer record in JSON message format. The incoming message headers are set as kafka message \
- * headers. Message payload is stored as is in JSON format in kafka message payload.
+ * Adapter for Databus producer record in JSON message format. The incoming
+ * message headers are set as kafka message \
+ * headers. Message payload is stored as is in JSON format in kafka message
+ * payload.
  *
  * @param <P> payload's type
  */
@@ -60,11 +61,8 @@ public final class DatabusProducerJSONRecordAdapter<P>
                 final List<Header> kafkaHeaders = new ArrayList<>();
 
                 for (final String key : headers.keySet()) {
-                        String val = headers.get(key);
-                        if (null == val) {
-                                val = "";
-                        }
-                        kafkaHeaders.add(new RecordHeader(key, val.getBytes()));
+
+                        kafkaHeaders.add(new RecordHeader(key, headers.get(key).getBytes()));
                 }
 
                 // Add internals header to let the consumer knows a tenantGroup name is part of
@@ -79,12 +77,11 @@ public final class DatabusProducerJSONRecordAdapter<P>
                 }
 
                 kafkaHeaders.add(new RecordHeader(HeaderInternalField.MESSAGE_FORMAT_KEY,
-                                        MessageFormat.JSON.name().getBytes()));
+                                MessageFormat.JSON.name().getBytes()));
 
                 final String targetTopic = TopicNameBuilder.getTopicName(
                                 sourceProducerRecord.getRoutingData().getTopic(),
                                 sourceProducerRecord.getRoutingData().getTenantGroup());
-
 
                 final org.apache.kafka.clients.producer.ProducerRecord<String, byte[]> targetJSONProducerRecord;
                 MessagePayload<P> messagePayload = sourceProducerRecord.payload();

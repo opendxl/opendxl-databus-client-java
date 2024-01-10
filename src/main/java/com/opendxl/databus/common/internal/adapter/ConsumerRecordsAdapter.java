@@ -2,7 +2,6 @@
  * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
-
 package com.opendxl.databus.common.internal.adapter;
 
 import com.opendxl.databus.common.MessageFormat;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Adapter for ConsumerRecords
+ *
  * @param <P> payload's type
  */
 public class ConsumerRecordsAdapter<P>
@@ -49,7 +49,6 @@ public class ConsumerRecordsAdapter<P>
      */
     private ConsumerRecordFilterableAdapter<P> recordFilterableAdapter;
 
-
     /**
      * The ConsumerJSONRecordsAdapter to deserialize a JSON record.
      */
@@ -62,13 +61,15 @@ public class ConsumerRecordsAdapter<P>
 
     /**
      * Constructor
-     * @param messageDeserializer a {@link Deserializer} getInstance used for deserializing the payload
+     *
+     * @param messageDeserializer a {@link Deserializer} getInstance used for
+     *                            deserializing the payload
      */
     public ConsumerRecordsAdapter(final Deserializer<P> messageDeserializer,
             final MessageDeserializer databusMessageDeserializer) {
         this.recordAdapter = new ConsumerRecordAdapter<P>(messageDeserializer, databusMessageDeserializer);
         this.recordFilterableAdapter = new ConsumerRecordFilterableAdapter<P>(messageDeserializer,
-            databusMessageDeserializer);
+                databusMessageDeserializer);
         this.consumerJSONRecordsAdapter = new ConsumerJSONRecordAdapter<P>();
     }
 
@@ -83,10 +84,12 @@ public class ConsumerRecordsAdapter<P>
 
     /**
      * Retrieves the message format header value from source kafka consumer record.
-     * @param sourceConsumerRecord source kafka record to extract the message format from
+     *
+     * @param sourceConsumerRecord source kafka record to extract the message format
+     *                             from
      */
-     public MessageFormat getMessageFormat(final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>
-                          sourceConsumerRecord) {
+    public MessageFormat getMessageFormat(
+            final org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]> sourceConsumerRecord) {
         Header header = null;
         MessageFormat messageFormat = MessageFormat.DATABUS;
         if (null != (header = sourceConsumerRecord.headers().lastHeader(HeaderInternalField.MESSAGE_FORMAT_KEY))) {
@@ -97,14 +100,16 @@ public class ConsumerRecordsAdapter<P>
 
     /**
      * Adapter pattern implementation for ConsumerRecords instance.
-     * Adapts a DatabusMessage list object for a given topic partition to a ConsumerRecords instance.
+     * Adapts a DatabusMessage list object for a given topic partition to a
+     * ConsumerRecords instance.
      *
-     * @param sourceConsumerRecords The consumer records source composed by DatabusMessage list instance.
+     * @param sourceConsumerRecords The consumer records source composed by
+     *                              DatabusMessage list instance.
      * @return a {@link ConsumerRecords} instance.
      */
     @Override
-    public ConsumerRecords
-    adapt(final org.apache.kafka.clients.consumer.ConsumerRecords<String, byte[]> sourceConsumerRecords) {
+    public ConsumerRecords adapt(
+            final org.apache.kafka.clients.consumer.ConsumerRecords<String, byte[]> sourceConsumerRecords) {
         if (sourceConsumerRecords == null) {
             throw new IllegalArgumentException("consumerRecords cannot be null");
         }
@@ -112,7 +117,7 @@ public class ConsumerRecordsAdapter<P>
         sourceConsumerRecords.partitions().forEach(topicPartition -> {
             // Get a list of kafka record for a given topic / partition
             final List<org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]>>
-                    topicPartitionRecords = sourceConsumerRecords.records(topicPartition);
+            topicPartitionRecords = sourceConsumerRecords.records(topicPartition);
             // Get a list of databus ConsumerRecord based on kafka ConsumerRecord
             final List<ConsumerRecord<P>> databusConsumerRecords = new ArrayList<>();
             topicPartitionRecords.forEach(kafkaConsumerRecord -> {
@@ -121,14 +126,14 @@ public class ConsumerRecordsAdapter<P>
                     databusConsumerRecord = consumerJSONRecordsAdapter.adapt(kafkaConsumerRecord);
                 } else {
                     databusConsumerRecord = filterable
-                        ? recordFilterableAdapter.adapt(kafkaConsumerRecord) : recordAdapter.adapt(kafkaConsumerRecord);
+                            ? recordFilterableAdapter.adapt(kafkaConsumerRecord)
+                            : recordAdapter.adapt(kafkaConsumerRecord);
                 }
                 if (databusConsumerRecord != null) {
                     databusConsumerRecords.add(databusConsumerRecord);
                 }
             });
-            final TopicPartition adaptedTopicPartition =
-                    new TopicPartitionAdapter().adapt(topicPartition);
+            final TopicPartition adaptedTopicPartition = new TopicPartitionAdapter().adapt(topicPartition);
             consumerRecords.put(adaptedTopicPartition, databusConsumerRecords);
         });
         return new ConsumerRecords(consumerRecords);
