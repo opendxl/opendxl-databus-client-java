@@ -78,7 +78,6 @@ public abstract class Consumer<P> {
      */
     protected Map<String, Object> headerFilter;
 
-
     /**
      * The logger object.
      */
