@@ -4,7 +4,6 @@
 
 package com.opendxl.databus.consumer;
 
-import com.opendxl.databus.common.MessageFormat;
 import com.opendxl.databus.common.MetricName;
 import com.opendxl.databus.common.OffsetAndTimestamp;
 import com.opendxl.databus.common.PartitionInfo;
@@ -79,10 +78,6 @@ public abstract class Consumer<P> {
      */
     protected Map<String, Object> headerFilter;
 
-    /**
-     * Takes one of the message formats as specified by enum MessageFormat.
-     */
-    private MessageFormat messageFormat = MessageFormat.DATABUS;
 
     /**
      * The logger object.
