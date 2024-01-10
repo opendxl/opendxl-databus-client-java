@@ -27,4 +27,9 @@ public final class HeaderInternalField {
      * The topic name key name.
      */
     public static final String TOPIC_NAME_KEY = INTERNAL_HEADER_IDENTIFIER + "TN" + INTERNAL_HEADER_IDENTIFIER;
+
+    /**
+     * The message format key name.
+     */
+    public static final String MESSAGE_FORMAT_KEY = INTERNAL_HEADER_IDENTIFIER + "MF" + INTERNAL_HEADER_IDENTIFIER;
 }
