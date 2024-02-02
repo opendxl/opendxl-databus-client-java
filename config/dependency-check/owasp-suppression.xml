@@ -9,9 +9,11 @@
    </suppress>
    <suppress>
       <notes><![CDATA[
-      file name: checkstyle-8.23.jar
+      file name: checkstyle-8.39.jar
       ]]></notes>
       <cve>CVE-2019-10782</cve>
+      <cve>CVE-2023-2976</cve>
+      <cve>CVE-2020-8908</cve>
    </suppress>
    <suppress>
       <notes><![CDATA[
@@ -33,6 +35,14 @@
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.apache\.zookeeper/zookeeper@.*$</packageUrl>
    <vulnerabilityName>CVE-2021-21409</vulnerabilityName>
+   <vulnerabilityName>CVE-2023-44981</vulnerabilityName>
+   </suppress>
+   <suppress>
+  	<notes><![CDATA[
+   file name: zookeeper-jute. To be fixed ater after Kafka and Zookeeper upgrade to 3.6.x
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.zookeeper/zookeeper-jute@.*$</packageUrl>
+   <vulnerabilityName>CVE-2023-44981</vulnerabilityName>
    </suppress>
    <suppress>
    <notes><![CDATA[
@@ -40,6 +50,16 @@
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka\-clients@.*$</packageUrl>
    <vulnerabilityName>CVE-2021-38153</vulnerabilityName>
+   <vulnerabilityName>CVE-2023-25194</vulnerabilityName>
+   </suppress>
+   <suppress>
+   <notes><![CDATA[
+   Related to zookeeper. To be fixed ater after Kafka and Zookeeper upgrade to 3.6.x
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/io\.netty/.*@.*$</packageUrl>
+   <vulnerabilityName>CVE-2023-44981</vulnerabilityName>
+   <vulnerabilityName>CVE-2023-34462</vulnerabilityName>
+   <vulnerabilityName>CVE-2023-44487</vulnerabilityName>
    </suppress>
    <suppress>
      <notes><![CDATA[
@@ -68,5 +88,26 @@
      ]]></notes>
      <sha1>c361d28608e0ddab7d6b7bb1f4bb456a74d7e294</sha1>
      <cpe>cpe:/a:apache:kafka</cpe>
-  </suppress>
+   </suppress>
+   <suppress base="true">
+      <notes><![CDATA[
+      FP per issue #5121 - fix for commons
+      ]]></notes>
+      <packageUrl regex="true">^(?!pkg:maven/commons-net/commons-net).*$</packageUrl>
+      <cve>CVE-2021-37533</cve>
+      <cpe>cpe:/a:apache:commons_net</cpe>
+   </suppress>
+   <suppress base="true">
+      <notes><![CDATA[
+         FP for jackson - fixed in later version of dependencycheck (8.4.1)
+         ]]></notes>
+      <cve>CVE-2022-45688</cve>
+      <cve>CVE-2023-5072</cve>
+   </suppress>
+   <suppress base="true">
+      <notes><![CDATA[
+         FP for avro - vulnerabilty is related to Go package not java
+         ]]></notes>
+      <cve>CVE-2023-37475</cve>
+   </suppress>
 </suppressions>
