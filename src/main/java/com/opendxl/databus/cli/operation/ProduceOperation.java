@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------*
- * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+ * Copyright (c) 2024 Musarubra, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
 package com.opendxl.databus.cli.operation;

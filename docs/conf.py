@@ -3,7 +3,7 @@ import sys, os
 from recommonmark.parser import CommonMarkParser
 
 project = u'OpenDXL Databus Java Client Library'
-copyright = u'2019, McAfee LLC'
+copyright = u'2024, Musarubra LLC'
 
 with open('../VERSION', 'r') as content_file:
     VERSION = content_file.read()

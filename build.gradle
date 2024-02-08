@@ -112,10 +112,10 @@ dependencies {
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16942
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16943
     // CVE-2020-25649
-    compile ('com.fasterxml.jackson.core:jackson-databind:2.16.0') {
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.16.1') {
         force = true
     }
-    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.16.0') {
+    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.16.1') {
         force = true
     }
 
