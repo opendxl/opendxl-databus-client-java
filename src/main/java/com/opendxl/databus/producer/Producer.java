@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------*
- * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+ * Copyright (c) 2024 Musarubra, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
 package com.opendxl.databus.producer;
@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.List;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -441,7 +443,7 @@ public abstract class Producer<P> {
      */
     public void close(final long timeout, final TimeUnit timeUnit) {
         try {
-            producer.close(timeout, timeUnit);
+            producer.close(Duration.of(timeout, toChronoUnit(timeUnit)));
         } catch (Exception e) {
             throw new DatabusClientRuntimeException("close cannot be performed :" + e.getMessage(), e, Producer.class);
         }
@@ -456,6 +458,25 @@ public abstract class Producer<P> {
     protected void setKeySerializer(final DatabusKeySerializer keySerializer) {
         this.keySerializer = keySerializer;
     }
+
+    /**
+     * converts the given Timeunit object to Chronounit.
+     *
+     * @param timeUnit timeunit to be converted
+     */
+
+    private static ChronoUnit toChronoUnit(TimeUnit timeUnit) {
+    switch (timeUnit) {
+        case NANOSECONDS:  return ChronoUnit.NANOS;
+        case MICROSECONDS: return ChronoUnit.MICROS;
+        case MILLISECONDS: return ChronoUnit.MILLIS;
+        case SECONDS:      return ChronoUnit.SECONDS;
+        case MINUTES:      return ChronoUnit.MINUTES;
+        case HOURS:        return ChronoUnit.HOURS;
+        case DAYS:         return ChronoUnit.DAYS;
+        default: throw new AssertionError();
+    }
+}
 
     /**
      * Set the value serializer in producer

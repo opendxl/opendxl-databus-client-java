@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------*
- * Copyright (c) 2019 McAfee, LLC - All Rights Reserved.                     *
+ * Copyright (c) 2024 Musarubra, LLC - All Rights Reserved.                     *
  *---------------------------------------------------------------------------*/
 
 package com.opendxl.databus.consumer;
@@ -11,7 +11,7 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
 import org.apache.kafka.common.metrics.Sensor;
-import org.apache.kafka.common.requests.IsolationLevel;
+import org.apache.kafka.common.IsolationLevel;
 import org.apache.kafka.common.serialization.Deserializer;
 
 import java.util.Collections;
