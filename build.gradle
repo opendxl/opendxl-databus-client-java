@@ -26,7 +26,6 @@ plugins {
 
 group 'com.opendxl'
 
-//sourceCompatibility = '17'
 
 apply plugin: 'base'
 apply plugin: 'java'
