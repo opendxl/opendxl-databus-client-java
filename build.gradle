@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.owasp:dependency-check-gradle:6.1.5'
+        
     }
 }
 
@@ -14,17 +15,18 @@ plugins {
     id 'checkstyle'
     id 'distribution'
     id 'java-library'
+    id 'java'
     id 'maven-publish'
     id 'signing'
-    id "com.github.johnrengelman.shadow" version "4.0.3"
-    id "kr.motd.sphinx" version "2.3.1"
+    id "com.github.johnrengelman.shadow" version "7.0.0" // Updated version
+    id "kr.motd.sphinx" version "2.5.0"
     id "jacoco"
     id "org.owasp.dependencycheck" version "6.1.5"
 }
 
 group 'com.opendxl'
 
-sourceCompatibility = 11
+//sourceCompatibility = '17'
 
 apply plugin: 'base'
 apply plugin: 'java'
@@ -36,6 +38,12 @@ apply plugin: 'org.owasp.dependencycheck'
 
 dependencyCheck {
     suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 jacoco {
@@ -75,6 +83,9 @@ dependencies {
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+
     testImplementation('org.apache.kafka:kafka_2.13:3.1.2') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
@@ -112,10 +123,10 @@ dependencies {
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16942
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16943
     // CVE-2020-25649
-    compile ('com.fasterxml.jackson.core:jackson-databind:2.14.2') {
-        force = true
-    }
-    compile 'com.fasterxml.jackson.module:jackson-module-scala_3:2.14.2'
+    // implementation ('com.fasterxml.jackson.core:jackson-databind:2.14.2') {
+    //     force = true
+    // }
+    implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.14.2'
     kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.14.2') {
         force = true
     }
@@ -124,7 +135,7 @@ dependencies {
     kafkaInMemory ('org.apache.commons:commons-compress:1.21') {
         force = true
     }
-    compile ('org.apache.commons:commons-compress:1.21') {
+    implementation ('org.apache.commons:commons-compress:1.21') {
         force = true
     }
 }
@@ -147,6 +158,18 @@ jar {
 task sourceJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
+    archiveClassifier.set('sources')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicates
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact tasks.sourceJar
+        }
+    }
 }
 
 // Task for creating a jar with JavaDoc
@@ -166,10 +189,18 @@ artifacts {
     archives javadocJar
 }
 
+tasks.named('sphinx') {
+    enabled = false
+}
+
+
+    //duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicates
+
+
 // Set up the distribution zip
 distributions {
     main {
-        baseName = 'dxldatabusclient-java-sdk'
+        distributionBaseName = 'dxldatabusclient-java-sdk'
         contents {
             from(jar) {
                 into('lib')

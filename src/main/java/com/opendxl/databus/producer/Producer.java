@@ -84,13 +84,13 @@ public abstract class Producer<P> {
      */
     protected boolean produceKafkaHeaders;
 
-    /**
-     * This method add credential kept into a configuration for the {@link Producer} instance
-     *
-     * @param configuration It is the configuration that a SDK's user sends when a new instance of DatabusProducer
-     *                      is created
-     * @param credential Identity to authentication/authorization
-     */
+    // /**
+    //  * This method add credential kept into a configuration for the {@link Producer} instance
+    //  *
+    //   @param configuration It is the configuration that a SDK's user sends when a new instance of DatabusProducer
+    //  *                      is created
+    //   @param credential Identity to authentication/authorization
+    //  */
     public void setProduceKafkaHeader(final boolean produceKafkaHeaders) {
         this.produceKafkaHeaders = produceKafkaHeaders;
     }
