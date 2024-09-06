@@ -6,14 +6,12 @@ package broker;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import kafka.zk.KafkaZkClient;
-import scala.runtime.AbstractFunction0;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.kafka.common.utils.SystemTime;
-
 
 import java.io.File;
 import java.nio.file.Files;
