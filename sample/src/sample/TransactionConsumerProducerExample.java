@@ -40,7 +40,7 @@ public class TransactionConsumerProducerExample {
 
     private static final long PRODUCER_TIME_CADENCE_MS = 1000L;
     private static final long CONSUMER_TIME_CADENCE_MS = 1000L;
-    private static final int TRANSACTIONAL_TOPIC_REPLICATION_FACTOR = 3;
+    private static final short TRANSACTIONAL_TOPIC_REPLICATION_FACTOR = 3;
     private static final int TRANSACTIONAL_TOPIC_PARTITION_NUMBER = 3;
     private static final int TRANSACTION_MESSAGES_NUMBER = 5;
     private final AtomicBoolean closed = new AtomicBoolean(false);
