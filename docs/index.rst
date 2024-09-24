@@ -40,14 +40,14 @@ Maven:
     <dependency>
       <groupId>com.opendxl</groupId>
       <artifactId>dxldatabusclient</artifactId>
-      <version>2.4.11</version>
+      <version>2.6.1</version>
     </dependency>
 
 or Gradle:
 
 .. code:: groovy
 
-    compile 'com.opendxl:dxldatabusclient:2.4.11'
+    compile 'com.opendxl:dxldatabusclient:2.6.1'
 
 API Documentation
 -----------------
