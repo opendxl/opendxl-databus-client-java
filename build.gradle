@@ -295,6 +295,10 @@ publishing {
                 }
             }
 
+            tasks.withType(GenerateModuleMetadata) {
+            enabled = false
+            }
+
             from components.java
 
             artifact(sourceJar) {
