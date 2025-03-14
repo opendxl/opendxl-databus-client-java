@@ -23,7 +23,7 @@ plugins {
 }
 
 group 'com.opendxl'
-version = '2.6.0'
+version = '2.7.0'
 
 apply plugin: 'base'
 apply plugin: 'java'
@@ -38,19 +38,18 @@ dependencyCheck {
 }
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 jacoco {
-    toolVersion = "0.8.8"
-    reportsDir = file("$buildDir/reports/coverage")
+    toolVersion = "0.8.11"
 }
 
 jacocoTestReport {
     reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination file("$buildDir/reports/coverage")
+        xml.required.set(false)
+        csv.required.set(false)
+        html.outputLocation.set(file("$buildDir/reports/coverage"))
     }
 }
 
@@ -63,33 +62,32 @@ configurations {
 }
 
 dependencies {
-    implementation ('org.apache.kafka:kafka-clients:3.8.0') {
+    implementation ('org.apache.kafka:kafka-clients:3.8.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.lz4', module: 'lz4-java'
         exclude group: 'org.xerial.snappy', module: 'snappy-java'
     }
-    implementation ('org.apache.kafka:kafka-streams:3.8.0') {
+    implementation ('org.apache.kafka:kafka-streams:3.8.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     implementation group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.10.5'
     implementation 'org.scala-lang:scala-reflect:2.13.9'
     implementation 'org.scala-lang:scala-library:2.13.9'
     implementation 'org.lz4:lz4-java:1.8.0'
-    implementation 'org.apache.avro:avro:1.11.3'
+    implementation 'org.apache.avro:avro:1.12.0'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.apache.commons:commons-configuration2:2.11.0'
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    testImplementation('org.apache.kafka:kafka_2.13:3.8.0') {
+    testImplementation('org.apache.kafka:kafka_2.13:3.8.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.xerial.snappy', module: 'snappy-java'
     }
     testImplementation 'org.scala-lang:scala-reflect:2.13.9'
-    testImplementation 'org.apache.zookeeper:zookeeper:3.6.4'
-    testImplementation('io.netty:netty-all:4.1.112.Final') {
-        force = true
-    }
+    testImplementation 'org.apache.zookeeper:zookeeper:3.9.3'
+    testImplementation enforcedPlatform('io.netty:netty-all:4.1.118.Final')
+    testImplementation 'io.netty:netty-all'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
@@ -119,18 +117,16 @@ dependencies {
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16942
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16943
     // CVE-2020-25649
-    implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.14.2'
-    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.16.1') {
-        force = true
-    }
+    implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.15.0'
+    kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.16.1')
 
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-12402
-    kafkaInMemory ('org.apache.commons:commons-compress:1.27.0') {
-        force = true
-    }
-    implementation ('org.apache.commons:commons-compress:1.27.0') {
-        force = true
-    }
+    kafkaInMemory enforcedPlatform('org.apache.commons:commons-compress:1.27.0')
+    kafkaInMemory 'org.apache.commons:commons-compress'
+    
+    implementation enforcedPlatform('org.apache.commons:commons-compress:1.27.0')
+    implementation 'org.apache.commons:commons-compress'
+    
 }
 
 repositories {
@@ -149,7 +145,6 @@ jar {
 
 // Task for creating a jar with the source files
 task sourceJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
     from sourceSets.main.allSource
     archiveClassifier.set('sources')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicates
@@ -165,7 +160,7 @@ publishing {
 
 // Task for creating a jar with JavaDoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
@@ -199,9 +194,6 @@ distributions {
             }
             from(configurations.compileClasspath) {
                 into("lib/3rdparty")
-            }
-            from(sphinx) {
-                into('doc')
             }
             from('sample') {
                 into 'sample'
@@ -275,9 +267,6 @@ task versionFile()  {
 
 checkstyle {
     sourceSets = []
-    toolVersion '8.39'
-
-
 }
 
 publishing {
@@ -358,5 +347,5 @@ signing {sign publishing.publications.maven}
 check.dependsOn dependencyCheckAnalyze
 distZip.dependsOn javadocJar
 distZip.dependsOn sourceJar
-sphinx.dependsOn(versionFile)
+check.dependsOn dependencyCheckAnalyze
 assemble.dependsOn(replaceVersionInREADME)
