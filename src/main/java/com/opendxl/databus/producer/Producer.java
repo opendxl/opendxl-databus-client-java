@@ -13,6 +13,7 @@ import com.opendxl.databus.common.RecordMetadata;
 import com.opendxl.databus.common.TopicPartition;
 import com.opendxl.databus.common.internal.adapter.DatabusProducerRecordAdapter;
 import com.opendxl.databus.common.internal.adapter.DatabusProducerJSONRecordAdapter;
+import com.opendxl.databus.common.internal.util.TimeUnitUtil;
 import com.opendxl.databus.common.internal.adapter.MetricNameMapAdapter;
 import com.opendxl.databus.common.internal.adapter.PartitionInfoListAdapter;
 import com.opendxl.databus.consumer.OffsetAndMetadata;
@@ -32,6 +33,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+import java.time.temporal.TemporalUnit;
 
 /**
  * An abstract producer, responsible for handling Databus outgoing messages.
@@ -443,13 +445,38 @@ public abstract class Producer<P> {
      */
     public void close(final long timeout, final TimeUnit timeUnit) {
         try {
-            producer.close(Duration.of(timeout, toChronoUnit(timeUnit)));
+            TemporalUnit convertedUnit = TimeUnitUtil.convert(timeUnit);
+            producer.close(Duration.of(timeout, convertedUnit));
         } catch (Exception e) {
             throw new DatabusClientRuntimeException("close cannot be performed :" + e.getMessage(), e, Producer.class);
         }
 
     }
-
+    /**
+     * This method waits up to <code>timeout</code> for the producer to complete the sending of all incomplete requests.
+     * <p>
+     * If the producer is unable to complete all requests before the timeout expires, this method will fail
+     * any unsent and unacknowledged records immediately.
+     * <p>
+     * If invoked from within a {@link Callback} this method will not block and will be equivalent to
+     * <code>close(0, TimeUnit.MILLISECONDS)</code>. This is done since no further sending will happen while
+     * blocking the I/O thread of the producer.
+     *
+     * @param timeout  The maximum time to wait for producer to complete any pending requests. The value should be
+     *                 non-negative. Specifying a timeout of zero means do not wait for pending send
+     *                 requests to complete.
+     * @param timeUnit The time unit for the <code>timeout</code>l
+     * @throws DatabusClientRuntimeException If close method fails. The original cause could be any of these exceptions:
+     *                                       <p> InterruptException       If the thread is interrupted while blocked
+     *                                       <p> IllegalArgumentException If the <code>timeout</code> is negative.
+     */
+    public void close(final long timeout, final TemporalUnit timeUnit) {
+        try {
+            producer.close(Duration.of(timeout, timeUnit));
+        } catch (Exception e) {
+            throw new DatabusClientRuntimeException("close cannot be performed :" + e.getMessage(), e, Producer.class);
+        }
+    }
     /**
      * Set the DatabusKeySerializer in producer
      *

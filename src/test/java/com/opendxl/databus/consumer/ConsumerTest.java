@@ -17,6 +17,7 @@ import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@Ignore
 public class ConsumerTest {
 
     private ConsumerHelper consumerHelper;

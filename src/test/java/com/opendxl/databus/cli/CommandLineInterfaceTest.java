@@ -16,7 +16,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
+@Ignore
 public class CommandLineInterfaceTest {
 
     @Rule

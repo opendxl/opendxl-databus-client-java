@@ -4,7 +4,7 @@
 
 package broker;
 
-import kafka.admin.TopicCommand;
+import org.apache.kafka.clients.admin.NewTopic;
 import kafka.zk.KafkaZkClient;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
@@ -12,12 +12,12 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.security.JaasUtils;
 import org.apache.kafka.common.utils.SystemTime;
-import scala.runtime.AbstractFunction0;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +30,10 @@ public class ClusterHelper {
 
     private static ClusterHelper clusterHelper;
     private static boolean isStarted = false;
-    private static int zookeeperPort = 2181;
+    private static int kafkaPort = 2181;
     private static Zookeeper zkNode;
     private static List<KafkaBroker> brokers = new ArrayList<>();
-    private static final String ZKHOST = "localhost";
+    private static final String KAFKAHOST  = "localhost";
     private static final int SESSION_TIMEOUT_MS = 30000;
     private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static final int MAX_IN_FLIGHT_REQUESTS = 1000;
@@ -47,23 +47,40 @@ public class ClusterHelper {
         return clusterHelper;
     }
 
-    public void addNewKafkaTopic(final String topicName, final int replicationFactor, final
+    public void addNewKafkaTopic(final String topicName, final short replicationFactor, final
     int partitions) throws Exception {
-        String[] arguments = {
-            "--create",
-            "--zookeeper", ZKHOST.concat(":").concat(String.valueOf(zookeeperPort)),
-            "--replication-factor", String.valueOf(replicationFactor),
-            "--partitions", String.valueOf(partitions),
-            "--topic", topicName
-        };
+        AdminClient adminClient = null;
+        try {
+            // Create an AdminClient instance
+            adminClient = createAdminClient();
 
-        TopicCommand.TopicCommandOptions opts = new TopicCommand.TopicCommandOptions(arguments);
-        try (KafkaZkClient zkUtils = getZkClient(opts)) {
-            new TopicCommand.ZookeeperTopicService(zkUtils).createTopic(opts);
-        } catch (Exception e) {
-            // In case of exceptions, abort topic creation.
-            throw new Exception("Error creating a new Kafka topic");
+            // Define the new topic with specified configurations
+            NewTopic newTopic = new NewTopic(topicName, partitions, replicationFactor);
+
+            // Create the topic
+            adminClient.createTopics(Collections.singleton(newTopic)).all().get();
+
+            System.out.println("Topic created successfully.");
         }
+        catch (ExecutionException | InterruptedException e) {
+            System.err.println("Error creating the Kafka topic: " + e.getMessage());
+            throw new RuntimeException("Error creating a new Kafka topic", e);
+        } finally {
+            if (adminClient != null) {
+                adminClient.close();
+            }
+        
+        }
+    }
+
+    public AdminClient createAdminClient() {
+        final Map<String, Object> props = new HashMap<>();
+        final Properties brokerConfig = brokers.get(0).getBrokerConfig();
+        final String bootstrapServer = brokerConfig.getProperty("host.name")
+                .concat(":")
+                .concat(brokerConfig.getProperty("port"));
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        return AdminClient.create(props);
     }
 
     public ClusterHelper addBroker(final int port) {
@@ -83,17 +100,17 @@ public class ClusterHelper {
 
     public ClusterHelper zookeeperPort(final int zkPort) {
         checkCluster();
-        ClusterHelper.zookeeperPort = zkPort;
+        ClusterHelper.kafkaPort = zkPort;
         for (KafkaBroker broker : brokers) {
             broker.getBrokerConfig().setProperty("zookeeper.connect",
-                    "localhost:".concat(String.valueOf(ClusterHelper.zookeeperPort)));
+                    "localhost:".concat(String.valueOf(ClusterHelper.kafkaPort)));
         }
         return clusterHelper;
     }
 
     public Collection<Node> start() {
         if (clusterHelper != null && !isStarted) {
-            ClusterHelper.zkNode = new Zookeeper(zookeeperPort);
+            ClusterHelper.zkNode = new Zookeeper(kafkaPort);
             zkNode.startup();
             for (final KafkaBroker broker : brokers) {
                 broker.start();
@@ -125,7 +142,7 @@ public class ClusterHelper {
         final Properties config =  new Properties();
         try {
             File logFile = Files.createTempDirectory(Constant.LOG_PATH_PREFIX + System.currentTimeMillis()).toFile();
-            config.setProperty("zookeeper.connect", "localhost:".concat(String.valueOf(zookeeperPort)));
+            config.setProperty("zookeeper.connect", "localhost:".concat(String.valueOf(kafkaPort)));
             config.setProperty("broker.id", String.valueOf(brokers.size() + 1));
             config.setProperty("host.name", "localhost");
             config.setProperty("port", Integer.toString(port));
@@ -165,20 +182,17 @@ public class ClusterHelper {
         return nodes;
     }
 
-    private KafkaZkClient getZkClient(TopicCommand.TopicCommandOptions opts) {
-        final String connectString = opts.zkConnect().getOrElse(new AbstractFunction0<String>() {
-            @Override
-            public String apply() {
-                return "";
-            } });
+    private KafkaZkClient getZkClient(AdminClient adminClient)  {
+        final String connectString = "";
 
         return KafkaZkClient.apply(connectString,
-                JaasUtils.isZkSecurityEnabled(),
+                JaasUtils.isZkSaslEnabled(),
                 SESSION_TIMEOUT_MS,
                 CONNECTION_TIMEOUT_MS,
                 MAX_IN_FLIGHT_REQUESTS,
                 new SystemTime(),
+                "",new org.apache.zookeeper.client.ZKClientConfig(),
                 METRIC_GROUP,
-                METRIC_TYPE, null);
+                METRIC_TYPE, false,false);
     }
 }

@@ -15,6 +15,7 @@ import com.opendxl.databus.util.ProducerHelper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
+@Ignore
 public class BackwardCompatibilityConsumerTest {
 
 

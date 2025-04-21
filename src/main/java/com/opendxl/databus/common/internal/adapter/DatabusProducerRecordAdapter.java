@@ -86,8 +86,6 @@ public final class DatabusProducerRecordAdapter<P>
                         sourceProducerRecord.getRoutingData().getTenantGroup());
         final List<Header> kafkaHeaders = produceKafkaHeaders
                 ? generateKafkaHeaders(databusMessage.getHeaders()) : null;
-        System.out.println("produceKafkaHeaders: " + produceKafkaHeaders);
-        System.out.println("kafkaHeaders: " + kafkaHeaders);
         final org.apache.kafka.clients.producer.ProducerRecord<String, DatabusMessage> targetProducerRecord =
                 new org.apache.kafka.clients.producer.ProducerRecord<>(targetTopic,
                 sourceProducerRecord.getRoutingData().getPartition(),
