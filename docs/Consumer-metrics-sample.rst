@@ -285,7 +285,7 @@ The output shows:
 ::
 
     Ctrl-C to finish
-    Zookeeper node started: localhost:2181
+    Zookeeper node started: localhost:2182
     Kafka broker started: localhost:9092
     Consumer started
     Producer started

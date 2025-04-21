@@ -222,7 +222,7 @@ The output shows:
 
 ::
 
-    Zookeeper node started: localhost:2181
+    Zookeeper node started: localhost:2182
     Kafka broker started: localhost:9092
     Producer started
     **************************************************************************************
