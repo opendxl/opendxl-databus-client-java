@@ -87,7 +87,6 @@ dependencies {
     testImplementation 'org.scala-lang:scala-reflect:2.13.9'
     testImplementation 'org.apache.zookeeper:zookeeper:3.9.3'
     testImplementation enforcedPlatform('io.netty:netty-all:4.1.118.Final')
-    testImplementation 'io.netty:netty-all'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
@@ -195,6 +194,12 @@ distributions {
             from(configurations.compileClasspath) {
                 into("lib/3rdparty")
             }
+            //Since sphinx task is temporarily disabled, this has been commented out
+            // as the document is not generated.
+            
+            // from(sphinx) {
+            //     into('doc')
+            // }
             from('sample') {
                 into 'sample'
             }
@@ -267,6 +272,7 @@ task versionFile()  {
 
 checkstyle {
     sourceSets = []
+    toolVersion '8.39'
 }
 
 publishing {
