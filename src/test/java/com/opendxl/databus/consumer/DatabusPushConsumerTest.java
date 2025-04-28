@@ -11,7 +11,6 @@ import com.opendxl.databus.util.Topic;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,7 +23,6 @@ import junit.extensions.PA;
 
 import static com.opendxl.databus.util.ProducerHelper.produceTo;
 
-@Ignore
 public class DatabusPushConsumerTest {
 
 

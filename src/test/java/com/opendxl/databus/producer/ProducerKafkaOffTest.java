@@ -7,12 +7,10 @@ package com.opendxl.databus.producer;
 import com.opendxl.databus.util.ProducerHelper;
 import com.opendxl.databus.util.TestCallback;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
-@Ignore
 public class ProducerKafkaOffTest {
 
     @Test

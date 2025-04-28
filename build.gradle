@@ -16,14 +16,15 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
-    id "com.github.johnrengelman.shadow" version "7.0.0"
-    id "kr.motd.sphinx" version "2.5.0"
+    id "com.github.johnrengelman.shadow" version "4.0.3"
+    id "kr.motd.sphinx" version "2.3.1"
     id "jacoco"
     id "org.owasp.dependencycheck" version "6.1.5"
 }
 
 group 'com.opendxl'
-version = '2.6.0'
+
+sourceCompatibility = 1.8
 
 apply plugin: 'base'
 apply plugin: 'java'
@@ -36,13 +37,9 @@ apply plugin: 'org.owasp.dependencycheck'
 dependencyCheck {
     suppressionFile = file("${projectDir}/config/dependency-check/owasp-suppression.xml")
 }
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
+
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.6"
     reportsDir = file("$buildDir/reports/coverage")
 }
 
@@ -57,52 +54,48 @@ jacocoTestReport {
 configurations {
     kafkaInMemory
     sampleJars.extendsFrom testImplementation
-    // Added below to get away of VSCode complaints - This might need only on local
-    // Comment it out before generating final artifacts 
-    implementation.extendsFrom kafkaInMemory
 }
 
 dependencies {
-    implementation ('org.apache.kafka:kafka-clients:3.8.0') {
+    implementation ('org.apache.kafka:kafka-clients:3.5.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.lz4', module: 'lz4-java'
         exclude group: 'org.xerial.snappy', module: 'snappy-java'
     }
-    implementation ('org.apache.kafka:kafka-streams:3.8.0') {
+    implementation ('org.apache.kafka:kafka-streams:3.5.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
     }
     implementation group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.10.5'
-    implementation 'org.scala-lang:scala-reflect:2.13.9'
-    implementation 'org.scala-lang:scala-library:2.13.9'
-    implementation 'org.lz4:lz4-java:1.8.0'
+    implementation 'org.scala-lang:scala-reflect:2.12.11'
+    implementation 'org.lz4:lz4-java:1.7.1'
     implementation 'org.apache.avro:avro:1.11.3'
     implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'org.apache.commons:commons-configuration2:2.11.0'
+    implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'commons-lang:commons-lang:2.6'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    testImplementation('org.apache.kafka:kafka_2.13:3.8.0') {
+    testImplementation('org.apache.kafka:kafka_2.12:3.5.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.xerial.snappy', module: 'snappy-java'
     }
-    testImplementation 'org.scala-lang:scala-reflect:2.13.9'
-    testImplementation 'org.apache.zookeeper:zookeeper:3.6.4'
-    testImplementation('io.netty:netty-all:4.1.112.Final') {
+    testImplementation 'org.scala-lang:scala-reflect:2.12.11'
+    testImplementation 'org.apache.zookeeper:zookeeper:3.5.7'
+    testImplementation('io.netty:netty-all:4.1.43.Final') {
         force = true
     }
-    testImplementation 'commons-io:commons-io:2.11.0'
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'commons-io:commons-io:2.7'
+    testImplementation 'junit:junit:4.12'
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     testImplementation 'com.e-movimento.tinytools:privilegedaccessor:1.2.2'
 
-    kafkaInMemory ('org.apache.kafka:kafka_2.13:3.8.0') {
+    kafkaInMemory ('org.apache.kafka:kafka_2.12:3.5.1') {
         exclude group: 'org.scala-lang', module: 'scala-reflect'
         exclude group: 'org.lz4', module: 'lz4-java'
         exclude group: 'org.xerial.snappy', module: 'snappy-java'
     }
-    kafkaInMemory 'org.scala-lang:scala-reflect:2.13.9'
+    kafkaInMemory 'org.scala-lang:scala-reflect:2.12.11'
     kafkaInMemory 'org.lz4:lz4-java:1.7.1'
-    kafkaInMemory 'commons-io:commons-io:2.11.0'
+    kafkaInMemory 'commons-io:commons-io:2.7'
 
     // This following section mitigates OWASP vulnerabilities report.
     // It enforces to use specific transitive dependency versions
@@ -119,16 +112,18 @@ dependencies {
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16942
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-16943
     // CVE-2020-25649
-    implementation 'com.fasterxml.jackson.module:jackson-module-scala_3:2.14.2'
+    compile ('com.fasterxml.jackson.core:jackson-databind:2.16.1') {
+        force = true
+    }
     kafkaInMemory ('com.fasterxml.jackson.core:jackson-databind:2.16.1') {
         force = true
     }
 
     // http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-12402
-    kafkaInMemory ('org.apache.commons:commons-compress:1.27.0') {
+    kafkaInMemory ('org.apache.commons:commons-compress:1.21') {
         force = true
     }
-    implementation ('org.apache.commons:commons-compress:1.27.0') {
+    compile ('org.apache.commons:commons-compress:1.21') {
         force = true
     }
 }
@@ -151,16 +146,6 @@ jar {
 task sourceJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
-    archiveClassifier.set('sources')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicates
-}
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact tasks.sourceJar
-        }
-    }
 }
 
 // Task for creating a jar with JavaDoc
@@ -179,14 +164,11 @@ artifacts {
     archives sourceJar
     archives javadocJar
 }
-tasks.named('sphinx') {
-    enabled = false
-}
 
 // Set up the distribution zip
 distributions {
     main {
-        distributionBaseName = 'dxldatabusclient-java-sdk'
+        baseName = 'dxldatabusclient-java-sdk'
         contents {
             from(jar) {
                 into('lib')
