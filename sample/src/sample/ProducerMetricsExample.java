@@ -58,7 +58,7 @@ public class ProducerMetricsExample {
     private static final long REPORT_METRICS_INITIAL_DELAY = 10000;
     private static final long REPORT_METRICS_PERIOD = 10000;
     private static final int BROKER_PORT = 9092;
-    private static final int ZOOKEEPER_PORT = 2181;
+    private static final int ZOOKEEPER_PORT = 2182;
 
     private static final String INTEGER_FORMAT_PATTERN = "###,###,###,###,###,###";
 
